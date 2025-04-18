@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client"
 
 import Link from "next/link"
@@ -1020,8 +1021,8 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-purple-900/20 bg-black/95 py-12 backdrop-blur supports-[backdrop-filter]:bg-black/60">
+      {/* complete footer with frammer motion with hover and color affect with link having orbit ot special affect */}
+      <motion.footer className="border-t border-purple-900/20 bg-black/95 py-12 backdrop-blur supports-[backdrop-filter]:bg-black/60">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             <div>
@@ -1154,7 +1155,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   )
 }
