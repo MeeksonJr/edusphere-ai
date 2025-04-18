@@ -1,121 +1,263 @@
-import { notFound } from "next/navigation"
+"use client"
 
-export default function CareerPositionPage({ params }: { params: { id: string } }) {
-  // In a real application, you would fetch the job details based on the ID
-  // For now, we'll handle a few predefined routes and show 404 for others
-  const validPositions = ["frontend-developer", "ai-engineer", "product-manager"]
+import { useParams } from "next/navigation"
+import Link from "next/link"
 
-  if (!validPositions.includes(params.id)) {
-    notFound()
+export default function CareerDetailPage() {
+  const params = useParams()
+  const id = params.id as string
+
+  // This would typically come from an API or database
+  const jobDetails = {
+    "frontend-developer": {
+      title: "Frontend Developer",
+      location: "Remote (US/Europe)",
+      type: "Full-time",
+      salary: "$90,000 - $120,000",
+      description:
+        "We're looking for a talented Frontend Developer to join our team and help build the next generation of educational AI tools.",
+      responsibilities: [
+        "Develop and maintain responsive web applications using Next.js and React",
+        "Collaborate with designers to implement UI/UX designs",
+        "Write clean, maintainable, and efficient code",
+        "Optimize applications for maximum speed and scalability",
+        "Implement state management solutions",
+      ],
+      requirements: [
+        "3+ years of experience with React and modern JavaScript",
+        "Experience with Next.js and TypeScript",
+        "Strong understanding of responsive design principles",
+        "Familiarity with state management libraries (Redux, Zustand, etc.)",
+        "Experience with CSS frameworks like Tailwind CSS",
+      ],
+      benefits: [
+        "Competitive salary and equity options",
+        "Flexible remote work policy",
+        "Health, dental, and vision insurance",
+        "401(k) matching",
+        "Professional development budget",
+      ],
+    },
+    "ai-engineer": {
+      title: "AI Engineer",
+      location: "Remote (US/Europe)",
+      type: "Full-time",
+      salary: "$120,000 - $160,000",
+      description:
+        "We're seeking an experienced AI Engineer to help develop and improve our AI-powered educational tools and features.",
+      responsibilities: [
+        "Design and implement AI models for educational applications",
+        "Integrate with various LLM APIs (OpenAI, Anthropic, etc.)",
+        "Optimize AI performance and response quality",
+        "Develop custom fine-tuned models for specific educational domains",
+        "Collaborate with product and engineering teams to implement AI features",
+      ],
+      requirements: [
+        "3+ years of experience in machine learning or AI development",
+        "Strong Python programming skills",
+        "Experience with LLMs and prompt engineering",
+        "Familiarity with NLP concepts and techniques",
+        "Understanding of educational technology is a plus",
+      ],
+      benefits: [
+        "Competitive salary and equity options",
+        "Flexible remote work policy",
+        "Health, dental, and vision insurance",
+        "401(k) matching",
+        "Professional development budget",
+      ],
+    },
+    "product-manager": {
+      title: "Product Manager",
+      location: "Remote (US/Europe)",
+      type: "Full-time",
+      salary: "$110,000 - $140,000",
+      description:
+        "We're looking for a Product Manager to help shape the future of our AI-powered educational platform.",
+      responsibilities: [
+        "Define product vision, strategy, and roadmap",
+        "Gather and prioritize product requirements",
+        "Work closely with engineering, design, and marketing teams",
+        "Analyze market trends and competitive landscape",
+        "Collect and analyze user feedback to inform product decisions",
+      ],
+      requirements: [
+        "3+ years of experience in product management",
+        "Experience with educational technology or AI products",
+        "Strong analytical and problem-solving skills",
+        "Excellent communication and stakeholder management abilities",
+        "Data-driven approach to decision making",
+      ],
+      benefits: [
+        "Competitive salary and equity options",
+        "Flexible remote work policy",
+        "Health, dental, and vision insurance",
+        "401(k) matching",
+        "Professional development budget",
+      ],
+    },
   }
 
-  // Format the position title for display
-  const positionTitle = params.id
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
+  const job = jobDetails[id as keyof typeof jobDetails]
+
+  if (!job) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-4">Job Not Found</h1>
+          <p className="mb-6">Sorry, the job position you're looking for doesn't exist.</p>
+          <Link
+            href="/careers"
+            className="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+          >
+            Back to Careers
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="bg-black/80 backdrop-blur-sm border-b border-purple-900/50 sticky top-0 z-10">
+      <header className="bg-black/50 backdrop-blur-sm border-b border-purple-900/50 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <a href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">E</span>
-            </div>
-            <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
               EduSphere AI
             </span>
           </a>
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="/" className="text-gray-300 hover:text-purple-400 transition">
+          <nav className="hidden md:flex gap-6">
+            <a href="/" className="hover:text-purple-400 transition-colors">
               Home
             </a>
-            <a href="/careers" className="text-purple-400 font-medium">
+            <a href="/careers" className="text-purple-400 transition-colors">
               Careers
-            </a>
-            <a href="/login" className="px-4 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white transition">
-              Login
             </a>
           </nav>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Breadcrumbs */}
-          <div className="flex items-center gap-2 text-sm text-gray-400 mb-8">
-            <a href="/" className="hover:text-purple-400 transition">
-              Home
-            </a>
-            <span>/</span>
-            <a href="/careers" className="hover:text-purple-400 transition">
-              Careers
-            </a>
-            <span>/</span>
-            <span className="text-purple-400">{positionTitle}</span>
-          </div>
+      {/* Breadcrumbs */}
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <a href="/" className="hover:text-purple-400 transition-colors">
+            Home
+          </a>
+          <span>/</span>
+          <a href="/careers" className="hover:text-purple-400 transition-colors">
+            Careers
+          </a>
+          <span>/</span>
+          <span className="text-purple-400">{job.title}</span>
+        </div>
+      </div>
 
-          <div className="bg-gray-900/50 border border-purple-900/50 rounded-lg p-8 mb-8">
-            <h1 className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
-              {positionTitle} Position
-            </h1>
+      {/* Job Details */}
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+            {job.title}
+          </h1>
 
-            <p className="text-gray-300 mb-6">
-              Thank you for your interest in the {positionTitle} position at EduSphere AI. Please use the application
-              form to submit your resume and other required information.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href={`/careers/${params.id}/apply`}
-                className="px-6 py-3 rounded-md bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:from-purple-700 hover:to-blue-700 transition text-center"
+          <div className="flex flex-wrap gap-4 mb-8">
+            <div className="flex items-center gap-2 bg-gray-900 px-3 py-1 rounded-full">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-purple-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                Apply Now
-              </a>
-              <a
-                href="/careers"
-                className="px-6 py-3 rounded-md border border-purple-600 text-purple-400 hover:bg-purple-900/20 transition text-center"
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+              <span>{job.location}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-gray-900 px-3 py-1 rounded-full">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-purple-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                View All Positions
-              </a>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{job.type}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-gray-900 px-3 py-1 rounded-full">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 text-purple-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>{job.salary}</span>
             </div>
           </div>
 
-          <div className="space-y-8">
-            <section>
-              <h2 className="text-2xl font-semibold mb-4 text-purple-400">Application Process</h2>
-              <ol className="list-decimal pl-5 space-y-2 text-gray-300">
-                <li>Fill out the application form with your personal and professional information</li>
-                <li>Upload your resume/CV and any other relevant documents</li>
-                <li>Our team will review your application</li>
-                <li>If your qualifications match our requirements, we'll contact you for an interview</li>
-                <li>The interview process typically includes 2-3 rounds, including technical assessments</li>
-                <li>Final candidates will receive an offer letter</li>
-              </ol>
-            </section>
+          <div className="prose prose-invert max-w-none">
+            <p className="text-lg mb-8">{job.description}</p>
 
-            <section>
-              <h2 className="text-2xl font-semibold mb-4 text-purple-400">What to Expect</h2>
-              <p className="text-gray-300 mb-4">
-                At EduSphere AI, we believe in a transparent and efficient hiring process. Here's what you can expect:
-              </p>
-              <ul className="list-disc pl-5 space-y-2 text-gray-300">
-                <li>Acknowledgment of your application within 48 hours</li>
-                <li>Initial screening response within 1-2 weeks</li>
-                <li>The entire process typically takes 3-4 weeks</li>
-                <li>We value your time and will keep you updated throughout the process</li>
-                <li>We welcome questions at any stage of the application process</li>
-              </ul>
-            </section>
+            <h2 className="text-xl font-semibold text-purple-400 mt-8 mb-4">Key Responsibilities</h2>
+            <ul className="list-disc pl-5 space-y-2">
+              {job.responsibilities.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+
+            <h2 className="text-xl font-semibold text-purple-400 mt-8 mb-4">Requirements</h2>
+            <ul className="list-disc pl-5 space-y-2">
+              {job.requirements.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+
+            <h2 className="text-xl font-semibold text-purple-400 mt-8 mb-4">Benefits</h2>
+            <ul className="list-disc pl-5 space-y-2">
+              {job.benefits.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-12">
+            <Link
+              href={`/careers/${id}/apply`}
+              className="inline-block px-8 py-4 rounded-md bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-colors text-lg font-semibold"
+            >
+              Apply for this Position
+            </Link>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-black/80 border-t border-purple-900/50 mt-20">
+      <footer className="bg-black/50 backdrop-blur-sm border-t border-purple-900/50 mt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-400">
             <p>© {new Date().getFullYear()} EduSphere AI. All rights reserved.</p>

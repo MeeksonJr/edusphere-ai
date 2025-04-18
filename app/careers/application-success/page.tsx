@@ -7,9 +7,6 @@ export default function ApplicationSuccessPage() {
       <header className="bg-black/50 backdrop-blur-sm border-b border-purple-900/50 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <a href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
-              <span className="text-white font-bold text-xl">E</span>
-            </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
               EduSphere AI
             </span>
@@ -26,44 +23,39 @@ export default function ApplicationSuccessPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow flex items-center justify-center p-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8 flex justify-center">
-            <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-10 w-10 text-green-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
+      <main className="flex-1 flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center">
+          <div className="mb-6">
+            <svg
+              className="mx-auto h-16 w-16 text-green-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
           </div>
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
-            Application Submitted Successfully!
+          <h1 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+            Application Submitted!
           </h1>
-          <p className="text-xl text-gray-300 mb-8">
+          <p className="text-lg text-gray-300 mb-8">
             Thank you for applying to join the EduSphere AI team. We've received your application and will review it
             shortly.
           </p>
-          <p className="text-gray-400 mb-12">
-            Our team will contact you via email if your qualifications match our requirements. In the meantime, feel
-            free to explore more about our company and products.
+          <p className="text-gray-400 mb-8">
+            Our team will contact you if your qualifications match our requirements. In the meantime, feel free to
+            explore more about our company.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/"
-              className="px-6 py-3 rounded-md bg-purple-600 hover:bg-purple-700 transition-colors text-white font-medium"
-            >
-              Return to Home
+            <Link href="/" className="px-6 py-3 rounded-md bg-gray-800 hover:bg-gray-700 transition-colors">
+              Return Home
             </Link>
             <Link
               href="/careers"
-              className="px-6 py-3 rounded-md border border-purple-600 text-purple-400 hover:bg-purple-900/20 transition-colors font-medium"
+              className="px-6 py-3 rounded-md bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-colors"
             >
-              View More Opportunities
+              View More Positions
             </Link>
           </div>
         </div>
