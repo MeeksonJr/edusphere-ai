@@ -38,19 +38,24 @@ interface CourseLayout {
 export async function POST(request: NextRequest) {
   let body: any = {}
   try {
+    console.log("Process route called - starting course generation")
     const supabase = createClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
 
     if (!user) {
+      console.error("Process route: Unauthorized - no user")
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     body = await request.json()
     const { courseId, topic, courseType, style } = body
 
+    console.log("Process route: Processing course", { courseId, topic, courseType, style })
+
     if (!courseId) {
+      console.error("Process route: Missing courseId")
       return NextResponse.json({ error: "Course ID is required" }, { status: 400 })
     }
 
@@ -67,10 +72,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Update status to processing
-    await supabase
+    const { error: statusError } = await supabase
       .from("courses")
       .update({ status: "processing" })
       .eq("id", courseId)
+
+    if (statusError) {
+      console.error("Error updating status to processing:", statusError)
+      return NextResponse.json(
+        { error: "Failed to update course status" },
+        { status: 500 }
+      )
+    }
+
+    console.log("Status updated to processing, starting AI generation...")
 
     // Generate course layout using AI (this can take time)
     const systemPrompt = `You are an expert course designer. Generate a comprehensive course layout in JSON format based on the user's topic and requirements.
@@ -125,6 +140,7 @@ Return the JSON in this exact format:
     let lastError: any = null
 
     // Try Gemini first (with internal model fallbacks)
+    console.log("Attempting AI generation with Gemini...")
     try {
       const aiResponse = await generateAIResponse({
         provider: "gemini",
@@ -134,6 +150,7 @@ Return the JSON in this exact format:
         maxTokens: 4000,
       })
       aiResponseText = aiResponse.text
+      console.log("Gemini generation successful, response length:", aiResponseText.length)
     } catch (geminiError: any) {
       console.error("Gemini AI generation error:", geminiError)
       lastError = geminiError
@@ -182,6 +199,7 @@ Return the JSON in this exact format:
     }
 
     // Parse AI response
+    console.log("Parsing AI response...")
     let layoutJson: CourseLayout
     try {
       const cleanedResponse = aiResponseText
@@ -189,8 +207,10 @@ Return the JSON in this exact format:
         .replace(/```\n?/g, "")
         .trim()
       layoutJson = JSON.parse(cleanedResponse)
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", aiResponseText)
+      console.log("Successfully parsed layout, chapters:", layoutJson.chapters?.length || 0)
+    } catch (parseError: any) {
+      console.error("Failed to parse AI response:", parseError)
+      console.error("AI Response text (first 500 chars):", aiResponseText.substring(0, 500))
       await supabase
         .from("courses")
         .update({ status: "failed" })
@@ -201,17 +221,32 @@ Return the JSON in this exact format:
       )
     }
 
+    // Validate layout structure
+    if (!layoutJson.chapters || !Array.isArray(layoutJson.chapters) || layoutJson.chapters.length === 0) {
+      console.error("Invalid layout structure - no chapters found")
+      await supabase
+        .from("courses")
+        .update({ status: "failed" })
+        .eq("id", courseId)
+      return NextResponse.json(
+        { error: "Generated layout is invalid - no chapters found" },
+        { status: 500 }
+      )
+    }
+
     // Calculate total duration
     const totalDuration = layoutJson.chapters.reduce((total, chapter) => {
       return (
         total +
-        chapter.slides.reduce((chapterTotal, slide) => {
+        (chapter.slides?.reduce((chapterTotal, slide) => {
           return chapterTotal + (slide.estimatedDuration || 30)
-        }, 0)
+        }, 0) || 0)
       )
     }, 0)
 
     layoutJson.estimatedDuration = totalDuration
+
+    console.log("Updating course with layout, duration:", totalDuration)
 
     // Update course with generated layout
     const { error: updateError } = await supabase
@@ -231,10 +266,12 @@ Return the JSON in this exact format:
         .update({ status: "failed" })
         .eq("id", courseId)
       return NextResponse.json(
-        { error: "Failed to update course with generated layout" },
+        { error: "Failed to update course with generated layout", details: updateError.message },
         { status: 500 }
       )
     }
+
+    console.log("Course updated successfully, status set to completed")
 
     // Generate questions for each slide (background task - don't await)
     generateQuestionsForCourse(supabase, courseId, layoutJson).catch((error) => {

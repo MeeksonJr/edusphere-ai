@@ -120,11 +120,12 @@ Return the JSON in this exact format:
 
     // Trigger async processing immediately (don't wait for it)
     // This will generate the layout in the background
-    const processPromise = fetch(`${requestUrl.origin}/api/courses/process`, {
+    fetch(`${requestUrl.origin}/api/courses/process`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Cookie: request.headers.get("Cookie") || "",
+        Authorization: request.headers.get("Authorization") || "",
       },
       body: JSON.stringify({ 
         courseId: course.id,
@@ -132,15 +133,29 @@ Return the JSON in this exact format:
         courseType,
         style,
       }),
-    }).catch((error) => {
-      console.error("Error triggering background processing:", error)
-      // Update course status to failed if processing trigger fails
-      supabase
-        .from("courses")
-        .update({ status: "failed" })
-        .eq("id", course.id)
-        .catch(console.error)
     })
+      .then(async (response) => {
+        if (!response.ok) {
+          const errorText = await response.text()
+          console.error("Process route returned error:", response.status, errorText)
+          // Update course status to failed if processing fails
+          await supabase
+            .from("courses")
+            .update({ status: "failed" })
+            .eq("id", course.id)
+        } else {
+          console.log("Process route called successfully for course:", course.id)
+        }
+      })
+      .catch((error) => {
+        console.error("Error triggering background processing:", error)
+        // Update course status to failed if processing trigger fails
+        supabase
+          .from("courses")
+          .update({ status: "failed" })
+          .eq("id", course.id)
+          .catch(console.error)
+      })
 
     // Don't await the processing - return immediately
     // The process endpoint will handle AI generation asynchronously

@@ -24,6 +24,13 @@ CREATE INDEX IF NOT EXISTS course_progress_completed_idx ON course_progress(comp
 -- Enable RLS
 ALTER TABLE course_progress ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist (to allow re-running the migration)
+DROP POLICY IF EXISTS "Users can view their own progress" ON course_progress;
+DROP POLICY IF EXISTS "Users can insert their own progress" ON course_progress;
+DROP POLICY IF EXISTS "Users can update their own progress" ON course_progress;
+DROP POLICY IF EXISTS "Users can delete their own progress" ON course_progress;
+DROP POLICY IF EXISTS "Service role can manage all progress" ON course_progress;
+
 -- Users can view their own progress
 CREATE POLICY "Users can view their own progress"
 ON course_progress FOR SELECT
