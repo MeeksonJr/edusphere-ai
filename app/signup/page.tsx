@@ -1,185 +1,325 @@
-"use client"
+"use client";
 
-import type React from "react"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { PublicLayout } from "@/components/layout/PublicLayout";
+import { ScrollReveal } from "@/components/shared/ScrollReveal";
+import { GlassSurface } from "@/components/shared/GlassSurface";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useSupabase } from "@/components/supabase-provider";
+import { Sparkles, Mail, Lock, User, Loader2, Eye, EyeOff, CheckCircle } from "lucide-react";
+import Link from "next/link";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useSupabase } from "@/components/supabase-provider"
+export default function SignupPage() {
+  const router = useRouter();
+  const { supabase } = useSupabase();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-export default function Signup() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const plan = searchParams.get("plan")
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        router.push("/dashboard");
+      }
+    };
+    checkUser();
+  }, [supabase, router]);
 
-  const { supabase } = useSupabase()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [fullName, setFullName] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const validateForm = () => {
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return false;
+    }
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return false;
+    }
+    if (!agreedToTerms) {
+      setError("Please agree to the Terms of Service and Privacy Policy");
+      return false;
+    }
+    return true;
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+    e.preventDefault();
+    setError(null);
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: formData.email,
+        password: formData.password,
         options: {
           data: {
-            full_name: fullName,
-            subscription_tier: plan || "free",
+            full_name: formData.name,
           },
         },
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
       if (data.user) {
-        // Create a profile record
-        const { error: profileError } = await supabase.from("profiles").insert([
-          {
-            id: data.user.id,
-            full_name: fullName,
-            subscription_tier: plan || "free",
-            ai_requests_count: 0,
-          },
-        ])
-
-        if (profileError) throw profileError
-
-        router.push("/dashboard")
-        router.refresh()
+        router.push("/dashboard");
       }
     } catch (error: any) {
-      setError(error.message || "An error occurred during signup")
+      setError(error.message || "An error occurred during signup");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const handleGoogleSignup = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            plan: plan || "free",
-          },
-        },
-      })
-      if (error) throw error
-    } catch (error: any) {
-      setError(error.message || "An error occurred during Google signup")
-    }
-  }
+  const passwordRequirements = [
+    { text: "At least 8 characters", met: formData.password.length >= 8 },
+    {
+      text: "Contains a number",
+      met: /\d/.test(formData.password),
+    },
+    {
+      text: "Contains a letter",
+      met: /[a-zA-Z]/.test(formData.password),
+    },
+  ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="w-full max-w-md p-8 glass-card neon-border-green">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold neon-text-green">Create Account</h1>
-          <p className="text-gray-400 mt-2">Join EduSphere AI and boost your academic success</p>
-          {plan && (
-            <div className="mt-2 inline-block px-3 py-1 rounded-full bg-gray-800 text-sm">
-              Selected plan: <span className="font-bold">{plan.charAt(0).toUpperCase() + plan.slice(1)}</span>
+    <PublicLayout navbarVariant="default">
+      <div className="min-h-screen flex items-center justify-center py-20 px-4">
+        <div className="max-w-md w-full">
+          <ScrollReveal direction="up">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4">
+                <Sparkles className="h-8 w-8 text-white" />
+              </div>
+              <h1 className="text-4xl font-bold mb-2">
+                <span className="text-white">Create Your</span>{" "}
+                <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Account
+                </span>
+              </h1>
+              <p className="text-white/70">
+                Start creating amazing courses in minutes
+              </p>
             </div>
-          )}
+
+            {/* Signup Form */}
+            <GlassSurface className="p-8">
+              {error && (
+                <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+                  <p className="text-red-400 text-sm">{error}</p>
+                </div>
+              )}
+
+              <form onSubmit={handleSignup} className="space-y-5">
+                <div>
+                  <Label htmlFor="name" className="text-white mb-2 block">
+                    Full Name
+                  </Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                    <Input
+                      id="name"
+                      name="name"
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="John Doe"
+                      className="pl-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="email" className="text-white mb-2 block">
+                    Email
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="your@email.com"
+                      className="pl-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="password" className="text-white mb-2 block">
+                    Password
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Create a strong password"
+                      className="pl-10 pr-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                  {formData.password && (
+                    <div className="mt-2 space-y-1">
+                      {passwordRequirements.map((req, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center space-x-2 text-xs"
+                        >
+                          <CheckCircle
+                            className={`h-3 w-3 ${
+                              req.met ? "text-green-400" : "text-white/20"
+                            }`}
+                          />
+                          <span
+                            className={
+                              req.met ? "text-green-400" : "text-white/40"
+                            }
+                          >
+                            {req.text}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Label
+                    htmlFor="confirmPassword"
+                    className="text-white mb-2 block"
+                  >
+                    Confirm Password
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                    <Input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      required
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      placeholder="Confirm your password"
+                      className="pl-10 pr-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="mt-1 rounded border-white/20 bg-transparent"
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm text-white/70 cursor-pointer"
+                  >
+                    I agree to the{" "}
+                    <Link
+                      href="/terms"
+                      className="text-purple-400 hover:text-purple-300 underline"
+                    >
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      href="/privacy"
+                      className="text-purple-400 hover:text-purple-300 underline"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </label>
+                </div>
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Creating account...
+                    </>
+                  ) : (
+                    "Create Account"
+                  )}
+                </Button>
+              </form>
+
+              <div className="mt-6 pt-6 border-t border-white/10">
+                <p className="text-center text-white/70 text-sm">
+                  Already have an account?{" "}
+                  <Link
+                    href="/login"
+                    className="text-purple-400 hover:text-purple-300 font-semibold transition-colors"
+                  >
+                    Sign in
+                  </Link>
+                </p>
+              </div>
+            </GlassSurface>
+          </ScrollReveal>
         </div>
-
-        {error && <div className="bg-red-900/30 border border-red-800 text-white p-3 rounded-md mb-6">{error}</div>}
-
-        <form onSubmit={handleSignup} className="space-y-6">
-          <div className="space-y-2">
-            <label htmlFor="fullName" className="text-sm font-medium">
-              Full Name
-            </label>
-            <Input
-              id="fullName"
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-              className="bg-gray-900 border-gray-700"
-              placeholder="John Doe"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="bg-gray-900 border-gray-700"
-              placeholder="your@email.com"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              Password
-            </label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="bg-gray-900 border-gray-700"
-              placeholder="••••••••"
-              minLength={6}
-            />
-            <p className="text-xs text-gray-400">Must be at least 6 characters</p>
-          </div>
-
-          <Button type="submit" className="w-full bg-green-600 hover:bg-green-700" disabled={loading}>
-            {loading ? "Creating account..." : "Create Account"}
-          </Button>
-        </form>
-
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-700"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-black text-gray-400">Or continue with</span>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full border-gray-700 hover:bg-gray-800"
-              onClick={handleGoogleSignup}
-            >
-              <svg className="w-5 h-5 mr-2" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z" />
-              </svg>
-              Google
-            </Button>
-          </div>
-        </div>
-
-        <p className="mt-8 text-center text-sm text-gray-400">
-          Already have an account?{" "}
-          <Link href="/login" className="text-green-500 hover:underline">
-            Sign in
-          </Link>
-        </p>
       </div>
-    </div>
-  )
+    </PublicLayout>
+  );
 }

@@ -1,474 +1,266 @@
+"use client";
+
+import { PublicLayout } from "@/components/layout/PublicLayout";
+import { ScrollReveal } from "@/components/shared/ScrollReveal";
+import { AnimatedCard } from "@/components/shared/AnimatedCard";
+import { GlassSurface } from "@/components/shared/GlassSurface";
+import { Button } from "@/components/ui/button";
+import {
+  Briefcase,
+  Users,
+  Globe,
+  TrendingUp,
+  Heart,
+  Sparkles,
+  ArrowRight,
+  CheckCircle,
+} from "lucide-react";
+import Link from "next/link";
+
+const cultureValues = [
+  {
+    icon: Sparkles,
+    title: "Innovation First",
+    description:
+      "We're constantly pushing the boundaries of what's possible in EdTech.",
+    gradient: "from-purple-500 to-purple-600",
+  },
+  {
+    icon: Globe,
+    title: "Remote-Friendly",
+    description:
+      "Work from anywhere in the world with our distributed team.",
+    gradient: "from-blue-500 to-blue-600",
+  },
+  {
+    icon: TrendingUp,
+    title: "Growth Mindset",
+    description:
+      "We invest in your professional development and learning.",
+    gradient: "from-green-500 to-green-600",
+  },
+];
+
+const benefits = [
+  { title: "Competitive Salary", description: "Top-of-market compensation packages" },
+  { title: "Health Insurance", description: "Comprehensive health, dental, and vision coverage" },
+  { title: "Flexible PTO", description: "Take time off when you need it" },
+  { title: "Learning Budget", description: "$2,000/year for courses, conferences, and books" },
+  { title: "Remote Work", description: "Work from anywhere in the world" },
+  { title: "401(k) Matching", description: "Company matching up to 4%" },
+];
+
+const openPositions = [
+  {
+    title: "Senior Full-Stack Engineer",
+    department: "Engineering",
+    location: "Remote",
+    type: "Full-time",
+  },
+  {
+    title: "Product Designer",
+    department: "Design",
+    location: "Remote",
+    type: "Full-time",
+  },
+  {
+    title: "AI/ML Engineer",
+    department: "Engineering",
+    location: "Remote",
+    type: "Full-time",
+  },
+  {
+    title: "Customer Success Manager",
+    department: "Customer Success",
+    location: "Remote",
+    type: "Full-time",
+  },
+];
+
 export default function CareersPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="py-12 px-4 md:px-6 text-center bg-gradient-to-r from-purple-900/20 to-black">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-600">
-          Join Our Team
-        </h1>
-        <p className="text-xl md:text-2xl max-w-3xl mx-auto text-gray-300">
-          Help us build the future of education technology
-        </p>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-12 md:px-6">
-        {/* Company Culture Section */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-6 text-purple-400">
-            Our Culture
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gray-900/50 p-6 rounded-xl border border-purple-500/20 hover:border-purple-500/50 transition-all">
-              <h3 className="text-xl font-bold mb-3 text-purple-300">
-                Innovation First
-              </h3>
-              <p className="text-gray-300">
-                We're constantly pushing the boundaries of what's possible in
-                EdTech.
-              </p>
-            </div>
-            <div className="bg-gray-900/50 p-6 rounded-xl border border-purple-500/20 hover:border-purple-500/50 transition-all">
-              <h3 className="text-xl font-bold mb-3 text-purple-300">
-                Remote-Friendly
-              </h3>
-              <p className="text-gray-300">
-                Work from anywhere in the world with our distributed team.
-              </p>
-            </div>
-            <div className="bg-gray-900/50 p-6 rounded-xl border border-purple-500/20 hover:border-purple-500/50 transition-all">
-              <h3 className="text-xl font-bold mb-3 text-purple-300">
-                Growth Mindset
-              </h3>
-              <p className="text-gray-300">
-                We invest in your professional development and learning.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Benefits Section */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-6 text-purple-400">Benefits</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="flex items-start space-x-4">
-              <div className="bg-purple-500/20 p-2 rounded-lg">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-purple-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold mb-1 text-white">
-                  Competitive Salary
-                </h3>
-                <p className="text-gray-300">
-                  We offer top-of-market compensation packages.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-4">
-              <div className="bg-purple-500/20 p-2 rounded-lg">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-purple-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold mb-1 text-white">
-                  Health Insurance
-                </h3>
-                <p className="text-gray-300">
-                  Comprehensive medical, dental, and vision coverage.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-4">
-              <div className="bg-purple-500/20 p-2 rounded-lg">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-purple-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold mb-1 text-white">
-                  Unlimited PTO
-                </h3>
-                <p className="text-gray-300">
-                  Take the time you need to rest and recharge.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-4">
-              <div className="bg-purple-500/20 p-2 rounded-lg">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-purple-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold mb-1 text-white">
-                  401(k) Matching
-                </h3>
-                <p className="text-gray-300">
-                  We help you save for your future.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Open Positions Section */}
-        <section>
-          <h2 className="text-3xl font-bold mb-6 text-purple-400">
-            Open Positions
-          </h2>
-
-          <div className="space-y-6">
-            {/* Position Card */}
-            <div className="bg-gray-900/50 p-6 rounded-xl border border-purple-500/20 hover:border-purple-500/50 transition-all">
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-white">
-                  Senior Frontend Developer
-                </h3>
-                <span className="inline-block mt-2 md:mt-0 px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
-                  Remote
-                </span>
-              </div>
-              <p className="text-gray-300 mb-4">
-                We're looking for an experienced frontend developer with
-                expertise in React, Next.js, and TypeScript to help build our
-                educational platform.
-              </p>
-              <a
-                href="/careers/frontend-developer"
-                className="inline-block px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-              >
-                Apply Now
-              </a>
-            </div>
-
-            {/* Position Card */}
-            <div className="bg-gray-900/50 p-6 rounded-xl border border-purple-500/20 hover:border-purple-500/50 transition-all">
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-white">AI Engineer</h3>
-                <span className="inline-block mt-2 md:mt-0 px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
-                  Remote
-                </span>
-              </div>
-              <p className="text-gray-300 mb-4">
-                Join our AI team to develop cutting-edge machine learning models
-                for our educational platform using Gemini and Hugging Face
-                technologies.
-              </p>
-              <a
-                href="/careers/ai-engineer"
-                className="inline-block px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-              >
-                Apply Now
-              </a>
-            </div>
-
-            {/* Position Card */}
-            <div className="bg-gray-900/50 p-6 rounded-xl border border-purple-500/20 hover:border-purple-500/50 transition-all">
-              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-white">
-                  Product Manager
-                </h3>
-                <span className="inline-block mt-2 md:mt-0 px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
-                  Remote
-                </span>
-              </div>
-              <p className="text-gray-300 mb-4">
-                We're seeking a product manager with experience in EdTech to
-                help shape the future of our platform and drive our product
-                roadmap.
-              </p>
-              <a
-                href="/careers/product-manager"
-                className="inline-block px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-              >
-                Apply Now
-              </a>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-black/80 border-t border-purple-900/50 mt-20">
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Logo & Description */}
-            <div>
-              <a
-                href="/"
-                className="flex items-center gap-2 mb-4"
-                aria-label="EduSphere AI Home"
-              >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">E</span>
+    <PublicLayout>
+      <div className="min-h-screen">
+        {/* Hero */}
+        <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black" />
+          
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <ScrollReveal direction="up">
+              <div className="max-w-3xl mx-auto text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-6">
+                  <Briefcase className="h-8 w-8 text-white" />
                 </div>
-                <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
-                  EduSphere AI
-                </span>
-              </a>
-              <p className="text-gray-400 mb-4">
-                Empowering students with AI-powered learning tools and
-                productivity solutions.
-              </p>
-              <div className="flex gap-4">
-                <a
-                  href="https://www.facebook.com/profile.php?id=100011003917426"
-                  className="text-gray-400 hover:text-purple-400 transition"
-                  aria-label="Facebook"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {/* Facebook */}
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </a>
-                <a
-                  href="https://twitter.com"
-                  className="text-gray-400 hover:text-purple-400 transition"
-                  aria-label="Twitter"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {/* Twitter */}
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                  </svg>
-                </a>
-                <a
-                  href="https://github.com/MeeksonJr"
-                  className="text-gray-400 hover:text-purple-400 transition"
-                  aria-label="GitHub"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {/* GitHub */}
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/mohamed-datt-b60907296"
-                  className="text-gray-400 hover:text-purple-400 transition"
-                  aria-label="LinkedIn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {/* LinkedIn */}
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                  </svg>
-                </a>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                  <span className="text-white">Join Our</span>{" "}
+                  <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Team
+                  </span>
+                </h1>
+                <p className="text-xl text-white/70 mb-8">
+                  Help us build the future of education technology
+                </p>
               </div>
-            </div>
+            </ScrollReveal>
+          </div>
+        </section>
 
-            {/* Company Links */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">
-                Company
-              </h3>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="/about"
-                    className="text-gray-400 hover:text-purple-400 transition"
+        {/* Culture */}
+        <section className="py-12">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <ScrollReveal direction="up">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
+                Our Culture
+              </h2>
+            </ScrollReveal>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {cultureValues.map((value, index) => {
+                const Icon = value.icon;
+                return (
+                  <ScrollReveal
+                    key={value.title}
+                    direction="up"
+                    delay={0.1 * index}
                   >
-                    About Us
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/careers"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Careers
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/blog"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/contact"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Resources Links */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">
-                Resources
-              </h3>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="/documentation"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/support"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Support
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/roadmap"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Roadmap
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/features"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Features
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Legal Links */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">
-                Legal
-              </h3>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="/terms"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Terms of Service
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/privacy"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/cookies"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Cookie Policy
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/licenses"
-                    className="text-gray-400 hover:text-purple-400 transition"
-                  >
-                    Licenses
-                  </a>
-                </li>
-              </ul>
+                    <AnimatedCard variant="3d" delay={0.1 * index}>
+                      <div className="p-6 text-center">
+                        <div
+                          className={`w-14 h-14 rounded-xl bg-gradient-to-br ${value.gradient} p-3 mx-auto mb-4`}
+                        >
+                          <Icon className="h-full w-full text-white" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">
+                          {value.title}
+                        </h3>
+                        <p className="text-white/70">{value.description}</p>
+                      </div>
+                    </AnimatedCard>
+                  </ScrollReveal>
+                );
+              })}
             </div>
           </div>
+        </section>
 
-          {/* Bottom Text */}
-          <div className="border-t border-purple-900/50 mt-12 pt-8 text-center text-gray-400">
-            <p>
-              © {new Date().getFullYear()} EduSphere AI. All rights reserved.
-            </p>
+        {/* Benefits */}
+        <section className="py-12">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <ScrollReveal direction="up">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
+                Benefits & Perks
+              </h2>
+            </ScrollReveal>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {benefits.map((benefit, index) => (
+                <ScrollReveal
+                  key={benefit.title}
+                  direction="up"
+                  delay={0.05 * index}
+                >
+                  <GlassSurface className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-1">
+                          {benefit.title}
+                        </h3>
+                        <p className="text-white/70 text-sm">
+                          {benefit.description}
+                        </p>
+                      </div>
+                    </div>
+                  </GlassSurface>
+                </ScrollReveal>
+              ))}
+            </div>
           </div>
-        </div>
-      </footer>
-    </div>
+        </section>
+
+        {/* Open Positions */}
+        <section className="py-12 pb-20">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <ScrollReveal direction="up">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
+                Open Positions
+              </h2>
+            </ScrollReveal>
+            <div className="max-w-4xl mx-auto space-y-4">
+              {openPositions.map((position, index) => (
+                <ScrollReveal
+                  key={position.title}
+                  direction="up"
+                  delay={0.1 * index}
+                >
+                  <GlassSurface className="p-6 hover:border-purple-500/30 transition-colors group cursor-pointer">
+                    <Link href={`/careers/${position.title.toLowerCase().replace(/\s+/g, '-')}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">
+                            {position.title}
+                          </h3>
+                          <div className="flex items-center space-x-4 text-sm text-white/60">
+                            <span>{position.department}</span>
+                            <span>•</span>
+                            <span>{position.location}</span>
+                            <span>•</span>
+                            <span>{position.type}</span>
+                          </div>
+                        </div>
+                        <ArrowRight className="h-5 w-5 text-white/40 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
+                      </div>
+                    </Link>
+                  </GlassSurface>
+                </ScrollReveal>
+              ))}
+            </div>
+            {openPositions.length === 0 && (
+              <ScrollReveal direction="up">
+                <GlassSurface className="p-12 text-center max-w-2xl mx-auto">
+                  <p className="text-white/70 text-lg mb-4">
+                    We don't have any open positions at the moment, but we're always looking 
+                    for talented people to join our team.
+                  </p>
+                  <Link href="/contact">
+                    <Button
+                      variant="outline"
+                      className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                    >
+                      Get in Touch
+                    </Button>
+                  </Link>
+                </GlassSurface>
+              </ScrollReveal>
+            )}
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="py-20">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <ScrollReveal direction="up">
+              <GlassSurface className="p-8 md:p-12 text-center max-w-3xl mx-auto">
+                <Heart className="h-16 w-16 text-purple-400 mx-auto mb-6" />
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                  Don't See a Role That Fits?
+                </h2>
+                <p className="text-xl text-white/70 mb-8">
+                  We're always looking for exceptional talent. Send us your resume and we'll 
+                  keep you in mind for future opportunities.
+                </p>
+                <Link href="/contact">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-8"
+                  >
+                    Send Your Resume
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              </GlassSurface>
+            </ScrollReveal>
+          </div>
+        </section>
+      </div>
+    </PublicLayout>
   );
 }
