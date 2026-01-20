@@ -30,6 +30,7 @@ interface CourseLayout {
 }
 
 export async function POST(request: NextRequest) {
+  const requestUrl = new URL(request.url)
   try {
     const supabase = createClient()
     const {
@@ -154,8 +155,25 @@ Return the JSON in this exact format:
       return NextResponse.json({ error: "Failed to save course" }, { status: 500 })
     }
 
-    // Trigger async processing (for now, just return success)
-    // TODO: Implement background job processing for slides, audio, captions
+    // Trigger async processing
+    // Call the process endpoint to start background processing
+    try {
+      const processResponse = await fetch(`${requestUrl.origin}/api/courses/process`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: request.headers.get("Cookie") || "",
+        },
+        body: JSON.stringify({ courseId: course.id }),
+      })
+
+      if (!processResponse.ok) {
+        console.warn("Failed to trigger background processing, but course was created")
+      }
+    } catch (processError) {
+      console.error("Error triggering background processing:", processError)
+      // Don't fail the request if processing trigger fails
+    }
 
     return NextResponse.json({
       success: true,

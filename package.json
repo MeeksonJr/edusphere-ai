@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
+    "@google-cloud/speech": "^7.2.1",
+    "@google-cloud/text-to-speech": "^6.4.0",
     "@google/generative-ai": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@huggingface/inference": "latest",
@@ -63,6 +65,7 @@
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
     "remotion": "4.0.407",
+    "replicate": "^1.4.0",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",

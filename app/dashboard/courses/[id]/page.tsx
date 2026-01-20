@@ -203,13 +203,15 @@ function CourseDetailContent() {
               </div>
             </div>
             {course.status === "completed" && (
-              <Button
-                variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
-              >
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Button>
+              <Link href={`/dashboard/courses/${course.id}/edit`}>
+                <Button
+                  variant="outline"
+                  className="border-white/20 text-white hover:bg-white/10"
+                >
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </Button>
+              </Link>
             )}
           </div>
         </div>

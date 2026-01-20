@@ -1,10 +1,13 @@
-import React from "react";
-import { useVideoConfig, useCurrentFrame } from "remotion";
+import React from "react"
+import { useVideoConfig, useCurrentFrame, Sequence, Audio, staticFile } from "remotion"
+import { TitleSlide } from "./slides/TitleSlide"
+import { ContentSlide } from "./slides/ContentSlide"
+import { TransitionSlide } from "./slides/TransitionSlide"
 
 interface CourseVideoProps {
-  courseId?: string;
-  chapters?: any[];
-  style?: string;
+  courseId?: string
+  chapters?: any[]
+  style?: string
 }
 
 export const CourseVideo: React.FC<CourseVideoProps> = ({
@@ -12,72 +15,121 @@ export const CourseVideo: React.FC<CourseVideoProps> = ({
   chapters = [],
   style = "professional",
 }) => {
-  const { width, height, fps, durationInFrames } = useVideoConfig();
-  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig()
+  const frame = useCurrentFrame()
 
-  // Calculate progress
-  const progress = frame / durationInFrames;
+  // Calculate slide sequences
+  const sequences: Array<{
+    from: number
+    duration: number
+    slide: any
+    chapter: any
+    audioUrl?: string
+  }> = []
+
+  let currentFrame = 0
+
+  chapters.forEach((chapter) => {
+    chapter.slides?.forEach((slide: any) => {
+      const slideDuration = (slide.estimatedDuration || 30) * fps // Convert seconds to frames
+
+      sequences.push({
+        from: currentFrame,
+        duration: slideDuration,
+        slide,
+        chapter,
+        audioUrl: slide.audioUrl,
+      })
+
+      currentFrame += slideDuration
+    })
+  })
+
+  // Get current slide based on frame
+  const currentSlide = sequences.find(
+    (seq) => frame >= seq.from && frame < seq.from + seq.duration
+  )
 
   return (
     <div
       style={{
-        width,
-        height,
+        width: "100%",
+        height: "100%",
         backgroundColor: "#000",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "system-ui",
-        color: "#fff",
+        position: "relative",
       }}
     >
-      <div
-        style={{
-          textAlign: "center",
-          padding: "2rem",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "4rem",
-            fontWeight: "bold",
-            marginBottom: "1rem",
-            background: "linear-gradient(to right, #a855f7, #3b82f6)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          Course Video
-        </h1>
-        <p style={{ fontSize: "1.5rem", opacity: 0.7 }}>
-          {chapters.length > 0
-            ? `Chapter 1: ${chapters[0]?.title || "Loading..."}`
-            : "No content yet"}
-        </p>
+      {/* Render all slide sequences */}
+      {sequences.map((sequence, index) => {
+        const SlideComponent =
+          sequence.slide.type === "title-slide"
+            ? TitleSlide
+            : sequence.slide.type === "transition-slide"
+              ? TransitionSlide
+              : ContentSlide
+
+        return (
+          <Sequence
+            key={`${sequence.chapter.chapterId}-${sequence.slide.slideId}-${index}`}
+            from={sequence.from}
+            durationInFrames={sequence.duration}
+          >
+            {/* Audio for this slide */}
+            {sequence.audioUrl && (
+              <Audio src={sequence.audioUrl} startFrom={0} />
+            )}
+
+            {/* Slide component */}
+            <SlideComponent
+              title={sequence.slide.content?.title || ""}
+              subtitle={
+                sequence.slide.type === "title-slide"
+                  ? sequence.chapter.title
+                  : undefined
+              }
+              content={sequence.slide.content?.body || ""}
+              visualElements={sequence.slide.content?.visualElements || []}
+              style={style}
+            />
+          </Sequence>
+        )
+      })}
+
+      {/* Fallback if no slides */}
+      {sequences.length === 0 && (
         <div
           style={{
-            marginTop: "2rem",
-            width: "50%",
-            height: "4px",
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
-            borderRadius: "2px",
-            overflow: "hidden",
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#fff",
+            fontSize: "3rem",
+            fontFamily: "system-ui",
           }}
         >
-          <div
-            style={{
-              width: `${progress * 100}%`,
-              height: "100%",
-              backgroundColor: "#a855f7",
-              transition: "width 0.1s linear",
-            }}
-          />
+          <div style={{ textAlign: "center" }}>
+            <h1
+              style={{
+                fontSize: "4rem",
+                fontWeight: "bold",
+                marginBottom: "1rem",
+                background: "linear-gradient(to right, #a855f7, #3b82f6)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Course Video
+            </h1>
+            <p style={{ fontSize: "1.5rem", opacity: 0.7 }}>
+              {chapters.length > 0
+                ? `Chapter 1: ${chapters[0]?.title || "Loading..."}`
+                : "No content yet"}
+            </p>
+          </div>
         </div>
-        <p style={{ marginTop: "1rem", fontSize: "1rem", opacity: 0.5 }}>
-          Frame {frame} / {durationInFrames} ({Math.round(progress * 100)}%)
-        </p>
-      </div>
+      )}
     </div>
-  );
-};
-
+  )
+}
