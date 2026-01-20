@@ -1,22 +1,24 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CalendarIcon, ChevronLeft, Sparkles, Clock, Loader2 } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { CalendarIcon, ChevronLeft, Sparkles, Clock, Loader2, Zap } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format, parse, isValid } from "date-fns"
 import { useSupabase } from "@/components/supabase-provider"
 import { generateAssignmentApproach, trackAIUsage } from "@/lib/ai-service"
 import { useToast } from "@/hooks/use-toast"
+import { GlassSurface } from "@/components/shared/GlassSurface"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
+import { Badge } from "@/components/ui/badge"
 
 const subjects = [
   "Mathematics",
@@ -74,7 +76,7 @@ export default function NewAssignmentPage() {
       setFormData((prev) => ({ ...prev, due_date: date.toISOString() }))
       setManualDateInput(format(date, "MM/dd/yyyy HH:mm"))
     } else {
-      setFormData((prev) => ({ ...prev, due_date: null }))
+      setFormData((prev) => ({ ...prev, due_date: "" }))
       setManualDateInput("")
     }
     setShowCalendar(false)
@@ -84,21 +86,15 @@ export default function NewAssignmentPage() {
     const input = e.target.value
     setManualDateInput(input)
 
-    // Try to parse the date
     try {
-      // Try different formats
       let parsedDate: Date | null = null
-
-      // Try MM/DD/YYYY HH:MM format
       parsedDate = parse(input, "MM/dd/yyyy HH:mm", new Date())
 
       if (!isValid(parsedDate)) {
-        // Try MM/DD/YYYY format
         parsedDate = parse(input, "MM/dd/yyyy", new Date())
       }
 
       if (!isValid(parsedDate)) {
-        // Try YYYY-MM-DD format
         parsedDate = parse(input, "yyyy-MM-dd", new Date())
       }
 
@@ -106,12 +102,10 @@ export default function NewAssignmentPage() {
         setDate(parsedDate)
         setFormData((prev) => ({ ...prev, due_date: parsedDate.toISOString() }))
       } else {
-        // If not valid, just update the input field but don't set the date
-        setFormData((prev) => ({ ...prev, due_date: null }))
+        setFormData((prev) => ({ ...prev, due_date: "" }))
       }
     } catch (error) {
-      // If parsing fails, just update the input field but don't set the date
-      setFormData((prev) => ({ ...prev, due_date: null }))
+      setFormData((prev) => ({ ...prev, due_date: "" }))
     }
   }
 
@@ -131,10 +125,7 @@ export default function NewAssignmentPage() {
 
       if (!user) throw new Error("You must be logged in to use the AI features")
 
-      // Track AI usage
       await trackAIUsage(supabase, user.id)
-
-      // Generate AI approach
       const aiSummary = await generateAssignmentApproach(formData.title, formData.description, formData.subject)
 
       setFormData((prev) => ({ ...prev, ai_summary: aiSummary }))
@@ -165,27 +156,29 @@ export default function NewAssignmentPage() {
         data: { user },
       } = await supabase.auth.getUser()
 
-      if (!user) throw new Error("User not authenticated")
+      if (!user) throw new Error("You must be logged in")
 
-      // Create assignment data object, ensuring due_date is null if not set
-      const assignmentData = {
-        ...formData,
-        user_id: user.id,
-        status: "ongoing",
-        due_date: formData.due_date || null, // Ensure null instead of empty string
-      }
+      const { error: insertError } = await supabase.from("assignments").insert([
+        {
+          user_id: user.id,
+          title: formData.title,
+          description: formData.description,
+          subject: formData.subject || null,
+          priority: formData.priority,
+          due_date: formData.due_date || null,
+          status: "ongoing",
+          ai_summary: formData.ai_summary || null,
+        },
+      ])
 
-      const { error } = await supabase.from("assignments").insert([assignmentData])
-
-      if (error) throw error
+      if (insertError) throw insertError
 
       toast({
         title: "Assignment Created",
-        description: "Your new assignment has been created successfully.",
+        description: "Your assignment has been created successfully.",
       })
 
       router.push("/dashboard/assignments")
-      router.refresh()
     } catch (error: any) {
       setError(error.message || "Failed to create assignment")
       toast({
@@ -199,175 +192,198 @@ export default function NewAssignmentPage() {
   }
 
   return (
-    <div className="p-6 md:p-8">
-      <div className="mb-8">
-        <Link href="/dashboard/assignments" className="inline-flex items-center text-gray-400 hover:text-white mb-4">
-          <ChevronLeft className="mr-1 h-4 w-4" /> Back to Assignments
-        </Link>
-        <h1 className="text-3xl font-bold neon-text-purple">Create New Assignment</h1>
-        <p className="text-gray-400 mt-1">Add details about your academic task</p>
-      </div>
+    <div className="p-6 md:p-8 lg:p-12 max-w-4xl mx-auto">
+      {/* Header */}
+      <ScrollReveal direction="up">
+        <div className="mb-8">
+          <Link
+            href="/dashboard/assignments"
+            className="inline-flex items-center text-white/70 hover:text-white mb-4 transition-colors"
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" aria-hidden="true" />
+            Back to Assignments
+          </Link>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <span className="text-white">Create New</span>{" "}
+            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Assignment
+            </span>
+          </h1>
+          <p className="text-white/70">Add a new assignment to track your academic tasks</p>
+        </div>
+      </ScrollReveal>
 
-      <Card className="glass-card">
-        <CardContent className="p-6">
-          {error && <div className="bg-red-900/30 border border-red-800 text-white p-3 rounded-md mb-6">{error}</div>}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium">
-                Assignment Title *
-              </label>
-              <Input
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                placeholder="e.g., Math Homework Chapter 5"
-                className="bg-gray-900 border-gray-700"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-medium">
-                Description *
-              </label>
-              <Textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                required
-                placeholder="Describe what you need to do for this assignment"
-                className="bg-gray-900 border-gray-700 min-h-[100px]"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="subject" className="text-sm font-medium">
-                  Subject
-                </label>
-                <Select value={formData.subject} onValueChange={(value) => handleSelectChange("subject", value)}>
-                  <SelectTrigger className="bg-gray-900 border-gray-700">
-                    <SelectValue placeholder="Select a subject" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {subjects.map((subject) => (
-                      <SelectItem key={subject} value={subject}>
-                        {subject}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Information */}
+        <ScrollReveal direction="up" delay={0.1}>
+          <GlassSurface className="p-6 lg:p-8">
+            <h2 className="text-xl font-bold text-white mb-6">Basic Information</h2>
+            <div className="space-y-5">
+              <div>
+                <Label htmlFor="title" className="text-white mb-2 block">
+                  Title <span className="text-red-400">*</span>
+                </Label>
+                <Input
+                  id="title"
+                  name="title"
+                  required
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder="e.g., Math Homework Chapter 5"
+                  className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                />
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="priority" className="text-sm font-medium">
-                  Priority
-                </label>
-                <Select value={formData.priority} onValueChange={(value) => handleSelectChange("priority", value)}>
-                  <SelectTrigger className="bg-gray-900 border-gray-700">
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div>
+                <Label htmlFor="description" className="text-white mb-2 block">
+                  Description
+                </Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="Describe the assignment requirements..."
+                  className="glass-surface border-white/20 text-white placeholder:text-white/40 resize-none"
+                />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <label htmlFor="due_date" className="text-sm font-medium">
-                Due Date
-              </label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    ref={dateInputRef}
-                    id="manual_date"
-                    value={manualDateInput}
-                    onChange={handleManualDateChange}
-                    placeholder="MM/DD/YYYY HH:MM or YYYY-MM-DD"
-                    className="bg-gray-900 border-gray-700 pl-10"
-                  />
-                  <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                  <Label htmlFor="subject" className="text-white mb-2 block">
+                    Subject
+                  </Label>
+                  <Select value={formData.subject} onValueChange={(value) => handleSelectChange("subject", value)}>
+                    <SelectTrigger className="glass-surface border-white/20 text-white">
+                      <SelectValue placeholder="Select subject" />
+                    </SelectTrigger>
+                    <SelectContent className="glass-surface border-white/20">
+                      {subjects.map((subject) => (
+                        <SelectItem key={subject} value={subject} className="text-white">
+                          {subject}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+
+                <div>
+                  <Label htmlFor="priority" className="text-white mb-2 block">
+                    Priority
+                  </Label>
+                  <Select value={formData.priority} onValueChange={(value) => handleSelectChange("priority", value)}>
+                    <SelectTrigger className="glass-surface border-white/20 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="glass-surface border-white/20">
+                      <SelectItem value="low" className="text-white">
+                        Low
+                      </SelectItem>
+                      <SelectItem value="medium" className="text-white">
+                        Medium
+                      </SelectItem>
+                      <SelectItem value="high" className="text-white">
+                        High
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="due_date" className="text-white mb-2 block">
+                  Due Date
+                </Label>
                 <Popover open={showCalendar} onOpenChange={setShowCalendar}>
                   <PopoverTrigger asChild>
                     <Button
-                      variant="outline"
-                      className="border-gray-700"
-                      onClick={() => setShowCalendar(!showCalendar)}
                       type="button"
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal glass-surface border-white/20 text-white hover:border-purple-500/50"
                     >
-                      <CalendarIcon className="h-4 w-4" />
+                      <CalendarIcon className="mr-2 h-4 w-4 text-white/60" aria-hidden="true" />
+                      {date ? format(date, "PPP") : <span className="text-white/60">Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-gray-900 border-gray-700">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={handleDateChange}
-                      initialFocus
-                      className="bg-gray-900"
-                    />
+                  <PopoverContent className="w-auto p-0 glass-surface border-white/20" align="start">
+                    <Calendar mode="single" selected={date} onSelect={handleDateChange} initialFocus />
                   </PopoverContent>
                 </Popover>
               </div>
-              <p className="text-xs text-gray-400">Enter date manually (MM/DD/YYYY HH:MM) or select from calendar</p>
             </div>
+          </GlassSurface>
+        </ScrollReveal>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label htmlFor="ai_summary" className="text-sm font-medium">
-                  AI-Generated Approach
-                </label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={generateAiSummary}
-                  disabled={aiLoading || !formData.title || !formData.description}
-                  className="border-primary text-primary hover:bg-primary/10"
-                >
-                  {aiLoading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="mr-2 h-4 w-4" />
-                  )}
-                  {aiLoading ? "Generating..." : "Generate"}
-                </Button>
+        {/* AI Summary */}
+        {formData.ai_summary && (
+          <ScrollReveal direction="up" delay={0.2}>
+            <GlassSurface className="p-6 lg:p-8 border-purple-500/30">
+              <div className="flex items-center space-x-2 mb-4">
+                <Sparkles className="h-5 w-5 text-purple-400" aria-hidden="true" />
+                <h2 className="text-xl font-bold text-white">AI-Generated Approach</h2>
               </div>
-              <Textarea
-                id="ai_summary"
-                name="ai_summary"
-                value={formData.ai_summary}
-                onChange={handleChange}
-                placeholder="Generate AI suggestions on how to approach this assignment"
-                className="bg-gray-900 border-gray-700 min-h-[100px]"
-                readOnly={aiLoading}
-              />
-              <p className="text-xs text-gray-400">
-                Let AI analyze your assignment and suggest the best approach to complete it.
-              </p>
-            </div>
+              <div className="prose prose-invert max-w-none">
+                <p className="text-white/80 whitespace-pre-wrap">{formData.ai_summary}</p>
+              </div>
+            </GlassSurface>
+          </ScrollReveal>
+        )}
 
-            <div className="flex justify-end space-x-4">
+        {/* Error Message */}
+        {error && (
+          <GlassSurface className="p-4 border-red-500/30 bg-red-500/10">
+            <p className="text-red-400 text-sm">{error}</p>
+          </GlassSurface>
+        )}
+
+        {/* Actions */}
+        <ScrollReveal direction="up" delay={0.3}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={generateAiSummary}
+              disabled={aiLoading || !formData.title || !formData.description}
+              className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+            >
+              {aiLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Zap className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Generate AI Approach
+                </>
+              )}
+            </Button>
+
+            <div className="flex gap-4">
               <Link href="/dashboard/assignments">
-                <Button variant="outline" className="border-gray-700">
+                <Button type="button" variant="ghost" className="text-white/70 hover:text-white">
                   Cancel
                 </Button>
               </Link>
-              <Button type="submit" className="bg-primary hover:bg-primary/80" disabled={loading}>
-                {loading ? "Creating..." : "Create Assignment"}
+              <Button
+                type="submit"
+                disabled={loading}
+                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Assignment"
+                )}
               </Button>
             </div>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+        </ScrollReveal>
+      </form>
     </div>
   )
 }

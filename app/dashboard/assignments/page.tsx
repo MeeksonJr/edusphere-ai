@@ -2,9 +2,13 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { CheckSquare, Clock, Plus, Search, Filter, SortAsc, SortDesc, CheckCircle2, Circle } from "lucide-react"
+import { CheckSquare, Clock, Plus, Search, Filter, SortAsc, SortDesc, CheckCircle2, Circle, Calendar } from "lucide-react"
 import type { Database } from "@/types/supabase"
+import { GlassSurface } from "@/components/shared/GlassSurface"
+import { AnimatedCard } from "@/components/shared/AnimatedCard"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 
 export default async function AssignmentsPage({
   searchParams,
@@ -52,155 +56,228 @@ export default async function AssignmentsPage({
 
   const uniqueSubjects = Array.from(new Set(subjects?.map((item) => item.subject)))
 
+  const statusFilters = [
+    { value: "all", label: "All", icon: CheckSquare },
+    { value: "ongoing", label: "Ongoing", icon: Circle },
+    { value: "completed", label: "Completed", icon: CheckCircle2 },
+  ]
+
   return (
-    <div className="p-6 md:p-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold neon-text-purple">Assignments</h1>
-          <p className="text-gray-400 mt-1">Manage your academic tasks and deadlines</p>
+    <div className="p-6 md:p-8 lg:p-12">
+      {/* Header */}
+      <ScrollReveal direction="up">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+              <span className="text-white">Assignments</span>
+            </h1>
+            <p className="text-white/70">Manage your academic tasks and deadlines</p>
+          </div>
+          <Link href="/dashboard/assignments/new" className="mt-4 md:mt-0">
+            <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+              <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+              New Assignment
+            </Button>
+          </Link>
         </div>
-        <Link href="/dashboard/assignments/new">
-          <Button className="mt-4 md:mt-0 bg-primary hover:bg-primary/80">
-            <Plus className="mr-2 h-4 w-4" /> New Assignment
-          </Button>
-        </Link>
-      </div>
+      </ScrollReveal>
 
       {/* Filters */}
-      <Card className="glass-card mb-6">
-        <CardContent className="p-4">
+      <ScrollReveal direction="up" delay={0.1}>
+        <GlassSurface className="p-4 md:p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
+            {/* Search */}
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-              <input
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/40" aria-hidden="true" />
+              <Input
                 type="text"
                 placeholder="Search assignments..."
-                className="w-full rounded-md border border-gray-700 bg-gray-900 py-2 pl-10 pr-4 text-sm text-white placeholder-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                className="pl-10 glass-surface border-white/20 text-white placeholder:text-white/40"
               />
             </div>
+
+            {/* Status Filters */}
             <div className="flex flex-wrap gap-2">
+              {statusFilters.map((filter) => {
+                const Icon = filter.icon
+                const isActive = status === filter.value
+                return (
+                  <Link
+                    key={filter.value}
+                    href={`/dashboard/assignments?status=${filter.value}&subject=${subject}&sort=${sort}`}
+                  >
+                    <Badge
+                      className={`inline-flex items-center px-3 py-1.5 text-sm font-medium transition-all ${
+                        isActive
+                          ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-500/30"
+                          : "glass-surface border-white/20 text-white/70 hover:text-white hover:border-white/40"
+                      }`}
+                    >
+                      <Icon className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+                      {filter.label}
+                    </Badge>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Subject & Sort Filters */}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {/* Subject Filter */}
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-white/60" aria-hidden="true" />
+              <span className="text-sm text-white/60">Subject:</span>
               <Link
-                href={`/dashboard/assignments?status=all&subject=${subject}&sort=${sort}`}
-                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-                  status === "all" ? "bg-primary/20 text-primary" : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                href={`/dashboard/assignments?status=${status}&subject=all&sort=${sort}`}
+                className={`text-sm px-2 py-1 rounded ${
+                  subject === "all"
+                    ? "text-purple-400 font-medium"
+                    : "text-white/70 hover:text-white"
                 }`}
               >
                 All
               </Link>
+              {uniqueSubjects.map((subj) => (
+                <Link
+                  key={subj}
+                  href={`/dashboard/assignments?status=${status}&subject=${subj}&sort=${sort}`}
+                  className={`text-sm px-2 py-1 rounded ${
+                    subject === subj
+                      ? "text-purple-400 font-medium"
+                      : "text-white/70 hover:text-white"
+                  }`}
+                >
+                  {subj}
+                </Link>
+              ))}
+            </div>
+
+            {/* Sort */}
+            <div className="flex items-center gap-2 ml-auto">
+              <span className="text-sm text-white/60">Sort:</span>
               <Link
-                href={`/dashboard/assignments?status=ongoing&subject=${subject}&sort=${sort}`}
-                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-                  status === "ongoing" ? "bg-primary/20 text-primary" : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                href={`/dashboard/assignments?status=${status}&subject=${subject}&sort=due_date-asc`}
+                className={`p-1.5 rounded ${
+                  sort === "due_date-asc"
+                    ? "bg-purple-500/20 text-purple-400"
+                    : "text-white/60 hover:text-white"
                 }`}
+                aria-label="Sort by due date ascending"
               >
-                <Circle className="mr-1 h-3 w-3" /> Ongoing
+                <SortAsc className="h-4 w-4" />
               </Link>
               <Link
-                href={`/dashboard/assignments?status=completed&subject=${subject}&sort=${sort}`}
-                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-                  status === "completed" ? "bg-primary/20 text-primary" : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                href={`/dashboard/assignments?status=${status}&subject=${subject}&sort=due_date-desc`}
+                className={`p-1.5 rounded ${
+                  sort === "due_date-desc"
+                    ? "bg-purple-500/20 text-purple-400"
+                    : "text-white/60 hover:text-white"
                 }`}
+                aria-label="Sort by due date descending"
               >
-                <CheckCircle2 className="mr-1 h-3 w-3" /> Completed
+                <SortDesc className="h-4 w-4" />
               </Link>
-              <div className="relative">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700"
-                >
-                  <Filter className="mr-1 h-3 w-3" /> Subject
-                </Button>
-                {/* Subject dropdown would go here */}
-              </div>
-              <div className="relative">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700"
-                >
-                  {sortOrder === "asc" ? <SortAsc className="mr-1 h-3 w-3" /> : <SortDesc className="mr-1 h-3 w-3" />}{" "}
-                  Sort
-                </Button>
-                {/* Sort dropdown would go here */}
-              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </GlassSurface>
+      </ScrollReveal>
 
       {/* Assignments List */}
-      {assignments && assignments.length > 0 ? (
-        <div className="grid gap-4">
-          {assignments.map((assignment) => (
-            <Link key={assignment.id} href={`/dashboard/assignments/${assignment.id}`}>
-              <Card className="glass-card hover:neon-border-purple transition-all">
-                <CardContent className="p-4">
-                  <div className="flex items-start space-x-4">
-                    <div
-                      className={`p-2 rounded-md ${
-                        assignment.status === "completed" ? "bg-green-900/30" : "bg-gray-800"
-                      }`}
-                    >
-                      <CheckSquare
-                        className={`h-5 w-5 ${assignment.status === "completed" ? "text-green-400" : "text-primary"}`}
-                      />
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-medium">{assignment.title}</h3>
-                        <div className="flex items-center text-xs text-gray-400">
-                          <Clock className="mr-1 h-3 w-3" />
-                          {assignment.due_date ? new Date(assignment.due_date).toLocaleDateString() : "No due date"}
-                        </div>
+      <div className="space-y-4">
+        {assignments && assignments.length > 0 ? (
+          assignments.map((assignment, index) => (
+            <ScrollReveal key={assignment.id} direction="up" delay={0.05 * index}>
+              <Link href={`/dashboard/assignments/${assignment.id}`}>
+                <AnimatedCard variant="3d" delay={0.05 * index} className="cursor-pointer group">
+                  <div className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div
+                        className={`w-12 h-12 rounded-xl p-3 flex-shrink-0 ${
+                          assignment.status === "completed"
+                            ? "bg-gradient-to-br from-green-500/20 to-emerald-500/20"
+                            : "bg-gradient-to-br from-purple-500/20 to-pink-500/20"
+                        }`}
+                      >
+                        {assignment.status === "completed" ? (
+                          <CheckCircle2 className="h-full w-full text-green-400" aria-hidden="true" />
+                        ) : (
+                          <CheckSquare className="h-full w-full text-purple-400" aria-hidden="true" />
+                        )}
                       </div>
-                      <p className="text-sm text-gray-400 line-clamp-2">{assignment.description}</p>
-                      <div className="flex items-center pt-1">
-                        {assignment.subject && (
-                          <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full">{assignment.subject}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="text-lg font-semibold text-white group-hover:text-purple-400 transition-colors">
+                            {assignment.title}
+                          </h3>
+                          <div className="flex items-center text-sm text-white/60 ml-4 flex-shrink-0">
+                            <Clock className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                            {assignment.due_date
+                              ? new Date(assignment.due_date).toLocaleDateString()
+                              : "No due date"}
+                          </div>
+                        </div>
+                        {assignment.description && (
+                          <p className="text-white/70 text-sm mb-3 line-clamp-2">
+                            {assignment.description}
+                          </p>
                         )}
-                        {assignment.priority && (
-                          <span
-                            className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                              assignment.priority === "high"
-                                ? "bg-red-900/30 text-red-400"
-                                : assignment.priority === "medium"
-                                  ? "bg-yellow-900/30 text-yellow-400"
-                                  : "bg-green-900/30 text-green-400"
-                            }`}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {assignment.subject && (
+                            <Badge className="glass-surface border-white/10 text-white/80">
+                              {assignment.subject}
+                            </Badge>
+                          )}
+                          {assignment.priority && (
+                            <Badge
+                              className={
+                                assignment.priority === "high"
+                                  ? "bg-red-500/20 text-red-400 border-red-500/30"
+                                  : assignment.priority === "medium"
+                                    ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                                    : "bg-green-500/20 text-green-400 border-green-500/30"
+                              }
+                            >
+                              {assignment.priority.charAt(0).toUpperCase() + assignment.priority.slice(1)}
+                            </Badge>
+                          )}
+                          <Badge
+                            className={
+                              assignment.status === "completed"
+                                ? "bg-green-500/20 text-green-400 border-green-500/30"
+                                : "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                            }
                           >
-                            {assignment.priority.charAt(0).toUpperCase() + assignment.priority.slice(1)}
-                          </span>
-                        )}
-                        {assignment.status === "completed" && (
-                          <span className="ml-2 text-xs bg-green-900/30 text-green-400 px-2 py-0.5 rounded-full">
-                            Completed
-                          </span>
-                        )}
+                            {assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <CheckSquare className="mx-auto h-12 w-12 text-gray-600 mb-4" />
-          <h3 className="text-xl font-medium mb-2">No assignments found</h3>
-          <p className="text-gray-400 mb-6">
-            {status !== "all"
-              ? `You don't have any ${status} assignments.`
-              : "Start by creating your first assignment."}
-          </p>
-          <Link href="/dashboard/assignments/new">
-            <Button className="bg-primary hover:bg-primary/80">
-              <Plus className="mr-2 h-4 w-4" /> Create Assignment
-            </Button>
-          </Link>
-        </div>
-      )}
+                </AnimatedCard>
+              </Link>
+            </ScrollReveal>
+          ))
+        ) : (
+          <ScrollReveal direction="up">
+            <GlassSurface className="p-12 text-center">
+              <CheckSquare className="h-16 w-16 text-white/20 mx-auto mb-4" aria-hidden="true" />
+              <h3 className="text-xl font-semibold text-white mb-2">No assignments found</h3>
+              <p className="text-white/60 mb-6">
+                {status !== "all"
+                  ? `No ${status} assignments match your filters.`
+                  : "Get started by creating your first assignment."}
+              </p>
+              <Link href="/dashboard/assignments/new">
+                <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+                  <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Create Assignment
+                </Button>
+              </Link>
+            </GlassSurface>
+          </ScrollReveal>
+        )}
+      </div>
     </div>
   )
 }

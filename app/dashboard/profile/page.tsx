@@ -1,15 +1,15 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
 import { useSupabase } from "@/components/supabase-provider"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -25,6 +25,9 @@ import {
   Trash2,
   AlertCircle,
   Loader2,
+  TrendingUp,
+  Zap,
+  Award,
 } from "lucide-react"
 import {
   AlertDialog,
@@ -36,9 +39,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Progress } from "@/components/ui/progress"
+import { GlassSurface } from "@/components/shared/GlassSurface"
+import { AnimatedCard } from "@/components/shared/AnimatedCard"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 
-export default function ProfilePage() {
+function ProfileContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { supabase } = useSupabase()
@@ -63,7 +69,6 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("profile")
 
   useEffect(() => {
-    // Check if tab is specified in URL
     const tab = searchParams.get("tab")
     if (tab) {
       setActiveTab(tab)
@@ -77,7 +82,6 @@ export default function ProfilePage() {
         const { data } = await supabase.auth.getUser()
 
         if (data.user) {
-          // Check if profile exists
           const { data: profileData, error: profileError } = await supabase
             .from("profiles")
             .select("*")
@@ -85,7 +89,6 @@ export default function ProfilePage() {
             .single()
 
           if (profileError && profileError.code === "PGRST116") {
-            // Profile doesn't exist, create it
             const { error: insertError } = await supabase.from("profiles").insert([
               {
                 id: data.user.id,
@@ -97,19 +100,13 @@ export default function ProfilePage() {
               },
             ])
 
-            if (insertError) {
-              console.error("Error creating profile:", insertError)
-              throw insertError
-            }
+            if (insertError) throw insertError
 
-            // Fetch the newly created profile
-            const { data: newProfileData, error: newProfileError } = await supabase
+            const { data: newProfileData } = await supabase
               .from("profiles")
               .select("*")
               .eq("id", data.user.id)
               .single()
-
-            if (newProfileError) throw newProfileError
 
             setUser({ ...data.user, profile: newProfileData })
             setProfile({
@@ -128,7 +125,6 @@ export default function ProfilePage() {
             })
           }
 
-          // Fetch user stats
           await fetchUserStats(data.user.id)
         }
       } catch (error: any) {
@@ -147,35 +143,22 @@ export default function ProfilePage() {
 
   const fetchUserStats = async (userId: string) => {
     try {
-      // Fetch assignments stats
-      const { data: assignments, error: assignmentsError } = await supabase
+      const { data: assignments } = await supabase
         .from("assignments")
         .select("status")
         .eq("user_id", userId)
 
-      if (assignmentsError) throw assignmentsError
-
       const completedAssignments = assignments?.filter((a) => a.status === "completed").length || 0
 
-      // Fetch flashcard stats
-      const { data: flashcardSets, error: flashcardsError } = await supabase
+      const { data: flashcardSets } = await supabase
         .from("flashcard_sets")
         .select("cards")
         .eq("user_id", userId)
 
-      if (flashcardsError) throw flashcardsError
-
       const totalCards = flashcardSets?.reduce((acc, set) => acc + (set.cards?.length || 0), 0) || 0
 
-      // Fetch resources stats
-      const { data: resources, error: resourcesError } = await supabase
-        .from("study_resources")
-        .select("id")
-        .eq("user_id", userId)
+      const { data: resources } = await supabase.from("study_resources").select("id").eq("user_id", userId)
 
-      if (resourcesError) throw resourcesError
-
-      // Get AI usage
       const aiRequestsCount = user?.profile?.ai_requests_count || 0
       const aiRequestsRemaining =
         user?.profile?.subscription_tier === "free" ? Math.max(0, 10 - aiRequestsCount) : "Unlimited"
@@ -205,10 +188,8 @@ export default function ProfilePage() {
   const handleUpdateProfile = async () => {
     try {
       setUpdating(true)
-
       if (!user) return
 
-      // Upload avatar if changed
       let avatarUrl = profile.avatar_url
       if (avatarFile) {
         const fileExt = avatarFile.name.split(".").pop()
@@ -216,15 +197,12 @@ export default function ProfilePage() {
         const filePath = `avatars/${fileName}`
 
         const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, avatarFile)
-
         if (uploadError) throw uploadError
 
         const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(filePath)
-
         avatarUrl = urlData.publicUrl
       }
 
-      // Update profile
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -258,8 +236,6 @@ export default function ProfilePage() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
       setAvatarFile(file)
-
-      // Create preview
       const reader = new FileReader()
       reader.onload = (event) => {
         setAvatarPreview(event.target?.result as string)
@@ -285,21 +261,13 @@ export default function ProfilePage() {
   const handleDeleteAccount = async () => {
     try {
       if (!user) return
-
       setUpdating(true)
 
-      // Delete user data
       const tables = ["assignments", "flashcard_sets", "study_resources", "ai_chats", "profiles"]
-
       for (const table of tables) {
-        const { error } = await supabase.from(table).delete().eq("user_id", user.id)
-        if (error && error.code !== "PGRST116") {
-          console.error(`Error deleting from ${table}:`, error)
-        }
+        await supabase.from(table).delete().eq("user_id", user.id)
       }
 
-      // Delete the auth user (requires admin rights in a real app)
-      // This is a simplified version - in production you'd use Supabase Edge Functions or server-side code
       await supabase.auth.signOut()
 
       toast({
@@ -323,276 +291,294 @@ export default function ProfilePage() {
 
   const getSubscriptionBadge = () => {
     const tier = user?.profile?.subscription_tier || "free"
-
     if (tier === "ultimate") {
-      return <Badge className="bg-pink-600">Ultimate Plan</Badge>
+      return <Badge className="bg-gradient-to-r from-pink-500 to-pink-600 text-white">Ultimate</Badge>
     } else if (tier === "pro") {
-      return <Badge className="bg-blue-600">Pro Plan</Badge>
+      return <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">Pro</Badge>
     } else {
-      return <Badge className="bg-gray-600">Free Plan</Badge>
+      return <Badge className="bg-gray-600 text-white">Free</Badge>
     }
   }
 
   if (loading) {
     return (
-      <div className="p-6 md:p-8 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="p-6 md:p-8 flex items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" text="Loading profile..." />
       </div>
     )
   }
 
   return (
-    <div className="p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold neon-text-purple">Your Profile</h1>
-        <p className="text-gray-400 mt-1">Manage your account and view your stats</p>
-      </div>
+    <div className="p-6 md:p-8 lg:p-12">
+      {/* Header */}
+      <ScrollReveal direction="up">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <span className="text-white">Your</span>{" "}
+            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Profile
+            </span>
+          </h1>
+          <p className="text-white/70">Manage your account and view your stats</p>
+        </div>
+      </ScrollReveal>
 
       <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="bg-gray-900 border border-gray-800">
-          <TabsTrigger value="profile" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-            <User className="h-4 w-4 mr-2" /> Profile
+        <TabsList className="glass-surface border-white/20 p-1">
+          <TabsTrigger
+            value="profile"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+          >
+            <User className="h-4 w-4 mr-2" aria-hidden="true" />
+            Profile
           </TabsTrigger>
-          <TabsTrigger value="stats" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-            <Sparkles className="h-4 w-4 mr-2" /> Stats
+          <TabsTrigger
+            value="stats"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+          >
+            <Sparkles className="h-4 w-4 mr-2" aria-hidden="true" />
+            Stats
           </TabsTrigger>
           <TabsTrigger
             value="subscription"
-            className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
           >
-            <CreditCard className="h-4 w-4 mr-2" /> Subscription
+            <CreditCard className="h-4 w-4 mr-2" aria-hidden="true" />
+            Subscription
           </TabsTrigger>
-          <TabsTrigger value="security" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-            <Key className="h-4 w-4 mr-2" /> Security
+          <TabsTrigger
+            value="security"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+          >
+            <Key className="h-4 w-4 mr-2" aria-hidden="true" />
+            Security
           </TabsTrigger>
         </TabsList>
 
         {/* Profile Tab */}
         <TabsContent value="profile">
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Update your profile information</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex flex-col md:flex-row gap-6">
+          <ScrollReveal direction="up">
+            <GlassSurface className="p-6 lg:p-8">
+              <h2 className="text-xl font-bold text-white mb-6">Personal Information</h2>
+              <div className="flex flex-col md:flex-row gap-8">
                 <div className="flex flex-col items-center space-y-4">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src={avatarPreview || profile.avatar_url} />
-                    <AvatarFallback className="bg-primary/20 text-primary text-xl">
+                  <Avatar className="h-32 w-32 border-4 border-purple-500/30">
+                    <AvatarImage src={avatarPreview || profile.avatar_url} alt={profile.full_name || "User"} />
+                    <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-3xl">
                       {profile.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex items-center">
-                    <label htmlFor="avatar-upload" className="cursor-pointer">
-                      <div className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 text-sm px-3 py-2 rounded-md">
-                        <Upload className="h-4 w-4" />
-                        <span>Upload</span>
-                      </div>
-                      <input
-                        id="avatar-upload"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleAvatarChange}
-                      />
-                    </label>
-                  </div>
+                  <label htmlFor="avatar-upload" className="cursor-pointer">
+                    <div className="flex items-center space-x-2 px-4 py-2 rounded-lg glass-surface border-white/20 hover:border-purple-500/50 transition-all">
+                      <Upload className="h-4 w-4" aria-hidden="true" />
+                      <span className="text-sm text-white">Upload Photo</span>
+                    </div>
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                  </label>
                 </div>
 
-                <div className="flex-1 space-y-4">
-                  <div className="space-y-2">
-                    <label htmlFor="full_name" className="text-sm font-medium">
+                <div className="flex-1 space-y-5">
+                  <div>
+                    <Label htmlFor="full_name" className="text-white mb-2 block">
                       Full Name
-                    </label>
+                    </Label>
                     <Input
                       id="full_name"
                       value={profile.full_name}
                       onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                      className="bg-gray-800 border-gray-700"
+                      className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                      placeholder="Enter your full name"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label htmlFor="username" className="text-sm font-medium">
+                  <div>
+                    <Label htmlFor="username" className="text-white mb-2 block">
                       Username
-                    </label>
+                    </Label>
                     <Input
                       id="username"
                       value={profile.username}
                       onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-                      className="bg-gray-800 border-gray-700"
+                      className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                      placeholder="Choose a username"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium">
+                  <div>
+                    <Label htmlFor="email" className="text-white mb-2 block">
                       Email
-                    </label>
-                    <Input id="email" value={user?.email} disabled className="bg-gray-800 border-gray-700 opacity-70" />
-                    <p className="text-xs text-gray-400">Email cannot be changed</p>
+                    </Label>
+                    <Input
+                      id="email"
+                      value={user?.email}
+                      disabled
+                      className="glass-surface border-white/20 text-white/50 opacity-70"
+                    />
+                    <p className="text-xs text-white/50 mt-1">Email cannot be changed</p>
+                  </div>
+
+                  <div className="pt-4">
+                    <Button
+                      onClick={handleUpdateProfile}
+                      disabled={updating}
+                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                    >
+                      {updating ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                          Updating...
+                        </>
+                      ) : (
+                        "Save Changes"
+                      )}
+                    </Button>
                   </div>
                 </div>
               </div>
-            </CardContent>
-            <CardFooter className="flex justify-end">
-              <Button onClick={handleUpdateProfile} className="bg-primary hover:bg-primary/80" disabled={updating}>
-                {updating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating...
-                  </>
-                ) : (
-                  "Save Changes"
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
+            </GlassSurface>
+          </ScrollReveal>
         </TabsContent>
 
         {/* Stats Tab */}
         <TabsContent value="stats">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle>Learning Progress</CardTitle>
-                <CardDescription>Your academic achievements</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="bg-gray-800 p-2 rounded-md">
-                      <CheckSquare className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium">Assignments</p>
-                        <p className="text-sm text-gray-400">{stats.assignments.total} total</p>
+            <ScrollReveal direction="up">
+              <AnimatedCard variant="glow">
+                <div className="p-6">
+                  <h2 className="text-xl font-bold text-white mb-6">Learning Progress</h2>
+                  <div className="space-y-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-3 flex-shrink-0">
+                        <CheckSquare className="h-full w-full text-purple-400" aria-hidden="true" />
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2.5">
-                        <div
-                          className="bg-primary h-2.5 rounded-full"
-                          style={{
-                            width:
-                              stats.assignments.total > 0
-                                ? `${(stats.assignments.completed / stats.assignments.total) * 100}%`
-                                : "0%",
-                          }}
-                        ></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold text-white">Assignments</p>
+                          <p className="text-sm text-white/60">{stats.assignments.total} total</p>
+                        </div>
+                        <Progress
+                          value={
+                            stats.assignments.total > 0
+                              ? (stats.assignments.completed / stats.assignments.total) * 100
+                              : 0
+                          }
+                          className="h-2"
+                        />
+                        <p className="text-xs text-white/50">
+                          {stats.assignments.completed} completed (
+                          {stats.assignments.total > 0
+                            ? Math.round((stats.assignments.completed / stats.assignments.total) * 100)
+                            : 0}
+                          %)
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-400">
-                        {stats.assignments.completed} completed (
-                        {stats.assignments.total > 0
-                          ? Math.round((stats.assignments.completed / stats.assignments.total) * 100)
-                          : 0}
-                        %)
-                      </p>
                     </div>
-                  </div>
 
-                  <div className="flex items-start space-x-4">
-                    <div className="bg-gray-800 p-2 rounded-md">
-                      <BrainCircuit className="h-5 w-5 text-pink-500" />
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium">Flashcards</p>
-                        <p className="text-sm text-gray-400">{stats.flashcards.sets} sets</p>
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 p-3 flex-shrink-0">
+                        <BrainCircuit className="h-full w-full text-pink-400" aria-hidden="true" />
                       </div>
-                      <p className="text-sm">{stats.flashcards.cards} cards created</p>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <p className="font-semibold text-white">Flashcards</p>
+                          <p className="text-sm text-white/60">{stats.flashcards.sets} sets</p>
+                        </div>
+                        <p className="text-sm text-white/70">{stats.flashcards.cards} cards created</p>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-start space-x-4">
-                    <div className="bg-gray-800 p-2 rounded-md">
-                      <BookOpen className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium">Study Resources</p>
-                        <p className="text-sm text-gray-400">{stats.resources.total} created</p>
+                    <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 p-3 flex-shrink-0">
+                        <BookOpen className="h-full w-full text-blue-400" aria-hidden="true" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold text-white">Study Resources</p>
+                          <p className="text-sm text-white/60">{stats.resources.total} created</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </AnimatedCard>
+            </ScrollReveal>
 
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle>AI Usage</CardTitle>
-                <CardDescription>Your AI assistant usage statistics</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+            <ScrollReveal direction="up" delay={0.1}>
+              <AnimatedCard variant="glow" delay={0.1}>
+                <div className="p-6">
+                  <h2 className="text-xl font-bold text-white mb-6">AI Usage</h2>
+                  <div className="space-y-6">
                     <div>
-                      <p className="text-sm text-gray-400">Current Plan</p>
-                      <div className="flex items-center space-x-2 mt-1">
+                      <p className="text-sm text-white/60 mb-2">Current Plan</p>
+                      <div className="flex items-center space-x-3 mb-4">
                         {getSubscriptionBadge()}
-                        <span className="text-sm">
+                        <span className="text-sm text-white/70">
                           {user?.profile?.subscription_tier === "free"
                             ? "10 AI requests per month"
                             : "Unlimited AI requests"}
                         </span>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm">AI Requests Used</p>
-                      <p className="font-medium">{stats.aiUsage.total}</p>
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm text-white/70">AI Requests Used</p>
+                        <p className="font-semibold text-white">{stats.aiUsage.total}</p>
+                      </div>
+                      {user?.profile?.subscription_tier === "free" && (
+                        <>
+                          <Progress value={(stats.aiUsage.total / 10) * 100} className="h-2 mb-2" />
+                          <div className="flex items-center justify-between text-xs text-white/50">
+                            <span>0</span>
+                            <span>Remaining: {stats.aiUsage.remaining}</span>
+                            <span>10</span>
+                          </div>
+                        </>
+                      )}
                     </div>
+
                     {user?.profile?.subscription_tier === "free" && (
-                      <>
-                        <Progress value={(stats.aiUsage.total / 10) * 100} className="h-2" />
-                        <div className="flex items-center justify-between text-xs text-gray-400">
-                          <span>0</span>
-                          <span>Remaining: {stats.aiUsage.remaining}</span>
-                          <span>10</span>
-                        </div>
-                      </>
+                      <GlassSurface className="p-4 border-purple-500/30">
+                        <p className="text-sm text-white/80 mb-4">
+                          Upgrade to Pro or Ultimate plan for unlimited AI requests and premium features.
+                        </p>
+                        <Button
+                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                          onClick={() => router.push("/dashboard/subscription")}
+                        >
+                          Upgrade Plan
+                        </Button>
+                      </GlassSurface>
                     )}
                   </div>
-
-                  {user?.profile?.subscription_tier === "free" && (
-                    <div className="bg-gray-800 p-4 rounded-lg">
-                      <p className="text-sm">
-                        Upgrade to Pro or Ultimate plan for unlimited AI requests and premium features.
-                      </p>
-                      <Button
-                        className="mt-4 w-full bg-blue-600 hover:bg-blue-700"
-                        onClick={() => router.push("/dashboard/subscription")}
-                      >
-                        Upgrade Plan
-                      </Button>
-                    </div>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
+              </AnimatedCard>
+            </ScrollReveal>
           </div>
         </TabsContent>
 
         {/* Subscription Tab */}
         <TabsContent value="subscription">
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle>Subscription Plan</CardTitle>
-              <CardDescription>Manage your subscription</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="bg-gray-800 p-6 rounded-lg">
-                <div className="flex items-center justify-between">
+          <ScrollReveal direction="up">
+            <GlassSurface className="p-6 lg:p-8">
+              <h2 className="text-xl font-bold text-white mb-6">Subscription Plan</h2>
+              <div className="glass-surface border-purple-500/30 p-6 rounded-lg mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-bold">
+                    <h3 className="text-2xl font-bold text-white mb-1">
                       {user?.profile?.subscription_tier === "ultimate"
                         ? "Ultimate Plan"
                         : user?.profile?.subscription_tier === "pro"
                           ? "Pro Plan"
                           : "Free Plan"}
                     </h3>
-                    <p className="text-gray-400 mt-1">
+                    <p className="text-white/70">
                       {user?.profile?.subscription_tier === "ultimate"
                         ? "$12.99/month"
                         : user?.profile?.subscription_tier === "pro"
@@ -603,58 +589,58 @@ export default function ProfilePage() {
                   {getSubscriptionBadge()}
                 </div>
 
-                <div className="mt-6 space-y-4">
-                  <h4 className="font-medium">Features included:</h4>
+                <div className="space-y-2 mb-6">
+                  <h4 className="font-semibold text-white mb-3">Features included:</h4>
                   <ul className="space-y-2">
                     {user?.profile?.subscription_tier === "ultimate" ? (
                       <>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Everything in Pro
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Multi-project/class support
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Study groups (peer-to-peer)
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Voice assistant for Gemini AI
                         </li>
                       </>
                     ) : user?.profile?.subscription_tier === "pro" ? (
                       <>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Unlimited AI prompts
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Priority support
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Premium Gemini features
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Flashcard & quiz generator
                         </li>
                       </>
                     ) : (
                       <>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Import calendar
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           10 AI requests/month
                         </li>
-                        <li className="flex items-center">
+                        <li className="flex items-center text-white/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Access to Hugging Face basic tools
                         </li>
@@ -663,198 +649,173 @@ export default function ProfilePage() {
                   </ul>
                 </div>
 
-                {user?.profile?.subscription_tier !== "free" && (
-                  <div className="mt-6">
-                    <p className="text-sm text-gray-400">
-                      Subscription ID: {user?.profile?.subscription_id || "N/A"}
-                      <br />
-                      Status: {user?.profile?.subscription_status || "Active"}
-                      <br />
-                      Last Updated:{" "}
-                      {user?.profile?.subscription_updated_at
-                        ? new Date(user.profile.subscription_updated_at).toLocaleDateString()
-                        : "N/A"}
-                    </p>
+                {user?.profile?.subscription_tier === "free" ? (
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <AnimatedCard variant="3d">
+                      <div className="p-6">
+                        <h4 className="text-lg font-bold text-white mb-2">Pro Plan</h4>
+                        <p className="text-white/60 mb-4">$6.99/month</p>
+                        <ul className="space-y-2 text-sm text-white/80 mb-6">
+                          <li className="flex items-center">
+                            <span className="mr-2 text-green-400">✓</span>
+                            Unlimited AI prompts
+                          </li>
+                          <li className="flex items-center">
+                            <span className="mr-2 text-green-400">✓</span>
+                            Priority support
+                          </li>
+                        </ul>
+                        <Button
+                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                          onClick={() => router.push("/dashboard/subscription")}
+                        >
+                          Upgrade to Pro
+                        </Button>
+                      </div>
+                    </AnimatedCard>
+
+                    <AnimatedCard variant="3d" delay={0.1}>
+                      <div className="p-6">
+                        <h4 className="text-lg font-bold text-white mb-2">Ultimate Plan</h4>
+                        <p className="text-white/60 mb-4">$12.99/month</p>
+                        <ul className="space-y-2 text-sm text-white/80 mb-6">
+                          <li className="flex items-center">
+                            <span className="mr-2 text-green-400">✓</span>
+                            Everything in Pro
+                          </li>
+                          <li className="flex items-center">
+                            <span className="mr-2 text-green-400">✓</span>
+                            Multi-project support
+                          </li>
+                        </ul>
+                        <Button
+                          className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+                          onClick={() => router.push("/dashboard/subscription")}
+                        >
+                          Upgrade to Ultimate
+                        </Button>
+                      </div>
+                    </AnimatedCard>
                   </div>
-                )}
-              </div>
-
-              {user?.profile?.subscription_tier === "free" ? (
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Card className="bg-gray-800 border-blue-600 hover:border-blue-500 transition-all">
-                    <CardHeader>
-                      <CardTitle>Pro Plan</CardTitle>
-                      <CardDescription>$6.99/month</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-center">
-                          <span className="mr-2 text-green-400">✓</span>
-                          Unlimited AI prompts
-                        </li>
-                        <li className="flex items-center">
-                          <span className="mr-2 text-green-400">✓</span>
-                          Priority support
-                        </li>
-                        <li className="flex items-center">
-                          <span className="mr-2 text-green-400">✓</span>
-                          Premium Gemini features
-                        </li>
-                        <li className="flex items-center">
-                          <span className="mr-2 text-green-400">✓</span>
-                          Flashcard & quiz generator
-                        </li>
-                      </ul>
-                    </CardContent>
-                    <CardFooter>
+                ) : (
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button
+                      variant="outline"
+                      className="glass-surface border-white/20 hover:border-red-500/50 text-red-400 hover:text-red-300"
+                      onClick={() => router.push("/dashboard/subscription")}
+                    >
+                      Cancel Subscription
+                    </Button>
+                    {user?.profile?.subscription_tier === "pro" && (
                       <Button
-                        className="w-full bg-blue-600 hover:bg-blue-700"
-                        onClick={() => router.push("/dashboard/subscription")}
-                      >
-                        Upgrade to Pro
-                      </Button>
-                    </CardFooter>
-                  </Card>
-
-                  <Card className="bg-gray-800 border-pink-600 hover:border-pink-500 transition-all">
-                    <CardHeader>
-                      <CardTitle>Ultimate Plan</CardTitle>
-                      <CardDescription>$12.99/month</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-center">
-                          <span className="mr-2 text-green-400">✓</span>
-                          Everything in Pro
-                        </li>
-                        <li className="flex items-center">
-                          <span className="mr-2 text-green-400">✓</span>
-                          Multi-project/class support
-                        </li>
-                        <li className="flex items-center">
-                          <span className="mr-2 text-green-400">✓</span>
-                          Study groups (peer-to-peer)
-                        </li>
-                        <li className="flex items-center">
-                          <span className="mr-2 text-green-400">✓</span>
-                          Voice assistant for Gemini AI
-                        </li>
-                      </ul>
-                    </CardContent>
-                    <CardFooter>
-                      <Button
-                        className="w-full bg-pink-600 hover:bg-pink-700"
+                        className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
                         onClick={() => router.push("/dashboard/subscription")}
                       >
                         Upgrade to Ultimate
                       </Button>
-                    </CardFooter>
-                  </Card>
-                </div>
-              ) : (
-                <div className="flex justify-between">
-                  <Button
-                    variant="outline"
-                    className="border-red-900 text-red-500 hover:text-red-400 hover:bg-red-900/20"
-                    onClick={() => router.push("/dashboard/subscription")}
-                  >
-                    Cancel Subscription
-                  </Button>
-                  {user?.profile?.subscription_tier === "pro" && (
-                    <Button
-                      className="bg-pink-600 hover:bg-pink-700"
-                      onClick={() => router.push("/dashboard/subscription")}
-                    >
-                      Upgrade to Ultimate
-                    </Button>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    )}
+                  </div>
+                )}
+              </div>
+            </GlassSurface>
+          </ScrollReveal>
         </TabsContent>
 
         {/* Security Tab */}
         <TabsContent value="security">
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle>Security Settings</CardTitle>
-              <CardDescription>Manage your account security</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Change Password</h3>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label htmlFor="current-password" className="text-sm font-medium">
-                      Current Password
-                    </label>
-                    <Input id="current-password" type="password" className="bg-gray-800 border-gray-700" />
+          <ScrollReveal direction="up">
+            <GlassSurface className="p-6 lg:p-8">
+              <h2 className="text-xl font-bold text-white mb-6">Security Settings</h2>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4">Change Password</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="current-password" className="text-white mb-2 block">
+                        Current Password
+                      </Label>
+                      <Input
+                        id="current-password"
+                        type="password"
+                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="new-password" className="text-white mb-2 block">
+                        New Password
+                      </Label>
+                      <Input
+                        id="new-password"
+                        type="password"
+                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="confirm-password" className="text-white mb-2 block">
+                        Confirm New Password
+                      </Label>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                      />
+                    </div>
+                    <Button
+                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                      onClick={() => {
+                        toast({
+                          title: "Password Update",
+                          description: "Password update functionality would be implemented in a production app.",
+                        })
+                      }}
+                    >
+                      Update Password
+                    </Button>
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="new-password" className="text-sm font-medium">
-                      New Password
-                    </label>
-                    <Input id="new-password" type="password" className="bg-gray-800 border-gray-700" />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="confirm-password" className="text-sm font-medium">
-                      Confirm New Password
-                    </label>
-                    <Input id="confirm-password" type="password" className="bg-gray-800 border-gray-700" />
-                  </div>
-                  <Button
-                    className="bg-primary hover:bg-primary/80"
-                    onClick={() => {
-                      toast({
-                        title: "Password Update",
-                        description: "Password update functionality would be implemented in a production app.",
-                      })
-                    }}
-                  >
-                    Update Password
-                  </Button>
                 </div>
-              </div>
 
-              <div className="border-t border-gray-800 pt-6 space-y-4">
-                <h3 className="text-lg font-medium">Account Actions</h3>
-                <div className="space-y-4">
-                  <Button
-                    variant="outline"
-                    className="w-full border-gray-700 text-gray-400 hover:text-white justify-start"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" /> Sign Out
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full border-red-900 text-red-500 hover:text-red-400 hover:bg-red-900/20 justify-start"
-                    onClick={() => setDeleteDialogOpen(true)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" /> Delete Account
-                  </Button>
+                <div className="border-t border-white/10 pt-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Account Actions</h3>
+                  <div className="space-y-3">
+                    <Button
+                      variant="outline"
+                      className="w-full glass-surface border-white/20 hover:border-white/40 text-white justify-start"
+                      onClick={handleSignOut}
+                    >
+                      <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
+                      Sign Out
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full border-red-500/30 text-red-400 hover:text-red-300 hover:bg-red-500/10 justify-start"
+                      onClick={() => setDeleteDialogOpen(true)}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
+                      Delete Account
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </GlassSurface>
+          </ScrollReveal>
         </TabsContent>
       </Tabs>
 
-      {/* Delete Account Confirmation Dialog */}
+      {/* Delete Account Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="bg-gray-900 border-gray-800">
+        <AlertDialogContent className="glass-surface border-white/20">
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center">
-              <AlertCircle className="h-5 w-5 text-red-500 mr-2" /> Delete Account
+            <AlertDialogTitle className="flex items-center text-white">
+              <AlertCircle className="h-5 w-5 text-red-400 mr-2" aria-hidden="true" />
+              Delete Account
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-gray-400">
+            <AlertDialogDescription className="text-white/70">
               This action cannot be undone. This will permanently delete your account and remove all your data from our
               servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-gray-800 border-gray-700 text-white hover:bg-gray-700">
+            <AlertDialogCancel className="glass-surface border-white/20 text-white hover:bg-white/10">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -864,7 +825,8 @@ export default function ProfilePage() {
             >
               {updating ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Deleting...
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                  Deleting...
                 </>
               ) : (
                 "Delete Account"
@@ -874,5 +836,13 @@ export default function ProfilePage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<LoadingSpinner size="lg" text="Loading..." />}>
+      <ProfileContent />
+    </Suspense>
   )
 }
