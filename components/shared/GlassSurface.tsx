@@ -22,24 +22,21 @@ export function GlassSurface({
     subtle: "glass-surface bg-black/20 backdrop-blur-sm",
   };
 
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        className={cn(variants[variant], className)}
+        onClick={onClick}
+        aria-label="Clickable surface"
+      >
+        {children}
+      </button>
+    );
+  }
+
   return (
-    <div
-      className={cn(variants[variant], className)}
-      onClick={onClick}
-      role={onClick ? "button" : undefined}
-      aria-label={onClick ? "Clickable surface" : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={
-        onClick
-          ? (e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onClick();
-              }
-            }
-          : undefined
-      }
-    >
+    <div className={cn(variants[variant], className)}>
       {children}
     </div>
   );

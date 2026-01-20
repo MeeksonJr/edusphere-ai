@@ -1,135 +1,146 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Sparkles, Menu, X, User, LogIn } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSupabase } from "@/components/supabase-provider";
+import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
+  Sparkles,
+  Menu,
+  X,
+  User,
+  LogOut,
+} from "lucide-react";
+import { useSupabase } from "@/components/supabase-provider";
 
 interface NavbarProps {
   variant?: "default" | "transparent";
 }
 
 export function Navbar({ variant = "default" }: NavbarProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, supabase } = useSupabase();
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const pathname = usePathname();
+  const { supabase } = useSupabase();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 20);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
-  };
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+    };
+    getUser();
+  }, [supabase]);
 
   const navLinks = [
-    { href: "/#features", label: "Features" },
+    { href: "/features", label: "Features" },
     { href: "/pricing", label: "Pricing" },
-    { href: "/features", label: "All Features" },
     { href: "/blog", label: "Blog" },
-    { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
   ];
 
+  const isActive = (href: string) => pathname === href;
+
   return (
-    <motion.header
+    <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled || variant === "default"
-          ? "glass-surface bg-black/80 border-b border-white/10"
-          : "bg-transparent border-b border-transparent"
+        scrolled || variant === "default"
+          ? "glass-surface border-b border-white/10"
+          : "bg-transparent"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
+      role="navigation"
+      aria-label="Main navigation"
     >
-      <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
-            <motion.div
-              className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg p-1.5 group-hover:scale-110 transition-transform"
-              whileHover={{ rotate: 180 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Sparkles className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
-            </motion.div>
-            <span className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+          <Link
+            href="/"
+            className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black rounded-lg"
+            aria-label="EduSphere AI Home"
+          >
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 p-2 flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-white" aria-hidden="true" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               EduSphere AI
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-1">
+          <div className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200 relative group"
+                className={`text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black rounded px-2 py-1 ${
+                  isActive(link.href)
+                    ? "text-purple-400"
+                    : "text-white/70 hover:text-white"
+                }`}
+                aria-current={isActive(link.href) ? "page" : undefined}
               >
                 {link.label}
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-purple-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
               </Link>
             ))}
           </div>
 
-          {/* Desktop Auth Buttons */}
-          <div className="hidden lg:flex items-center space-x-3">
+          {/* Auth Buttons */}
+          <div className="hidden md:flex items-center space-x-4">
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+              <>
+                <Link href="/dashboard">
                   <Button
                     variant="ghost"
-                    className="glass-surface border-white/10 hover:bg-white/5"
+                    className="text-white/70 hover:text-white"
+                    aria-label="Go to dashboard"
                   >
-                    <User className="h-4 w-4 mr-2" />
-                    {user.email?.split("@")[0]}
+                    <User className="h-4 w-4 mr-2" aria-hidden="true" />
+                    Dashboard
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="glass-surface border-white/10">
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">Dashboard</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/profile">Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard/settings">Settings</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-white/10" />
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Link>
+                <Button
+                  variant="ghost"
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    window.location.href = "/";
+                  }}
+                  className="text-white/70 hover:text-white"
+                  aria-label="Sign out"
+                >
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </>
             ) : (
               <>
                 <Link href="/login">
                   <Button
                     variant="ghost"
-                    className="text-white/80 hover:text-white hover:bg-white/5"
+                    className="text-white/70 hover:text-white"
+                    aria-label="Sign in"
                   >
-                    <LogIn className="h-4 w-4 mr-2" />
                     Login
                   </Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white border-0 shadow-lg shadow-purple-500/25">
-                    Get Started
+                  <Button
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                    aria-label="Sign up"
+                  >
+                    Sign Up
                   </Button>
                 </Link>
               </>
@@ -138,79 +149,102 @@ export function Navbar({ variant = "default" }: NavbarProps) {
 
           {/* Mobile Menu Button */}
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-            aria-label="Toggle menu"
+            type="button"
+            className="md:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
           >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
+            {isOpen ? (
+              <X className="h-6 w-6" aria-hidden="true" />
             ) : (
-              <Menu className="h-6 w-6" />
+              <Menu className="h-6 w-6" aria-hidden="true" />
             )}
           </button>
         </div>
+      </div>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="lg:hidden overflow-hidden"
-            >
-              <div className="py-4 space-y-2 border-t border-white/10 mt-2">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                <div className="px-4 pt-4 space-y-2 border-t border-white/10">
-                  {user ? (
-                    <>
-                      <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button variant="ghost" className="w-full justify-start">
-                          Dashboard
-                        </Button>
-                      </Link>
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden glass-surface border-t border-white/10"
+            role="menu"
+            aria-label="Mobile navigation menu"
+          >
+            <div className="container mx-auto px-4 py-4 space-y-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`block text-base font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-black rounded px-2 py-2 ${
+                    isActive(link.href)
+                      ? "text-purple-400"
+                      : "text-white/70 hover:text-white"
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                  role="menuitem"
+                  aria-current={isActive(link.href) ? "page" : undefined}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <div className="pt-4 border-t border-white/10 space-y-2">
+                {user ? (
+                  <>
+                    <Link href="/dashboard" onClick={() => setIsOpen(false)}>
                       <Button
                         variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => {
-                          handleSignOut();
-                          setIsMobileMenuOpen(false);
-                        }}
+                        className="w-full justify-start text-white/70 hover:text-white"
+                        role="menuitem"
                       >
-                        Sign Out
+                        <User className="h-4 w-4 mr-2" aria-hidden="true" />
+                        Dashboard
                       </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button variant="ghost" className="w-full">
-                          Login
-                        </Button>
-                      </Link>
-                      <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
-                        <Button className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700">
-                          Get Started
-                        </Button>
-                      </Link>
-                    </>
-                  )}
-                </div>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      onClick={async () => {
+                        await supabase.auth.signOut();
+                        window.location.href = "/";
+                        setIsOpen(false);
+                      }}
+                      className="w-full justify-start text-white/70 hover:text-white"
+                      role="menuitem"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" aria-hidden="true" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setIsOpen(false)}>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start text-white/70 hover:text-white"
+                        role="menuitem"
+                      >
+                        Login
+                      </Button>
+                    </Link>
+                    <Link href="/signup" onClick={() => setIsOpen(false)}>
+                      <Button
+                        className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                        role="menuitem"
+                      >
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
-    </motion.header>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 }
-
