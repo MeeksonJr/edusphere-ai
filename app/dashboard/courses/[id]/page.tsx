@@ -486,84 +486,142 @@ function CourseDetailContent() {
       {layout?.chapters && layout.chapters.length > 0 && (
         <ScrollReveal direction="up" delay={0.2}>
           <GlassSurface className="p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Course Structure</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">Course Structure</h2>
+              <Button
+                onClick={() => {
+                  // TODO: Add new chapter functionality
+                  toast({
+                    id: `add-chapter-${Date.now()}`,
+                    title: "Coming Soon",
+                    description: "Chapter editing feature will be available soon.",
+                  })
+                }}
+                variant="outline"
+                size="sm"
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Chapter
+              </Button>
+            </div>
             <div className="space-y-4">
-              {layout.chapters.map((chapter: any, chapterIndex: number) => (
-                <div
-                  key={chapter.chapterId || chapterIndex}
-                  className="p-4 rounded-lg glass-surface border border-white/10"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="text-lg font-semibold text-white">
-                        Chapter {chapter.order || chapterIndex + 1}: {chapter.title}
-                      </h3>
-                      <p className="text-white/60 text-sm mt-1">
-                        {chapter.slides?.length || 0} slides
-                      </p>
-                    </div>
-                  </div>
-                  {chapter.slides && chapter.slides.length > 0 && (
-                    <div className="mt-3 space-y-2">
-                      {chapter.slides.map((slide: any, slideIndex: number) => (
-                        <div
-                          key={slide.slideId || slideIndex}
-                          className="p-3 rounded bg-white/5 border border-white/5 hover:border-purple-500/30 transition-colors group"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <Badge variant="outline" className="border-white/20 text-white/70 text-xs">
-                                  {slide.type?.replace("-", " ") || "slide"}
-                                </Badge>
-                                <span className="text-white/90 font-medium text-sm">
-                                  {slide.content?.title || `Slide ${slideIndex + 1}`}
-                                </span>
-                              </div>
-                              {slide.content?.body && (
-                                <p className="text-white/60 text-xs line-clamp-2 mt-1">
-                                  {slide.content.body.replace(/[#*`]/g, "").substring(0, 100)}...
-                                </p>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 ml-4">
-                              <div className="text-white/50 text-xs">
-                                {slide.estimatedDuration || 30}s
-                              </div>
-                              <Button
-                                onClick={() => {
-                                  setSelectedSlide(slide)
-                                  setSelectedChapter(chapter)
-                                  setSidePanelOpen(true)
-                                }}
-                                variant="ghost"
-                                size="sm"
-                                className="opacity-0 group-hover:opacity-100 transition-opacity text-white/70 hover:text-white hover:bg-white/10 h-7 px-2"
-                              >
-                                <Sparkles className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
+              {layout.chapters.map((chapter: any, chapterIndex: number) => {
+                const chapterKey = chapter.chapterId || `chapter-${chapterIndex}`
+                const isExpanded = expandedSections[chapterKey] ?? true // Default to expanded
+
+                return (
+                  <div
+                    key={chapterKey}
+                    className="p-4 rounded-lg glass-surface border border-white/10"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            onClick={() => toggleSection(chapterKey)}
+                            variant="ghost"
+                            size="sm"
+                            className="p-1 h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
+                          >
+                            {isExpanded ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <h3 className="text-lg font-semibold text-white">
+                            Chapter {chapter.order || chapterIndex + 1}: {chapter.title}
+                          </h3>
                         </div>
-                      ))}
+                        <p className="text-white/60 text-sm mt-1 ml-8">
+                          {chapter.slides?.length || 0} slides
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          onClick={() => {
+                            // TODO: Edit chapter functionality
+                            toast({
+                              id: `edit-chapter-${Date.now()}`,
+                              title: "Coming Soon",
+                              description: "Chapter editing feature will be available soon.",
+                            })
+                          }}
+                          variant="ghost"
+                          size="sm"
+                          className="text-white/70 hover:text-white hover:bg-white/10"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                  )}
-                  <div className="mt-3 pt-3 border-t border-white/10">
-                    <Button
-                      onClick={() => {
-                        setSelectedChapter(chapter)
-                        setSelectedSlide(null)
-                        setSidePanelOpen(true)
-                      }}
-                      variant="outline"
-                      className="w-full border-white/20 text-white hover:bg-white/10 text-sm"
-                    >
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      Learn More About This Chapter
-                    </Button>
+                    {isExpanded && (
+                      <>
+                        {chapter.slides && chapter.slides.length > 0 && (
+                          <div className="mt-3 space-y-2">
+                            {chapter.slides.map((slide: any, slideIndex: number) => (
+                              <div
+                                key={slide.slideId || slideIndex}
+                                className="p-3 rounded bg-white/5 border border-white/5 hover:border-purple-500/30 transition-colors group"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <Badge variant="outline" className="border-white/20 text-white/70 text-xs">
+                                        {slide.type?.replace("-", " ") || "slide"}
+                                      </Badge>
+                                      <span className="text-white/90 font-medium text-sm">
+                                        {slide.content?.title || `Slide ${slideIndex + 1}`}
+                                      </span>
+                                    </div>
+                                    {slide.content?.body && (
+                                      <p className="text-white/60 text-xs line-clamp-2 mt-1">
+                                        {slide.content.body.replace(/[#*`]/g, "").substring(0, 100)}...
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 ml-4">
+                                    <div className="text-white/50 text-xs">
+                                      {slide.estimatedDuration || 30}s
+                                    </div>
+                                    <Button
+                                      onClick={() => {
+                                        setSelectedSlide(slide)
+                                        setSelectedChapter(chapter)
+                                        setSidePanelOpen(true)
+                                      }}
+                                      variant="ghost"
+                                      size="sm"
+                                      className="opacity-0 group-hover:opacity-100 transition-opacity text-white/70 hover:text-white hover:bg-white/10 h-7 px-2"
+                                    >
+                                      <Sparkles className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="mt-3 pt-3 border-t border-white/10">
+                          <Button
+                            onClick={() => {
+                              setSelectedChapter(chapter)
+                              setSelectedSlide(null)
+                              setSidePanelOpen(true)
+                            }}
+                            variant="outline"
+                            className="w-full border-white/20 text-white hover:bg-white/10 text-sm"
+                          >
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Learn More About This Chapter
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </GlassSurface>
         </ScrollReveal>

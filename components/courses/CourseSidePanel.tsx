@@ -38,12 +38,24 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
 
   const { supabase } = useSupabase()
 
-  // Generate "Learn More" content when panel opens
+  // Reset content when chapter or slide changes
   useEffect(() => {
-    if (isOpen && activeTab === "learn" && !learnMoreContent) {
+    setLearnMoreContent("")
+    setAnswer("")
+    setQuestion("")
+    setIsReading(false)
+    setIsPaused(false)
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel()
+    }
+  }, [chapter, slide])
+
+  // Generate "Learn More" content when panel opens or content changes
+  useEffect(() => {
+    if (isOpen && activeTab === "learn" && (chapter || slide)) {
       generateLearnMore()
     }
-  }, [isOpen, activeTab])
+  }, [isOpen, activeTab, chapter, slide])
 
   // Load available voices when component mounts
   useEffect(() => {
@@ -70,6 +82,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
     if (!chapter && !slide) return
 
     setLoading(true)
+    setLearnMoreContent("") // Clear previous content immediately
     try {
       const content = slide
         ? `${slide.content?.title || ""}\n\n${slide.content?.body || ""}\n\n${slide.narrationScript || ""}`
