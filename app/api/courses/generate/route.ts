@@ -96,27 +96,76 @@ Return the JSON in this exact format:
 
     const userPrompt = `Create a course about: ${topic}`
 
-    // Generate layout
-    const aiResponse = await generateAIResponse({
-      provider: "gemini",
-      prompt: userPrompt,
-      systemPrompt,
-      temperature: 0.7,
-      maxTokens: 4000,
-    })
+    // Generate layout with multiple fallbacks
+    let aiResponseText: string
+    let lastError: any = null
+
+    // Try Gemini first (with internal model fallbacks)
+    try {
+      const aiResponse = await generateAIResponse({
+        provider: "gemini",
+        prompt: userPrompt,
+        systemPrompt,
+        temperature: 0.7,
+        maxTokens: 4000,
+      })
+      aiResponseText = aiResponse.text
+    } catch (geminiError: any) {
+      console.error("Gemini AI generation error:", geminiError)
+      lastError = geminiError
+
+      // Try Groq as second fallback
+      try {
+        console.log("Falling back to Groq...")
+        const groqResponse = await generateAIResponse({
+          provider: "groq",
+          prompt: userPrompt,
+          systemPrompt,
+          temperature: 0.7,
+          maxTokens: 4000,
+        })
+        aiResponseText = groqResponse.text
+      } catch (groqError: any) {
+        console.error("Groq fallback also failed:", groqError)
+        lastError = groqError
+
+        // Try Hugging Face as final fallback
+        try {
+          console.log("Falling back to Hugging Face...")
+          const hfResponse = await generateAIResponse({
+            provider: "huggingface",
+            prompt: `${systemPrompt}\n\n${userPrompt}`,
+            systemPrompt: undefined,
+            temperature: 0.7,
+            maxTokens: 4000,
+          })
+          aiResponseText = hfResponse.text
+        } catch (hfError: any) {
+          console.error("All AI providers failed:", { geminiError, groqError, hfError })
+          return NextResponse.json(
+            { 
+              error: "Failed to generate course layout. All AI services are unavailable. Please check your API keys and try again later.",
+              details: lastError?.message 
+            },
+            { status: 500 }
+          )
+        }
+      }
+    }
 
     // Parse AI response (handle markdown code blocks if present)
     let layoutJson: CourseLayout
     try {
-      const cleanedResponse = aiResponse
+      const cleanedResponse = aiResponseText
         .replace(/```json\n?/g, "")
         .replace(/```\n?/g, "")
         .trim()
       layoutJson = JSON.parse(cleanedResponse)
     } catch (parseError) {
-      console.error("Failed to parse AI response:", aiResponse)
+      console.error("Failed to parse AI response:", aiResponseText)
+      console.error("Parse error:", parseError)
       return NextResponse.json(
-        { error: "Failed to generate valid course layout. Please try again." },
+        { error: "Failed to generate valid course layout. The AI response was not in the expected format. Please try again." },
         { status: 500 }
       )
     }

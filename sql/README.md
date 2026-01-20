@@ -15,10 +15,9 @@ Execute the SQL files in the following order:
 7. **07-create-courses-table.sql** - Courses table (for video generation)
 8. **08-create-render-jobs-table.sql** - Render jobs table (depends on courses)
 9. **09-create-course-slides-table.sql** - Course slides table (depends on courses)
-10. **create-calendar-table.sql** - Calendar events table (already exists)
-11. **create-study-guides-table.sql** - Study guides table (updated with RLS)
-12. **create-user-settings-table.sql** - User settings table (already exists)
-13. **10-create-storage-buckets.sql** - Storage buckets for file uploads
+10. **10-create-storage-buckets.sql** - Storage buckets for file uploads
+11. **11-create-user-settings-table.sql** - User settings table (NEW - Required for settings page)
+12. **create-study-guides-table.sql** - Study guides table (updated with RLS)
 
 ## How to Execute
 

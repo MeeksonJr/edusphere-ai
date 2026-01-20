@@ -2,7 +2,7 @@
 // All client initialization is done lazily at runtime
 
 let hf: any = null
-let geminiModel: any = null
+let geminiModelCache: { model: any; modelId: string } | null = null
 
 // Helper to check if we're in a build context
 function isBuildContext(): boolean {
@@ -35,37 +35,54 @@ async function getHfClient() {
   return hf
 }
 
-async function getGeminiModel() {
+async function getGeminiModel(modelName?: string) {
   // Only execute on server, never during build
   if (typeof window !== "undefined" || isBuildContext()) {
     throw new Error("AI service can only be used on the server side at runtime")
   }
   
-  if (!geminiModel) {
-    try {
-      const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
-      if (!apiKey) {
-        console.warn("GEMINI_API_KEY not found")
-        return null
-      }
-      const { GoogleGenerativeAI } = await import("@google/generative-ai")
-      const genAI = new GoogleGenerativeAI(apiKey)
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
-      // Verify the model has the generateContent method
-      if (model && typeof model.generateContent === "function") {
-        geminiModel = model
-      } else {
-        throw new Error("Gemini model does not have generateContent method")
-      }
-    } catch (error) {
-      console.error("Failed to initialize Gemini model:", error)
+  try {
+    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
+    if (!apiKey) {
+      console.warn("GEMINI_API_KEY not found")
       return null
     }
+    const { GoogleGenerativeAI } = await import("@google/generative-ai")
+    const genAI = new GoogleGenerativeAI(apiKey)
+    
+    // Try the specified model or use fallback chain
+    const modelsToTry = modelName 
+      ? [modelName]
+      : [
+          "gemini-2.5-flash",        // Stable, fast, best price-performance
+          "gemini-3-flash-preview",  // Latest flash model
+          "gemini-2.5-pro",          // Stable pro model
+          "gemini-3-pro-preview",    // Latest pro model
+          "gemini-2.0-flash",        // Previous generation stable
+          "gemini-pro",              // Legacy stable model
+        ]
+    
+    for (const modelId of modelsToTry) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelId })
+        // Verify the model has the generateContent method
+        if (model && typeof model.generateContent === "function") {
+          return { model, modelId }
+        }
+      } catch (modelError: any) {
+        console.warn(`Failed to initialize Gemini model ${modelId}:`, modelError.message)
+        continue // Try next model
+      }
+    }
+    
+    throw new Error("All Gemini models failed to initialize")
+  } catch (error) {
+    console.error("Failed to initialize Gemini model:", error)
+    return null
   }
-  return geminiModel
 }
 
-export type AIProvider = "gemini" | "huggingface"
+export type AIProvider = "gemini" | "huggingface" | "groq"
 
 export interface AIRequestOptions {
   provider: AIProvider
@@ -87,11 +104,12 @@ export async function generateAIResponse(options: AIRequestOptions): Promise<AIR
 
   try {
     if (provider === "gemini") {
-      const geminiModelInstance = await getGeminiModel()
-      if (!geminiModelInstance) {
+      const geminiResult = await getGeminiModel()
+      if (!geminiResult) {
         throw new Error("Gemini model not available. Make sure GEMINI_API_KEY is set.")
       }
 
+      const { model: geminiModelInstance, modelId } = geminiResult
       const geminiPrompt = systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt
 
       // Check if generateContent method exists
@@ -106,7 +124,7 @@ export async function generateAIResponse(options: AIRequestOptions): Promise<AIR
       return {
         text,
         provider: "gemini",
-        model: "gemini-1.5-flash",
+        model: modelId,
       }
     } else if (provider === "huggingface") {
       const client = await getHfClient()
@@ -131,12 +149,75 @@ export async function generateAIResponse(options: AIRequestOptions): Promise<AIR
         provider: "huggingface",
         model: hfModelName,
       }
+    } else if (provider === "groq") {
+      // Groq fallback support
+      return await generateGroqResponse(prompt, systemPrompt, temperature, maxTokens)
     } else {
       throw new Error("Invalid AI provider specified")
     }
   } catch (error: any) {
     console.error("AI generation error:", error)
     throw new Error(`Failed to generate AI response: ${error.message}`)
+  }
+}
+
+/**
+ * Generate response using Groq API (fallback)
+ */
+async function generateGroqResponse(
+  prompt: string,
+  systemPrompt?: string,
+  temperature: number = 0.7,
+  maxTokens: number = 1024
+): Promise<AIResponse> {
+  try {
+    const apiKey = process.env.GROQ_API_KEY
+    if (!apiKey) {
+      throw new Error("GROQ_API_KEY is not set")
+    }
+
+    // Dynamic import to avoid build-time issues
+    const Groq = (await import("groq-sdk")).default
+    const groq = new Groq({ apiKey })
+
+    // Try models in order of preference
+    const modelsToTry = [
+      "llama-3.3-70b-versatile",  // Best quality
+      "llama-3.1-8b-instant",      // Fastest
+      "gpt-oss-120b",              // OpenAI OSS
+      "gpt-oss-20b",               // Smaller OpenAI OSS
+    ]
+
+    for (const modelId of modelsToTry) {
+      try {
+        const completion = await groq.chat.completions.create({
+          messages: [
+            ...(systemPrompt ? [{ role: "system" as const, content: systemPrompt }] : []),
+            { role: "user" as const, content: prompt },
+          ],
+          model: modelId,
+          temperature,
+          max_tokens: maxTokens,
+        })
+
+        const text = completion.choices[0]?.message?.content || ""
+        if (text) {
+          return {
+            text,
+            provider: "groq",
+            model: modelId,
+          }
+        }
+      } catch (modelError: any) {
+        console.warn(`Groq model ${modelId} failed:`, modelError.message)
+        continue // Try next model
+      }
+    }
+
+    throw new Error("All Groq models failed")
+  } catch (error: any) {
+    console.error("Groq generation error:", error)
+    throw new Error(`Failed to generate Groq response: ${error.message}`)
   }
 }
 

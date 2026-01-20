@@ -1,6 +1,6 @@
 // Wrapper to ensure AI service is only loaded at runtime, not during build
 export async function generateAIResponse(options: {
-  provider: "gemini" | "huggingface"
+  provider: "gemini" | "huggingface" | "groq"
   prompt: string
   systemPrompt?: string
   model?: string
