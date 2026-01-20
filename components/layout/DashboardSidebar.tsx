@@ -24,12 +24,14 @@ import { useSupabase } from "@/components/supabase-provider";
 import { useMediaQuery } from "@/hooks/use-mobile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { GlassSurface } from "@/components/shared/GlassSurface";
+import { useSettings } from "@/contexts/settings-context";
 import { cn } from "@/lib/utils";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { supabase } = useSupabase();
+  const { settings } = useSettings();
   const [open, setOpen] = useState(true);
   const [collapsed, setCollapsed] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -74,20 +76,24 @@ export function DashboardSidebar() {
   // Keyboard shortcut: Ctrl+B to toggle sidebar (check settings)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Check if shortcuts are enabled (default to true)
-      const shortcutsEnabled = localStorage.getItem("keyboardShortcuts") !== "false";
+      // Check if shortcuts are enabled from settings context (default to true)
+      const shortcutsEnabled = settings?.keyboardShortcuts?.sidebarToggle !== false;
       
-      if (shortcutsEnabled && (e.ctrlKey || e.metaKey) && e.key === "b") {
+      // Also check localStorage as fallback (for instant updates)
+      const localStorageEnabled = localStorage.getItem("keyboardShortcuts") !== "false";
+      const enabled = shortcutsEnabled !== false && localStorageEnabled;
+      
+      if (enabled && (e.ctrlKey || e.metaKey) && e.key === "b") {
         e.preventDefault();
         if (!isMobile) {
-          setOpen((prev) => !prev);
+          setCollapsed((prev) => !prev);
         }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isMobile]);
+  }, [isMobile, settings]);
 
   const handleSignOut = async () => {
     if (!supabase) {

@@ -29,14 +29,19 @@ export async function POST(
     }
 
     const body = await request.json()
-    const { title, topic } = body
+    const { title, topicCount } = body
 
-    if (!title || !topic) {
+    if (!title) {
       return NextResponse.json(
-        { error: "Chapter title and topic are required" },
+        { error: "Chapter title is required" },
         { status: 400 }
       )
     }
+
+    // Validate and limit topic count (1-5)
+    let validTopicCount = parseInt(topicCount, 10) || 3
+    if (validTopicCount < 1) validTopicCount = 1
+    if (validTopicCount > 5) validTopicCount = 5
 
     const currentLayout = course.layout as any || { chapters: [] }
     const existingChapters = currentLayout.chapters || []
@@ -51,12 +56,14 @@ export async function POST(
         body: JSON.stringify({
           action: "generateAIResponse",
           provider: "gemini",
-          prompt: `Generate a chapter for a course about "${course.title}". 
+          prompt: `Generate a comprehensive chapter for a course about "${course.title}". 
       
 Chapter Title: ${title}
-Chapter Topic: ${topic}
+Number of Topics: ${validTopicCount}
 
-Create a chapter with 3-5 slides covering this topic. Return a JSON object with this structure:
+Create a well-structured chapter with ${validTopicCount} main topics. Each topic should have 2-3 slides (title slide + content slides) that flow smoothly from one topic to the next. The chapter should be organized, detailed, and provide enough context for each topic while maintaining a logical flow throughout.
+
+Return a JSON object with this structure:
 {
   "chapterId": "generate-uuid-here",
   "title": "${title}",
@@ -90,36 +97,55 @@ Return ONLY the JSON object, no markdown formatting.`,
       response = { text: result.data?.text || "" }
     } catch (aiError: any) {
       console.error("AI generation error, using fallback:", aiError)
-      // Fallback: Create basic chapter structure
+      // Fallback: Create basic chapter structure with requested number of topics
+      const fallbackSlides: any[] = [
+        {
+          slideId: `slide-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          type: "title-slide",
+          content: {
+            title: title,
+            body: `This chapter covers ${validTopicCount} main topics.`,
+            visualElements: [],
+          },
+          narrationScript: `Welcome to ${title}. This chapter will cover ${validTopicCount} important topics.`,
+          estimatedDuration: 30,
+        },
+      ]
+
+      // Add slides for each topic
+      for (let i = 1; i <= validTopicCount; i++) {
+        fallbackSlides.push(
+          {
+            slideId: `slide-${Date.now()}-${i}-1-${Math.random().toString(36).substring(2, 9)}`,
+            type: "content-slide",
+            content: {
+              title: `Topic ${i}: Introduction`,
+              body: `This is topic ${i} of ${validTopicCount} in this chapter.`,
+              visualElements: [],
+            },
+            narrationScript: `Let's begin with topic ${i}.`,
+            estimatedDuration: 30,
+          },
+          {
+            slideId: `slide-${Date.now()}-${i}-2-${Math.random().toString(36).substring(2, 9)}`,
+            type: "content-slide",
+            content: {
+              title: `Topic ${i}: Details`,
+              body: `Here are the key details for topic ${i}.`,
+              visualElements: [],
+            },
+            narrationScript: `Now let's explore the details of topic ${i}.`,
+            estimatedDuration: 30,
+          }
+        )
+      }
+
       response = {
         text: JSON.stringify({
           chapterId: `chapter-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           title: title,
           order: newChapterOrder,
-          slides: [
-            {
-              slideId: `slide-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-              type: "title-slide",
-              content: {
-                title: title,
-                body: `This chapter covers ${topic}.`,
-                visualElements: [],
-              },
-              narrationScript: `Welcome to ${title}. This chapter will cover ${topic}.`,
-              estimatedDuration: 30,
-            },
-            {
-              slideId: `slide-${Date.now()}-1-${Math.random().toString(36).substring(2, 9)}`,
-              type: "content-slide",
-              content: {
-                title: `Introduction to ${topic}`,
-                body: `Let's explore ${topic} in detail.`,
-                visualElements: [],
-              },
-              narrationScript: `In this section, we'll dive into ${topic}.`,
-              estimatedDuration: 30,
-            },
-          ],
+          slides: fallbackSlides,
         }),
       }
     }

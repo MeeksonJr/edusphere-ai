@@ -495,14 +495,22 @@ function CourseDetailContent() {
                   const title = prompt("Enter chapter title:")
                   if (!title) return
 
-                  const topic = prompt("Enter chapter topic:")
-                  if (!topic) return
+                  let topicCountInput = prompt("Enter number of topics (1-5):")
+                  if (!topicCountInput) return
+
+                  // Parse and validate topic count
+                  let topicCount = parseInt(topicCountInput, 10)
+                  if (isNaN(topicCount) || topicCount < 1) {
+                    topicCount = 1
+                  } else if (topicCount > 5) {
+                    topicCount = 5
+                  }
 
                   try {
                     const response = await fetch(`/api/courses/${params.id}/chapters`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ title, topic }),
+                      body: JSON.stringify({ title, topicCount }),
                     })
 
                     const result = await response.json()
@@ -514,7 +522,7 @@ function CourseDetailContent() {
                     toast({
                       id: `chapter-added-${Date.now()}`,
                       title: "Chapter Added!",
-                      description: `Successfully added "${title}" with ${result.chapter?.slides?.length || 0} slides.`,
+                      description: `Successfully added "${title}" with ${result.chapter?.slides?.length || 0} slides across ${topicCount} topics.`,
                     })
 
                     // Refresh the page to show the new chapter

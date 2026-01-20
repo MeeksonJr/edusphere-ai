@@ -317,20 +317,195 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
           {activeTab === "learn" && (
-            <GlassSurface className="p-6">
-              {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 text-purple-400 animate-spin" />
-                  <span className="ml-3 text-white/70">Generating detailed content...</span>
-                </div>
-              ) : (
-                <div className="prose prose-invert max-w-none">
-                  <div className="text-white/90 whitespace-pre-wrap leading-relaxed">
-                    {learnMoreContent || "Click to generate detailed content..."}
+            <div className="space-y-4">
+              <GlassSurface className="p-6">
+                {loading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 text-purple-400 animate-spin" />
+                    <span className="ml-3 text-white/70">Generating detailed content...</span>
                   </div>
-                </div>
+                ) : (
+                  <div className="prose prose-invert max-w-none">
+                    <div className="text-white/90 whitespace-pre-wrap leading-relaxed">
+                      {learnMoreContent || "Click to generate detailed content..."}
+                    </div>
+                  </div>
+                )}
+              </GlassSurface>
+
+              {/* Read Aloud Controls for Learn More Content */}
+              {learnMoreContent && !loading && (
+                <GlassSurface className="p-6 border-purple-500/30">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-white font-semibold flex items-center">
+                        <Volume2 className="h-5 w-5 mr-2 text-purple-400" />
+                        Read Aloud
+                      </h3>
+                    </div>
+
+                    {/* Voice Selection */}
+                    <div>
+                      <label className="block text-white/70 text-sm font-medium mb-2">
+                        Voice
+                      </label>
+                      <select
+                        value={selectedVoice}
+                        onChange={(e) => setSelectedVoice(e.target.value)}
+                        disabled={isReading}
+                        aria-label="Voice selection"
+                        className="w-full glass-surface border border-white/20 text-white bg-white/5 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                      >
+                        {availableVoices.length === 0 ? (
+                          <option value="">Loading voices...</option>
+                        ) : (
+                          availableVoices.map((voice) => (
+                            <option key={voice.name} value={voice.name} className="bg-gray-800">
+                              {voice.name} ({voice.lang})
+                            </option>
+                          ))
+                        )}
+                      </select>
+                    </div>
+
+                    {/* Speed and Pitch Controls */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-white/70 text-sm font-medium mb-2">
+                          Speed: {speechRate.toFixed(1)}x
+                        </label>
+                        <input
+                          type="range"
+                          min="0.5"
+                          max="2"
+                          step="0.1"
+                          value={speechRate}
+                          onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
+                          disabled={isReading}
+                          className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 disabled:opacity-50"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-white/70 text-sm font-medium mb-2">
+                          Pitch: {speechPitch.toFixed(1)}
+                        </label>
+                        <input
+                          type="range"
+                          min="0.5"
+                          max="2"
+                          step="0.1"
+                          value={speechPitch}
+                          onChange={(e) => setSpeechPitch(parseFloat(e.target.value))}
+                          disabled={isReading}
+                          className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 disabled:opacity-50"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Control Buttons */}
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={() => {
+                          if (isPaused) {
+                            // Resume
+                            window.speechSynthesis.resume()
+                            setIsPaused(false)
+                          } else if (isReading) {
+                            // Pause
+                            window.speechSynthesis.pause()
+                            setIsPaused(true)
+                          } else {
+                            // Start reading
+                            const textToRead = learnMoreContent
+                            if (!textToRead) return
+
+                            setIsReading(true)
+                            setIsPaused(false)
+                            
+                            const utterance = new SpeechSynthesisUtterance(textToRead)
+                            utterance.rate = speechRate
+                            utterance.pitch = speechPitch
+                            utterance.volume = 1
+
+                            if (selectedVoice) {
+                              const voice = availableVoices.find((v) => v.name === selectedVoice)
+                              if (voice) {
+                                utterance.voice = voice
+                              }
+                            }
+
+                            utterance.onend = () => {
+                              setIsReading(false)
+                              setIsPaused(false)
+                              setCurrentUtterance(null)
+                            }
+
+                            utterance.onerror = () => {
+                              setIsReading(false)
+                              setIsPaused(false)
+                              setCurrentUtterance(null)
+                            }
+
+                            setCurrentUtterance(utterance)
+                            window.speechSynthesis.speak(utterance)
+                          }
+                        }}
+                        disabled={!learnMoreContent || !window.speechSynthesis}
+                        className={`flex-1 ${
+                          isReading && !isPaused
+                            ? "bg-yellow-500 hover:bg-yellow-600"
+                            : isPaused
+                            ? "bg-green-500 hover:bg-green-600"
+                            : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                        } text-white border-0`}
+                      >
+                        {isReading && !isPaused ? (
+                          <>
+                            <Pause className="mr-2 h-4 w-4" />
+                            Pause
+                          </>
+                        ) : isPaused ? (
+                          <>
+                            <Play className="mr-2 h-4 w-4" />
+                            Resume
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="mr-2 h-4 w-4" />
+                            Start Reading
+                          </>
+                        )}
+                      </Button>
+                      {isReading && (
+                        <Button
+                          onClick={handleStopReading}
+                          className="bg-red-500 hover:bg-red-600 text-white border-0"
+                        >
+                          <VolumeX className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Transcript */}
+                    {learnMoreContent && (
+                      <div className="mt-4">
+                        <label className="block text-white/70 text-sm font-medium mb-2">
+                          Transcript
+                        </label>
+                        <div className="glass-surface border border-white/10 p-4 rounded-lg max-h-48 overflow-y-auto">
+                          <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">
+                            {learnMoreContent}
+                          </p>
+                        </div>
+                        <p className="text-xs text-white/50 mt-2">
+                          Follow along with the transcript as you listen
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </GlassSurface>
               )}
-            </GlassSurface>
+            </div>
           )}
 
           {activeTab === "qa" && (
