@@ -51,7 +51,7 @@ export default function NewFlashcardPage() {
   const [newSet, setNewSet] = useState({
     title: "",
     description: "",
-    subject: "",
+    subject: "none",
     cards: [] as { question: string; answer: string }[],
   })
   const [newCard, setNewCard] = useState({ question: "", answer: "" })
@@ -181,7 +181,7 @@ export default function NewFlashcardPage() {
         user_id: userData.user.id,
         title: newSet.title,
         description: newSet.description || null,
-        subject: newSet.subject || null,
+        subject: newSet.subject === "none" ? null : newSet.subject,
         cards: newSet.cards,
       })
 
@@ -263,7 +263,7 @@ export default function NewFlashcardPage() {
                     <SelectValue placeholder="Select a subject" />
                   </SelectTrigger>
                   <SelectContent className="glass-surface border-white/20">
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {subjects.map((subject) => (
                       <SelectItem key={subject} value={subject} className="text-white">
                         {subject}

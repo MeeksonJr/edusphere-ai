@@ -64,7 +64,7 @@ export default function NewResourcePage() {
   const [newResource, setNewResource] = useState({
     title: "",
     description: "",
-    subject: "",
+    subject: "none",
     content: "",
     resource_type: "notes",
     tags: [] as string[],
@@ -215,7 +215,7 @@ export default function NewResourcePage() {
         user_id: userData.user.id,
         title: newResource.title,
         description: newResource.description || null,
-        subject: newResource.subject || null,
+        subject: newResource.subject === "none" ? null : newResource.subject,
         content: newResource.content,
         resource_type: newResource.resource_type,
         tags: newResource.tags,
@@ -306,7 +306,7 @@ export default function NewResourcePage() {
                       <SelectValue placeholder="Select a subject" />
                     </SelectTrigger>
                     <SelectContent className="glass-surface border-white/20">
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {subjects.map((subject) => (
                         <SelectItem key={subject} value={subject} className="text-white">
                           {subject}
