@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /auth/
+Disallow: /_next/
+
+Sitemap: https://edusphere-ai-eight.vercel.app/sitemap.xml
+

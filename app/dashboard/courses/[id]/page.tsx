@@ -76,6 +76,7 @@ function CourseDetailContent() {
         console.error("Error fetching course:", err)
         setError(err.message || "Failed to load course")
         toast({
+          id: `course-error-${Date.now()}`,
           title: "Error",
           description: "Failed to load course. Please try again.",
           variant: "destructive",
@@ -86,6 +87,38 @@ function CourseDetailContent() {
     }
 
     fetchCourse()
+
+    // Poll for updates if course is pending or processing
+    const pollInterval = setInterval(() => {
+      if (!supabase || !params.id) return
+      
+      supabase
+        .from("courses")
+        .select("*")
+        .eq("id", params.id)
+        .single()
+        .then(({ data, error }) => {
+          if (!error && data) {
+            setCourse((prevCourse: any) => {
+              // Only update if status changed or layout was updated
+              if (!prevCourse || prevCourse.status !== data.status || 
+                  JSON.stringify(prevCourse.layout) !== JSON.stringify(data.layout)) {
+                return data
+              }
+              return prevCourse
+            })
+            
+            // Stop polling if course is completed or failed
+            if (data.status === "completed" || data.status === "failed") {
+              clearInterval(pollInterval)
+            }
+          }
+        })
+        .catch((err) => console.error("Polling error:", err))
+    }, 3000) // Poll every 3 seconds
+
+    // Cleanup interval on unmount
+    return () => clearInterval(pollInterval)
   }, [supabase, params.id, toast])
 
   const getStatusBadge = (status: string) => {

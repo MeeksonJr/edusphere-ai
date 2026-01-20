@@ -207,7 +207,7 @@ export async function updateSubscription(subscriptionId: string, tier: string, u
         subscription_tier: tier,
         subscription_id: subscriptionId,
         subscription_status: "ACTIVE",
-        subscription_updated_at: new Date().toISOString(),
+        subscription_last_updated: new Date().toISOString(),
       })
       .eq("id", userId)
 

@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         subscription_tier: tier,
         subscription_id: orderId,
         subscription_status: "ACTIVE",
-        subscription_updated_at: new Date().toISOString(),
+        subscription_last_updated: new Date().toISOString(),
       })
       .eq("id", userId)
 
