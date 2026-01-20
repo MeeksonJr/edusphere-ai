@@ -62,6 +62,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   // Load settings from database on initial render
   useEffect(() => {
     const loadSettings = async () => {
+      if (!supabase) {
+        setLoading(false)
+        return
+      }
+
       try {
         setLoading(true)
         const {
@@ -107,6 +112,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   // Update settings in the database
   const updateSettings = async (newSettings: Partial<UserSettings>) => {
+    if (!supabase) {
+      console.warn("Cannot update settings: Supabase client not available")
+      return
+    }
     try {
       setLoading(true)
 

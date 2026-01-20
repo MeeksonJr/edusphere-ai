@@ -28,11 +28,34 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+    // Debug logging (only in development)
+    if (process.env.NODE_ENV === "development") {
+      console.log("Supabase Client Initialization:", {
+        url: supabaseUrl,
+        hasPublishableKey: !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+        hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        usingKey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ? "publishable" : "anon",
+      })
+    }
+
     if (!supabaseUrl || !supabaseAnonKey) {
       console.error(
-        "Missing Supabase environment variables. Please check NEXT_PUBLIC_SUPABASE_URL and either NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY are set."
+        "Missing Supabase environment variables. Please check NEXT_PUBLIC_SUPABASE_URL and either NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY are set.",
+        {
+          url: supabaseUrl,
+          hasPublishableKey: !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+          hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        }
       )
       return
+    }
+
+    // Validate URL format
+    if (!supabaseUrl.includes("qyqbqgubsuxepnloduvd")) {
+      console.warn(
+        "⚠️ WARNING: Supabase URL appears to be from old database. Expected: qyqbqgubsuxepnloduvd, Got:",
+        supabaseUrl
+      )
     }
 
     try {
