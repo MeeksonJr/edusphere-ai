@@ -98,10 +98,18 @@ Requirements:
 - Each slide should have: title, content (in markdown), narration script, and estimated duration
 - Return ONLY valid JSON, no markdown formatting or code blocks
 
-Course structure:
-- For "quick-explainer": 1-3 chapters, 3-5 slides per chapter
-- For "full-course": 6-10 chapters, 4-6 slides per chapter (optimize for fast generation)
-- For "tutorial": 3-6 chapters, 3-5 slides per chapter
+Course structure (MINIMAL - for fast generation, can be enhanced later):
+- For "quick-explainer": 1-2 chapters, 2-3 slides per chapter
+- For "full-course": 3-5 chapters, 3-4 slides per chapter
+- For "tutorial": 2-4 chapters, 2-3 slides per chapter
+
+IMPORTANT: Generate a COMPLETE but MINIMAL course structure. Each slide must have:
+- A clear title
+- Content body (can be brief, 2-3 sentences minimum)
+- Narration script (can be brief, 1-2 sentences minimum)
+- Estimated duration (30-60 seconds per slide)
+
+The course should be functional and complete, but can be expanded later using the "Enhance Course" feature.
 
 Generate unique IDs for courseId, chapterId, and slideId (use UUID format).
 

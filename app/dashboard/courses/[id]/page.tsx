@@ -24,6 +24,8 @@ import {
   Plus,
   ChevronDown,
   ChevronUp,
+  Sparkles,
+  Zap,
 } from "lucide-react"
 import Link from "next/link"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
@@ -273,6 +275,48 @@ function CourseDetailContent() {
       }
     } catch (err) {
       console.error("Error updating progress:", err)
+    }
+  }
+
+  const handleEnhanceCourse = async () => {
+    if (!supabase || !params.id || enhancing) return
+
+    setEnhancing(true)
+    try {
+      const response = await fetch(`/api/courses/${params.id}/enhance`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to enhance course")
+      }
+
+      toast({
+        id: `course-enhanced-${Date.now()}`,
+        title: "Course Enhanced!",
+        description: `Added ${result.totalSlides} slides across ${result.chapters} chapters.`,
+      })
+
+      // Refresh course data
+      router.refresh()
+      
+      // Reload the page to show updated content
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
+    } catch (err: any) {
+      console.error("Error enhancing course:", err)
+      toast({
+        id: `course-enhance-error-${Date.now()}`,
+        title: "Error",
+        description: err.message || "Failed to enhance course. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setEnhancing(false)
     }
   }
 
