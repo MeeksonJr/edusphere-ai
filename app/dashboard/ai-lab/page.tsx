@@ -1,14 +1,13 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
 import {
   Sparkles,
   Send,
@@ -42,6 +41,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { GlassSurface } from "@/components/shared/GlassSurface"
+import { AnimatedCard } from "@/components/shared/AnimatedCard"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 
 export default function AILabPage() {
   const { supabase } = useSupabase()
@@ -86,7 +89,6 @@ export default function AILabPage() {
         const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
         setUser({ ...data.user, profile })
 
-        // Fetch saved chats
         const { data: chats } = await supabase
           .from("ai_chats")
           .select("*")
@@ -103,7 +105,6 @@ export default function AILabPage() {
           )
         }
 
-        // Fetch saved flashcards
         const { data: flashcardSets } = await supabase
           .from("flashcard_sets")
           .select("*")
@@ -120,7 +121,6 @@ export default function AILabPage() {
           )
         }
 
-        // Fetch saved study plans
         const { data: studyPlans } = await supabase
           .from("study_guides")
           .select("*")
@@ -140,18 +140,15 @@ export default function AILabPage() {
         }
       }
     }
-
     getUser()
   }, [supabase])
 
   useEffect(() => {
-    // Scroll to bottom of chat
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: "smooth" })
     }
   }, [chatHistory])
 
-  // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto"
@@ -165,27 +162,16 @@ export default function AILabPage() {
 
     try {
       setLoading(true)
-
-      // Add user message to chat
       const userMessage = chatInput.trim()
       setChatHistory((prev) => [...prev, { role: "user", content: userMessage }])
       setChatInput("")
 
       if (!user) throw new Error("You must be logged in to use the AI Lab")
-
-      // Track AI usage
       await trackAIUsage(supabase, user.id)
-
-      // Show thinking state
       setIsThinking(true)
 
-      // Get AI response
       const response = await answerQuestion(userMessage)
-
-      // Hide thinking state
       setIsThinking(false)
-
-      // Add AI response to chat
       setChatHistory((prev) => [...prev, { role: "assistant", content: response }])
     } catch (error: any) {
       toast({
@@ -263,11 +249,8 @@ export default function AILabPage() {
   const deleteSavedChat = async (chatId: string) => {
     try {
       const { error } = await supabase.from("ai_chats").delete().eq("id", chatId)
-
       if (error) throw error
-
       setSavedChats((prev) => prev.filter((chat) => chat.id !== chatId))
-
       toast({
         title: "Chat Deleted",
         description: "The chat has been deleted successfully.",
@@ -286,13 +269,8 @@ export default function AILabPage() {
 
     try {
       setLoading(true)
-
       if (!user) throw new Error("You must be logged in to use the AI Lab")
-
-      // Track AI usage
       await trackAIUsage(supabase, user.id)
-
-      // Generate summary
       const summary = await generateSummary(summaryInput)
       setSummaryResult(summary)
     } catch (error: any) {
@@ -311,13 +289,8 @@ export default function AILabPage() {
 
     try {
       setLoading(true)
-
       if (!user) throw new Error("You must be logged in to use the AI Lab")
-
-      // Track AI usage
       await trackAIUsage(supabase, user.id)
-
-      // Generate study plan
       const plan = await generateStudyPlan(studySubject, studyTopic)
       setStudyPlan(plan)
       setStudyPlanTitle(`${studySubject}: ${studyTopic}`)
@@ -370,12 +343,11 @@ export default function AILabPage() {
           ...prev,
         ])
 
-        setIsSaveStudyPlanDialogOpen(false)
-
         toast({
           title: "Study Plan Saved",
           description: "Your study plan has been saved successfully.",
         })
+        setIsSaveStudyPlanDialogOpen(false)
       }
     } catch (error: any) {
       toast({
@@ -390,20 +362,17 @@ export default function AILabPage() {
     const plan = savedStudyPlans.find((p) => p.id === planId)
     if (plan) {
       setStudyPlan(plan.content)
+      setStudyPlanTitle(plan.title)
       setStudySubject(plan.subject)
       setStudyTopic(plan.topic)
-      setStudyPlanTitle(plan.title)
     }
   }
 
   const deleteSavedStudyPlan = async (planId: string) => {
     try {
       const { error } = await supabase.from("study_guides").delete().eq("id", planId)
-
       if (error) throw error
-
       setSavedStudyPlans((prev) => prev.filter((plan) => plan.id !== planId))
-
       toast({
         title: "Study Plan Deleted",
         description: "The study plan has been deleted successfully.",
@@ -422,13 +391,8 @@ export default function AILabPage() {
 
     try {
       setLoading(true)
-
       if (!user) throw new Error("You must be logged in to use the AI Lab")
-
-      // Track AI usage
       await trackAIUsage(supabase, user.id)
-
-      // Generate flashcards
       const cards = await generateFlashcards(flashcardTopic, Number.parseInt(flashcardCount))
       setFlashcards(cards)
       setActiveFlashcard(0)
@@ -505,11 +469,8 @@ export default function AILabPage() {
   const deleteSavedFlashcardSet = async (setId: string) => {
     try {
       const { error } = await supabase.from("flashcard_sets").delete().eq("id", setId)
-
       if (error) throw error
-
       setSavedFlashcards((prev) => prev.filter((set) => set.id !== setId))
-
       toast({
         title: "Flashcard Set Deleted",
         description: "The flashcard set has been deleted successfully.",
@@ -587,33 +548,21 @@ export default function AILabPage() {
     URL.revokeObjectURL(url)
   }
 
-  // Function to get AI explanation for flashcard
   const getFlashcardExplanation = async (question: string, answer: string) => {
     try {
       setLoading(true)
-
       if (!user) throw new Error("You must be logged in to use the AI Lab")
-
-      // Track AI usage
       await trackAIUsage(supabase, user.id)
 
-      // Generate explanation
       const prompt = `Please explain in detail how to arrive at this answer:\n\nQuestion: ${question}\nAnswer: ${answer}\n\nProvide a step-by-step explanation with any relevant formulas, concepts, or reasoning.`
 
-      // Add to chat history
       setChatHistory([
         { role: "user", content: prompt },
         { role: "assistant", content: "Generating detailed explanation..." },
       ])
 
-      // Switch to chat tab
-      document.querySelector('[data-state="inactive"][value="chat"]')?.click()
-
-      // Get AI response
       const explanation = await answerQuestion(prompt)
-
-      // Update the last message with the actual response
-      setChatHistory((prev) => [prev[0], { role: "assistant", content: explanation }])
+      setChatHistory([{ role: "user", content: prompt }, { role: "assistant", content: explanation }])
     } catch (error: any) {
       toast({
         title: "Error",
@@ -625,10 +574,8 @@ export default function AILabPage() {
     }
   }
 
-  // Function to edit flashcard
   const handleEditFlashcard = () => {
     if (!editingFlashcard) return
-
     const { index, field, value } = editingFlashcard
     const updatedFlashcards = [...flashcards]
     updatedFlashcards[index] = {
@@ -640,7 +587,6 @@ export default function AILabPage() {
     setEditingFlashcard(null)
   }
 
-  // Function to delete flashcard
   const deleteFlashcard = (index: number) => {
     const updatedFlashcards = flashcards.filter((_, i) => i !== index)
     setFlashcards(updatedFlashcards)
@@ -649,153 +595,126 @@ export default function AILabPage() {
     }
   }
 
-  // Function to render markdown content
-  const renderMarkdown = (content: string) => {
-    // This is a simple implementation - in a real app, you'd use a markdown parser
-    const sections = content.split("\n\n")
-    return sections.map((section, index) => {
-      if (section.startsWith("# ")) {
-        return (
-          <h1 key={index} className="text-3xl font-bold my-6">
-            {section.replace("# ", "")}
-          </h1>
-        )
-      } else if (section.startsWith("## ")) {
-        return (
-          <h2 key={index} className="text-2xl font-bold my-5">
-            {section.replace("## ", "")}
-          </h2>
-        )
-      } else if (section.startsWith("### ")) {
-        return (
-          <h3 key={index} className="text-xl font-bold my-4">
-            {section.replace("### ", "")}
-          </h3>
-        )
-      } else if (section.startsWith("- ")) {
-        const items = section.split("\n").map((item) => item.replace("- ", ""))
-        return (
-          <ul key={index} className="list-disc pl-6 my-4 space-y-2">
-            {items.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
-        )
-      } else if (section.includes("\n1. ")) {
-        const items = section.split("\n").filter((item) => item.match(/^\d+\. /))
-        return (
-          <ol key={index} className="list-decimal pl-6 my-4 space-y-2">
-            {items.map((item, i) => (
-              <li key={i}>{item.replace(/^\d+\. /, "")}</li>
-            ))}
-          </ol>
-        )
-      } else if (section.startsWith("**")) {
-        return (
-          <p key={index} className="font-bold my-4">
-            {section.replace(/\*\*/g, "")}
-          </p>
-        )
-      } else {
-        return (
-          <p key={index} className="my-4">
-            {section}
-          </p>
-        )
-      }
-    })
-  }
-
   return (
-    <div className="p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold neon-text-green">AI Lab</h1>
-        <p className="text-gray-400 mt-1">
-          Leverage AI to enhance your learning experience
-          {user?.profile?.subscription_tier === "free" && (
-            <span className="ml-2 text-xs bg-gray-800 px-2 py-1 rounded-full">
-              {10 - (user?.profile?.ai_requests_count || 0)} requests remaining
+    <div className="p-6 md:p-8 lg:p-12">
+      {/* Header */}
+      <ScrollReveal direction="up">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <span className="text-white">AI</span>{" "}
+            <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+              Lab
             </span>
-          )}
-        </p>
-      </div>
-
-      <div className="flex items-center mb-6 space-x-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium">AI Provider:</span>
-          <Select value={aiProvider} onValueChange={(value: "gemini" | "huggingface") => setAiProvider(value)}>
-            <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700">
-              <SelectValue placeholder="Select provider" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="gemini">
-                <div className="flex items-center">
-                  <Sparkles className="mr-2 h-4 w-4 text-blue-400" />
-                  Gemini AI
-                </div>
-              </SelectItem>
-              <SelectItem value="huggingface">
-                <div className="flex items-center">
-                  <Zap className="mr-2 h-4 w-4 text-yellow-400" />
-                  Hugging Face
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          </h1>
+          <div className="flex items-center gap-4">
+            <p className="text-white/70">Leverage AI to enhance your learning experience</p>
+            {user?.profile?.subscription_tier === "free" && (
+              <Badge className="glass-surface border-white/10 text-white/80">
+                {10 - (user?.profile?.ai_requests_count || 0)} requests remaining
+              </Badge>
+            )}
+          </div>
         </div>
+      </ScrollReveal>
 
-        <Badge variant="outline" className="bg-gray-800 text-gray-300 hover:bg-gray-700">
-          {aiProvider === "gemini" ? "Gemini 1.5 Flash" : "Hugging Face Models"}
-        </Badge>
-      </div>
+      {/* AI Provider Selector */}
+      <ScrollReveal direction="up" delay={0.1}>
+        <GlassSurface className="p-4 mb-6">
+          <div className="flex items-center space-x-4">
+            <span className="text-sm font-medium text-white">AI Provider:</span>
+            <Select value={aiProvider} onValueChange={(value: "gemini" | "huggingface") => setAiProvider(value)}>
+              <SelectTrigger className="w-[180px] glass-surface border-white/20 text-white">
+                <SelectValue placeholder="Select provider" />
+              </SelectTrigger>
+              <SelectContent className="glass-surface border-white/20">
+                <SelectItem value="gemini" className="text-white">
+                  <div className="flex items-center">
+                    <Sparkles className="mr-2 h-4 w-4 text-blue-400" aria-hidden="true" />
+                    Gemini AI
+                  </div>
+                </SelectItem>
+                <SelectItem value="huggingface" className="text-white">
+                  <div className="flex items-center">
+                    <Zap className="mr-2 h-4 w-4 text-yellow-400" aria-hidden="true" />
+                    Hugging Face
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <Badge className="glass-surface border-white/10 text-white/80">
+              {aiProvider === "gemini" ? "Gemini 1.5 Flash" : "Hugging Face Models"}
+            </Badge>
+          </div>
+        </GlassSurface>
+      </ScrollReveal>
 
       <Tabs defaultValue="chat" className="space-y-6">
-        <TabsList className="bg-gray-900 border border-gray-800">
-          <TabsTrigger value="chat" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-            <MessageSquare className="h-4 w-4 mr-2" /> AI Chat
+        <TabsList className="glass-surface border-white/20 p-1">
+          <TabsTrigger
+            value="chat"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+          >
+            <MessageSquare className="h-4 w-4 mr-2" aria-hidden="true" />
+            AI Chat
           </TabsTrigger>
-          <TabsTrigger value="summarize" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-            <Lightbulb className="h-4 w-4 mr-2" /> Summarize
+          <TabsTrigger
+            value="summarize"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+          >
+            <Lightbulb className="h-4 w-4 mr-2" aria-hidden="true" />
+            Summarize
           </TabsTrigger>
           <TabsTrigger
             value="study-plan"
-            className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
           >
-            <BookOpen className="h-4 w-4 mr-2" /> Study Plan
+            <BookOpen className="h-4 w-4 mr-2" aria-hidden="true" />
+            Study Plan
           </TabsTrigger>
           <TabsTrigger
             value="flashcards"
-            className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
           >
-            <BrainCircuit className="h-4 w-4 mr-2" /> Flashcards
+            <BrainCircuit className="h-4 w-4 mr-2" aria-hidden="true" />
+            Flashcards
           </TabsTrigger>
         </TabsList>
 
         {/* AI Chat Tab */}
         <TabsContent value="chat" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="md:col-span-3">
-              <Card className="glass-card">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle>AI Assistant</CardTitle>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" className="border-gray-700" onClick={handleNewChat}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      New Chat
-                    </Button>
-                    <Button variant="outline" size="sm" className="border-gray-700" onClick={() => setChatHistory([])}>
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Clear
-                    </Button>
+              <ScrollReveal direction="up" delay={0.2}>
+                <GlassSurface className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold text-white">AI Assistant</h2>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="glass-surface border-white/20 text-white hover:bg-white/10"
+                        onClick={handleNewChat}
+                      >
+                        <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
+                        New Chat
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="glass-surface border-white/20 text-white hover:bg-white/10"
+                        onClick={() => setChatHistory([])}
+                      >
+                        <RefreshCw className="h-4 w-4 mr-2" aria-hidden="true" />
+                        Clear
+                      </Button>
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="h-[400px] overflow-y-auto mb-4 space-y-4 scrollbar-thin pr-2" id="chat-container">
+                  <div className="h-[400px] overflow-y-auto mb-4 space-y-4 pr-2" id="chat-container">
                     {chatHistory.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-center">
-                        <Sparkles className="h-12 w-12 text-primary mb-4" />
-                        <h3 className="text-xl font-medium mb-2">Ask me anything!</h3>
-                        <p className="text-gray-400 max-w-md">
+                        <Sparkles className="h-12 w-12 text-purple-400 mb-4" aria-hidden="true" />
+                        <h3 className="text-xl font-semibold text-white mb-2">Ask me anything!</h3>
+                        <p className="text-white/70 max-w-md">
                           I can help with homework, explain concepts, solve problems, and more.
                         </p>
                       </div>
@@ -807,26 +726,29 @@ export default function AILabPage() {
                         >
                           <div
                             className={`max-w-[80%] rounded-lg p-4 ${
-                              message.role === "user" ? "user-message" : "ai-message"
+                              message.role === "user"
+                                ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30"
+                                : "glass-surface border-white/10"
                             }`}
                           >
                             <div className="flex items-start mb-2">
                               {message.role === "assistant" && (
-                                <Avatar className="h-8 w-8 mr-2">
-                                  <AvatarImage src="/ai-avatar.png" />
-                                  <AvatarFallback className="bg-blue-900 text-blue-300">AI</AvatarFallback>
+                                <Avatar className="h-8 w-8 mr-2 border-2 border-purple-500/30">
+                                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                                    AI
+                                  </AvatarFallback>
                                 </Avatar>
                               )}
                               <div className={`flex-1 ${message.role === "user" ? "text-right" : "text-left"}`}>
-                                <p className="text-sm font-medium mb-1">
+                                <p className="text-sm font-medium mb-1 text-white/80">
                                   {message.role === "assistant" ? "AI Assistant" : "You"}
                                 </p>
-                                <div className="whitespace-pre-wrap text-left">{message.content}</div>
+                                <div className="whitespace-pre-wrap text-left text-white/90">{message.content}</div>
                               </div>
                               {message.role === "user" && (
-                                <Avatar className="h-8 w-8 ml-2">
+                                <Avatar className="h-8 w-8 ml-2 border-2 border-purple-500/30">
                                   <AvatarImage src={user?.profile?.avatar_url || ""} />
-                                  <AvatarFallback className="bg-purple-900 text-purple-300">
+                                  <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
                                     {user?.profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                                   </AvatarFallback>
                                 </Avatar>
@@ -837,13 +759,13 @@ export default function AILabPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-7 text-xs text-gray-400 hover:text-white"
+                                  className="h-7 text-xs text-white/60 hover:text-white"
                                   onClick={() => copyToClipboard(message.content, index)}
                                 >
                                   {copiedIndex === index ? (
-                                    <Check className="h-3 w-3 mr-1" />
+                                    <Check className="h-3 w-3 mr-1" aria-hidden="true" />
                                   ) : (
-                                    <Copy className="h-3 w-3 mr-1" />
+                                    <Copy className="h-3 w-3 mr-1" aria-hidden="true" />
                                   )}
                                   {copiedIndex === index ? "Copied" : "Copy"}
                                 </Button>
@@ -855,19 +777,20 @@ export default function AILabPage() {
                     )}
                     {isThinking && (
                       <div className="flex justify-start">
-                        <div className="ai-message max-w-[80%] rounded-lg p-4">
+                        <div className="glass-surface border-white/10 max-w-[80%] rounded-lg p-4">
                           <div className="flex items-start mb-2">
-                            <Avatar className="h-8 w-8 mr-2">
-                              <AvatarImage src="/ai-avatar.png" />
-                              <AvatarFallback className="bg-blue-900 text-blue-300">AI</AvatarFallback>
+                            <Avatar className="h-8 w-8 mr-2 border-2 border-purple-500/30">
+                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                                AI
+                              </AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
-                              <p className="text-sm font-medium mb-1">AI Assistant</p>
+                              <p className="text-sm font-medium mb-1 text-white/80">AI Assistant</p>
                               <div className="flex items-center space-x-2">
-                                <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse"></div>
-                                <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse delay-150"></div>
-                                <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse delay-300"></div>
-                                <span className="text-sm text-gray-400 ml-1">Thinking...</span>
+                                <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse"></div>
+                                <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse delay-150"></div>
+                                <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse delay-300"></div>
+                                <span className="text-sm text-white/60 ml-1">Thinking...</span>
                               </div>
                             </div>
                           </div>
@@ -883,7 +806,7 @@ export default function AILabPage() {
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
                       placeholder="Ask a question..."
-                      className="flex-1 bg-gray-900 border-gray-700 min-h-[60px] max-h-[200px] resize-none"
+                      className="flex-1 glass-surface border-white/20 text-white placeholder:text-white/40 min-h-[60px] max-h-[200px] resize-none"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault()
@@ -896,200 +819,224 @@ export default function AILabPage() {
                     <div className="flex flex-col gap-2 self-end">
                       <Button
                         type="submit"
-                        className="bg-primary hover:bg-primary/80"
+                        className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
                         disabled={loading || !chatInput.trim()}
                       >
-                        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                        {loading ? (
+                          <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+                        ) : (
+                          <Send className="h-5 w-5" aria-hidden="true" />
+                        )}
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
-                        className="border-gray-700"
+                        className="glass-surface border-white/20 text-white hover:bg-white/10"
                         onClick={handleSaveChat}
                         disabled={chatHistory.length === 0}
                       >
-                        <Save className="h-5 w-5" />
+                        <Save className="h-5 w-5" aria-hidden="true" />
                       </Button>
                     </div>
                   </form>
-                </CardContent>
-              </Card>
+                </GlassSurface>
+              </ScrollReveal>
             </div>
 
             <div>
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle>Saved Chats</CardTitle>
-                  <CardDescription>Your previous conversations</CardDescription>
-                </CardHeader>
-                <CardContent className="max-h-[400px] overflow-y-auto scrollbar-thin">
-                  {savedChats.length > 0 ? (
-                    <div className="space-y-2">
-                      {savedChats.map((chat) => (
-                        <div key={chat.id} className="flex items-center justify-between">
+              <ScrollReveal direction="up" delay={0.3}>
+                <GlassSurface className="p-6">
+                  <h3 className="text-lg font-bold text-white mb-4">Saved Chats</h3>
+                  <div className="max-h-[400px] overflow-y-auto space-y-2">
+                    {savedChats.length > 0 ? (
+                      savedChats.map((chat) => (
+                        <div key={chat.id} className="flex items-center justify-between gap-2">
                           <Button
                             variant="outline"
-                            className="w-full justify-start border-gray-700 text-left mr-2"
+                            className="flex-1 justify-start glass-surface border-white/20 text-white hover:bg-white/10 text-left"
                             onClick={() => loadSavedChat(chat.id)}
                           >
-                            <FileText className="h-4 w-4 mr-2 flex-shrink-0" />
-                            <span className="truncate">{chat.title}</span>
+                            <FileText className="h-4 w-4 mr-2 flex-shrink-0" aria-hidden="true" />
+                            <span className="truncate text-sm">{chat.title}</span>
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => deleteSavedChat(chat.id)} className="text-red-500">
+                            <DropdownMenuContent align="end" className="glass-surface border-white/20">
+                              <DropdownMenuItem
+                                onClick={() => deleteSavedChat(chat.id)}
+                                className="text-red-400 hover:text-red-300"
+                              >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-400">
-                      No saved chats yet. Save your conversations to access them later.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+                      ))
+                    ) : (
+                      <p className="text-sm text-white/60">No saved chats yet.</p>
+                    )}
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
             </div>
           </div>
         </TabsContent>
 
         {/* Summarize Tab */}
-        <TabsContent value="summarize" className="space-y-4">
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle>Text Summarizer</CardTitle>
-              <CardDescription>
+        <TabsContent value="summarize">
+          <ScrollReveal direction="up" delay={0.2}>
+            <GlassSurface className="p-6 lg:p-8">
+              <h2 className="text-xl font-bold text-white mb-2">Text Summarizer</h2>
+              <p className="text-white/70 mb-6">
                 Paste any text to get a concise summary. Great for articles, research papers, or long documents.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6">
+              </p>
               <div className="mb-4">
-                <label htmlFor="summary-input" className="block text-sm font-medium mb-2">
+                <Label htmlFor="summary-input" className="text-white mb-2 block">
                   Text to Summarize
-                </label>
+                </Label>
                 <Textarea
                   id="summary-input"
                   value={summaryInput}
                   onChange={(e) => setSummaryInput(e.target.value)}
                   placeholder="Paste the text you want to summarize..."
-                  className="bg-gray-900 border-gray-700 min-h-[200px]"
+                  className="glass-surface border-white/20 text-white placeholder:text-white/40 min-h-[200px] resize-none"
                 />
               </div>
 
-              <div className="flex justify-between">
+              <div className="flex justify-between mb-6">
                 <Button
                   onClick={handleSummarize}
-                  className="bg-primary hover:bg-primary/80 mb-6"
+                  className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
                   disabled={loading || !summaryInput.trim()}
                 >
-                  {loading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Lightbulb className="h-5 w-5 mr-2" />}
-                  Generate Summary
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin mr-2" aria-hidden="true" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Lightbulb className="h-5 w-5 mr-2" aria-hidden="true" />
+                      Generate Summary
+                    </>
+                  )}
                 </Button>
 
                 {summaryResult && (
-                  <Button variant="outline" className="border-gray-700 mb-6" onClick={downloadSummary}>
-                    <Download className="h-5 w-5 mr-2" />
-                    Download Summary
+                  <Button
+                    variant="outline"
+                    className="glass-surface border-white/20 text-white hover:bg-white/10"
+                    onClick={downloadSummary}
+                  >
+                    <Download className="h-5 w-5 mr-2" aria-hidden="true" />
+                    Download
                   </Button>
                 )}
               </div>
 
               {summaryResult && (
                 <div className="mt-4">
-                  <h3 className="text-lg font-medium mb-2">Summary</h3>
-                  <div className="bg-gray-800 rounded-lg p-4 whitespace-pre-wrap">
-                    {summaryResult}
+                  <h3 className="text-lg font-semibold text-white mb-2">Summary</h3>
+                  <div className="glass-surface border-white/10 p-4 rounded-lg">
+                    <p className="text-white/90 whitespace-pre-wrap leading-relaxed">{summaryResult}</p>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="mt-2 h-7 text-xs text-gray-400 hover:text-white"
+                      className="mt-2 h-7 text-xs text-white/60 hover:text-white"
                       onClick={() => copyToClipboard(summaryResult, 0)}
                     >
-                      {copiedIndex === 0 ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                      {copiedIndex === 0 ? (
+                        <Check className="h-3 w-3 mr-1" aria-hidden="true" />
+                      ) : (
+                        <Copy className="h-3 w-3 mr-1" aria-hidden="true" />
+                      )}
                       {copiedIndex === 0 ? "Copied" : "Copy"}
                     </Button>
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </GlassSurface>
+          </ScrollReveal>
         </TabsContent>
 
         {/* Study Plan Tab */}
-        <TabsContent value="study-plan" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <TabsContent value="study-plan">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="md:col-span-3">
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle>Study Plan Generator</CardTitle>
-                  <CardDescription>
+              <ScrollReveal direction="up" delay={0.2}>
+                <GlassSurface className="p-6 lg:p-8">
+                  <h2 className="text-xl font-bold text-white mb-2">Study Plan Generator</h2>
+                  <p className="text-white/70 mb-6">
                     Create a personalized study plan for any subject or topic. Includes learning objectives, resources,
                     and a timeline.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6">
+                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label htmlFor="study-subject" className="block text-sm font-medium mb-2">
+                      <Label htmlFor="study-subject" className="text-white mb-2 block">
                         Subject
-                      </label>
+                      </Label>
                       <Input
                         id="study-subject"
                         value={studySubject}
                         onChange={(e) => setStudySubject(e.target.value)}
                         placeholder="e.g., Mathematics, Physics, History"
-                        className="bg-gray-900 border-gray-700"
+                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
                       />
                     </div>
                     <div>
-                      <label htmlFor="study-topic" className="block text-sm font-medium mb-2">
+                      <Label htmlFor="study-topic" className="text-white mb-2 block">
                         Specific Topic
-                      </label>
+                      </Label>
                       <Input
                         id="study-topic"
                         value={studyTopic}
                         onChange={(e) => setStudyTopic(e.target.value)}
                         placeholder="e.g., Calculus, Quantum Mechanics, World War II"
-                        className="bg-gray-900 border-gray-700"
+                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
                       />
                     </div>
                   </div>
 
-                  <div className="flex justify-between">
+                  <div className="flex justify-between mb-6">
                     <Button
                       onClick={handleGenerateStudyPlan}
-                      className="bg-primary hover:bg-primary/80 mb-6"
+                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
                       disabled={loading || !studySubject.trim() || !studyTopic.trim()}
                     >
                       {loading ? (
-                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin mr-2" aria-hidden="true" />
+                          Generating...
+                        </>
                       ) : (
-                        <BookOpen className="h-5 w-5 mr-2" />
+                        <>
+                          <BookOpen className="h-5 w-5 mr-2" aria-hidden="true" />
+                          Generate Study Plan
+                        </>
                       )}
-                      Generate Study Plan
                     </Button>
 
                     {studyPlan && (
-                      <div className="space-x-2">
-                        <Button variant="outline" className="border-gray-700 mb-6" onClick={downloadStudyPlan}>
-                          <Download className="h-5 w-5 mr-2" />
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          className="glass-surface border-white/20 text-white hover:bg-white/10"
+                          onClick={downloadStudyPlan}
+                        >
+                          <Download className="h-5 w-5 mr-2" aria-hidden="true" />
                           Download
                         </Button>
                         <Button
                           variant="outline"
-                          className="border-gray-700 mb-6"
+                          className="glass-surface border-white/20 text-white hover:bg-white/10"
                           onClick={() => setIsSaveStudyPlanDialogOpen(true)}
                         >
-                          <Save className="h-5 w-5 mr-2" />
+                          <Save className="h-5 w-5 mr-2" aria-hidden="true" />
                           Save Plan
                         </Button>
                       </div>
@@ -1098,137 +1045,151 @@ export default function AILabPage() {
 
                   {studyPlan && (
                     <div className="mt-4">
-                      <h3 className="text-lg font-medium mb-2">Your Study Plan</h3>
-                      <div className="bg-gray-800 rounded-lg p-6 whitespace-pre-wrap prose prose-invert max-w-none">
-                        {renderMarkdown(studyPlan)}
+                      <h3 className="text-lg font-semibold text-white mb-2">Your Study Plan</h3>
+                      <div className="glass-surface border-white/10 p-6 rounded-lg">
+                        <pre className="whitespace-pre-wrap text-white/90 font-mono text-sm leading-relaxed">
+                          {studyPlan}
+                        </pre>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="mt-2 h-7 text-xs text-gray-400 hover:text-white"
+                          className="mt-2 h-7 text-xs text-white/60 hover:text-white"
                           onClick={() => copyToClipboard(studyPlan, 0)}
                         >
-                          {copiedIndex === 0 ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                          {copiedIndex === 0 ? (
+                            <Check className="h-3 w-3 mr-1" aria-hidden="true" />
+                          ) : (
+                            <Copy className="h-3 w-3 mr-1" aria-hidden="true" />
+                          )}
                           {copiedIndex === 0 ? "Copied" : "Copy"}
                         </Button>
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </GlassSurface>
+              </ScrollReveal>
             </div>
 
             <div>
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle>Saved Study Plans</CardTitle>
-                  <CardDescription>Your study guides</CardDescription>
-                </CardHeader>
-                <CardContent className="max-h-[400px] overflow-y-auto scrollbar-thin">
-                  {savedStudyPlans.length > 0 ? (
-                    <div className="space-y-2">
-                      {savedStudyPlans.map((plan) => (
-                        <div key={plan.id} className="flex items-center justify-between">
+              <ScrollReveal direction="up" delay={0.3}>
+                <GlassSurface className="p-6">
+                  <h3 className="text-lg font-bold text-white mb-4">Saved Study Plans</h3>
+                  <div className="max-h-[400px] overflow-y-auto space-y-2">
+                    {savedStudyPlans.length > 0 ? (
+                      savedStudyPlans.map((plan) => (
+                        <div key={plan.id} className="flex items-center justify-between gap-2">
                           <Button
                             variant="outline"
-                            className="w-full justify-start border-gray-700 text-left mr-2"
+                            className="flex-1 justify-start glass-surface border-white/20 text-white hover:bg-white/10 text-left"
                             onClick={() => loadSavedStudyPlan(plan.id)}
                           >
-                            <BookOpen className="h-4 w-4 mr-2 flex-shrink-0" />
-                            <span className="truncate">{plan.title}</span>
+                            <BookOpen className="h-4 w-4 mr-2 flex-shrink-0" aria-hidden="true" />
+                            <span className="truncate text-sm">{plan.title}</span>
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => deleteSavedStudyPlan(plan.id)} className="text-red-500">
+                            <DropdownMenuContent align="end" className="glass-surface border-white/20">
+                              <DropdownMenuItem
+                                onClick={() => deleteSavedStudyPlan(plan.id)}
+                                className="text-red-400 hover:text-red-300"
+                              >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-400">
-                      No saved study plans yet. Generate and save study plans to access them later.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+                      ))
+                    ) : (
+                      <p className="text-sm text-white/60">No saved study plans yet.</p>
+                    )}
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
             </div>
           </div>
         </TabsContent>
 
         {/* Flashcards Tab */}
-        <TabsContent value="flashcards" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <TabsContent value="flashcards">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="md:col-span-3">
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle>Flashcard Generator</CardTitle>
-                  <CardDescription>
+              <ScrollReveal direction="up" delay={0.2}>
+                <GlassSurface className="p-6 lg:p-8">
+                  <h2 className="text-xl font-bold text-white mb-2">Flashcard Generator</h2>
+                  <p className="text-white/70 mb-6">
                     Create flashcards for any topic to help with memorization and quick review.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-6">
+                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div className="md:col-span-2">
-                      <label htmlFor="flashcard-topic" className="block text-sm font-medium mb-2">
+                      <Label htmlFor="flashcard-topic" className="text-white mb-2 block">
                         Topic
-                      </label>
+                      </Label>
                       <Input
                         id="flashcard-topic"
                         value={flashcardTopic}
                         onChange={(e) => setFlashcardTopic(e.target.value)}
                         placeholder="e.g., Spanish Vocabulary, Chemical Elements, Historical Dates"
-                        className="bg-gray-900 border-gray-700"
+                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
                       />
                     </div>
                     <div>
-                      <label htmlFor="flashcard-count" className="block text-sm font-medium mb-2">
+                      <Label htmlFor="flashcard-count" className="text-white mb-2 block">
                         Number of Cards
-                      </label>
+                      </Label>
                       <Select value={flashcardCount} onValueChange={setFlashcardCount}>
-                        <SelectTrigger className="bg-gray-900 border-gray-700">
+                        <SelectTrigger className="glass-surface border-white/20 text-white">
                           <SelectValue placeholder="Select count" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="5">5 cards</SelectItem>
-                          <SelectItem value="10">10 cards</SelectItem>
-                          <SelectItem value="15">15 cards</SelectItem>
-                          <SelectItem value="20">20 cards</SelectItem>
+                        <SelectContent className="glass-surface border-white/20">
+                          <SelectItem value="5" className="text-white">5 cards</SelectItem>
+                          <SelectItem value="10" className="text-white">10 cards</SelectItem>
+                          <SelectItem value="15" className="text-white">15 cards</SelectItem>
+                          <SelectItem value="20" className="text-white">20 cards</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
 
-                  <div className="flex justify-between">
+                  <div className="flex justify-between mb-6">
                     <Button
                       onClick={handleGenerateFlashcards}
-                      className="bg-primary hover:bg-primary/80 mb-6"
+                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
                       disabled={loading || !flashcardTopic.trim()}
                     >
                       {loading ? (
-                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin mr-2" aria-hidden="true" />
+                          Generating...
+                        </>
                       ) : (
-                        <BrainCircuit className="h-5 w-5 mr-2" />
+                        <>
+                          <BrainCircuit className="h-5 w-5 mr-2" aria-hidden="true" />
+                          Generate Flashcards
+                        </>
                       )}
-                      Generate Flashcards
                     </Button>
 
                     {flashcards.length > 0 && (
-                      <div className="space-x-2">
-                        <Button variant="outline" className="border-gray-700 mb-6" onClick={downloadFlashcards}>
-                          <Download className="h-5 w-5 mr-2" />
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          className="glass-surface border-white/20 text-white hover:bg-white/10"
+                          onClick={downloadFlashcards}
+                        >
+                          <Download className="h-5 w-5 mr-2" aria-hidden="true" />
                           Download
                         </Button>
-
-                        <Button variant="outline" className="border-gray-700 mb-6" onClick={handleSaveFlashcards}>
-                          <Save className="h-5 w-5 mr-2" />
+                        <Button
+                          variant="outline"
+                          className="glass-surface border-white/20 text-white hover:bg-white/10"
+                          onClick={handleSaveFlashcards}
+                        >
+                          <Save className="h-5 w-5 mr-2" aria-hidden="true" />
                           Save Set
                         </Button>
                       </div>
@@ -1238,14 +1199,14 @@ export default function AILabPage() {
                   {flashcards.length > 0 && (
                     <div className="mt-4">
                       <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-medium">
+                        <h3 className="text-lg font-semibold text-white">
                           Flashcard {activeFlashcard + 1} of {flashcards.length}
                         </h3>
                         <div className="flex items-center space-x-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-gray-700"
+                            className="glass-surface border-white/20 text-white hover:bg-white/10"
                             onClick={() =>
                               getFlashcardExplanation(
                                 flashcards[activeFlashcard]?.question,
@@ -1253,17 +1214,17 @@ export default function AILabPage() {
                               )
                             }
                           >
-                            <Sparkles className="h-4 w-4 mr-2" />
+                            <Sparkles className="h-4 w-4 mr-2" aria-hidden="true" />
                             Get AI Explanation
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
+                              <Button variant="ghost" size="sm" className="text-white/60 hover:text-white">
                                 <MoreHorizontal className="h-4 w-4 mr-2" />
                                 Actions
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
+                            <DropdownMenuContent align="end" className="glass-surface border-white/20">
                               <DropdownMenuItem
                                 onClick={() => {
                                   setEditingFlashcard({
@@ -1273,6 +1234,7 @@ export default function AILabPage() {
                                   })
                                   setIsEditDialogOpen(true)
                                 }}
+                                className="text-white"
                               >
                                 Edit Question
                               </DropdownMenuItem>
@@ -1285,12 +1247,13 @@ export default function AILabPage() {
                                   })
                                   setIsEditDialogOpen(true)
                                 }}
+                                className="text-white"
                               >
                                 Edit Answer
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => deleteFlashcard(activeFlashcard)}
-                                className="text-red-500"
+                                className="text-red-400 hover:text-red-300"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete Card
@@ -1300,36 +1263,39 @@ export default function AILabPage() {
                         </div>
                       </div>
 
-                      <div className="flashcard">
+                      <div className="flashcard mb-4">
                         <div className={`flashcard-inner ${showAnswer ? "flipped" : ""}`}>
-                          <div className="flashcard-front bg-gray-800 rounded-lg">
+                          <div className="flashcard-front glass-surface border-white/10 rounded-lg p-8 min-h-[250px] flex items-center justify-center">
                             <div>
-                              <p className="font-medium mb-2">Question:</p>
-                              <p className="text-gray-300 text-lg">{flashcards[activeFlashcard]?.question}</p>
+                              <p className="font-semibold text-white mb-3">Question:</p>
+                              <p className="text-white/90 text-lg">{flashcards[activeFlashcard]?.question}</p>
                             </div>
                           </div>
-                          <div className="flashcard-back bg-gray-800 rounded-lg">
+                          <div className="flashcard-back glass-surface border-white/10 rounded-lg p-8 min-h-[250px] flex items-center justify-center">
                             <div>
-                              <p className="font-medium mb-2">Answer:</p>
-                              <p className="text-gray-300 text-lg">{flashcards[activeFlashcard]?.answer}</p>
+                              <p className="font-semibold text-white mb-3">Answer:</p>
+                              <p className="text-white/90 text-lg">{flashcards[activeFlashcard]?.answer}</p>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center mt-4">
+                      <div className="flex justify-between items-center">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-gray-700"
+                          className="glass-surface border-white/20 text-white"
                           onClick={handlePrevFlashcard}
                           disabled={activeFlashcard === 0}
                         >
                           Previous
                         </Button>
                         <Button
-                          variant={showAnswer ? "outline" : "default"}
-                          className={showAnswer ? "border-gray-700" : "bg-primary hover:bg-primary/80"}
+                          className={
+                            showAnswer
+                              ? "glass-surface border-white/20 text-white"
+                              : "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                          }
                           onClick={() => setShowAnswer(!showAnswer)}
                         >
                           {showAnswer ? "Hide Answer" : "Show Answer"}
@@ -1337,7 +1303,7 @@ export default function AILabPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-gray-700"
+                          className="glass-surface border-white/20 text-white"
                           onClick={handleNextFlashcard}
                           disabled={activeFlashcard === flashcards.length - 1}
                         >
@@ -1346,39 +1312,36 @@ export default function AILabPage() {
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </GlassSurface>
+              </ScrollReveal>
             </div>
 
             <div>
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle>Saved Flashcards</CardTitle>
-                  <CardDescription>Your flashcard sets</CardDescription>
-                </CardHeader>
-                <CardContent className="max-h-[400px] overflow-y-auto scrollbar-thin">
-                  {savedFlashcards.length > 0 ? (
-                    <div className="space-y-2">
-                      {savedFlashcards.map((set) => (
-                        <div key={set.id} className="flex items-center justify-between">
+              <ScrollReveal direction="up" delay={0.3}>
+                <GlassSurface className="p-6">
+                  <h3 className="text-lg font-bold text-white mb-4">Saved Flashcards</h3>
+                  <div className="max-h-[400px] overflow-y-auto space-y-2">
+                    {savedFlashcards.length > 0 ? (
+                      savedFlashcards.map((set) => (
+                        <div key={set.id} className="flex items-center justify-between gap-2">
                           <Button
                             variant="outline"
-                            className="w-full justify-start border-gray-700 text-left mr-2"
+                            className="flex-1 justify-start glass-surface border-white/20 text-white hover:bg-white/10 text-left"
                             onClick={() => loadSavedFlashcards(set.id)}
                           >
-                            <BrainCircuit className="h-4 w-4 mr-2 flex-shrink-0" />
-                            <span className="truncate">{set.title}</span>
+                            <BrainCircuit className="h-4 w-4 mr-2 flex-shrink-0" aria-hidden="true" />
+                            <span className="truncate text-sm">{set.title}</span>
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
+                            <DropdownMenuContent align="end" className="glass-surface border-white/20">
                               <DropdownMenuItem
                                 onClick={() => deleteSavedFlashcardSet(set.id)}
-                                className="text-red-500"
+                                className="text-red-400 hover:text-red-300"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Delete
@@ -1386,15 +1349,13 @@ export default function AILabPage() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-400">
-                      No saved flashcard sets yet. Save your flashcards to access them later.
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+                      ))
+                    ) : (
+                      <p className="text-sm text-white/60">No saved flashcard sets yet.</p>
+                    )}
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
             </div>
           </div>
         </TabsContent>
@@ -1402,58 +1363,73 @@ export default function AILabPage() {
 
       {/* Edit Flashcard Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-gray-900 border-gray-800">
+        <DialogContent className="glass-surface border-white/20">
           <DialogHeader>
-            <DialogTitle>Edit Flashcard {editingFlashcard?.field === "question" ? "Question" : "Answer"}</DialogTitle>
-            <DialogDescription>
-              Make changes to your flashcard {editingFlashcard?.field === "question" ? "question" : "answer"}.
-            </DialogDescription>
+            <DialogTitle className="text-white">
+              Edit {editingFlashcard?.field === "question" ? "Question" : "Answer"}
+            </DialogTitle>
           </DialogHeader>
-          <div className="py-4">
+          <div className="space-y-4">
             <Textarea
               value={editingFlashcard?.value || ""}
-              onChange={(e) => setEditingFlashcard((prev) => (prev ? { ...prev, value: e.target.value } : null))}
-              className="bg-gray-800 border-gray-700 min-h-[150px]"
+              onChange={(e) =>
+                setEditingFlashcard(
+                  editingFlashcard ? { ...editingFlashcard, value: e.target.value } : null,
+                )
+              }
+              className="glass-surface border-white/20 text-white placeholder:text-white/40 min-h-[100px] resize-none"
             />
+            <DialogFooter>
+              <Button
+                variant="outline"
+                className="glass-surface border-white/20 text-white hover:bg-white/10"
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                onClick={handleEditFlashcard}
+              >
+                Save
+              </Button>
+            </DialogFooter>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="border-gray-700">
-              Cancel
-            </Button>
-            <Button onClick={handleEditFlashcard} className="bg-primary hover:bg-primary/80">
-              Save Changes
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Save Study Plan Dialog */}
       <Dialog open={isSaveStudyPlanDialogOpen} onOpenChange={setIsSaveStudyPlanDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-gray-900 border-gray-800">
+        <DialogContent className="glass-surface border-white/20">
           <DialogHeader>
-            <DialogTitle>Save Study Plan</DialogTitle>
-            <DialogDescription>Give your study plan a title before saving it.</DialogDescription>
+            <DialogTitle className="text-white">Save Study Plan</DialogTitle>
+            <DialogDescription className="text-white/70">
+              Give your study plan a title to save it for later.
+            </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <label htmlFor="study-plan-title" className="block text-sm font-medium mb-2">
-              Title
-            </label>
+          <div className="space-y-4">
             <Input
-              id="study-plan-title"
               value={studyPlanTitle}
               onChange={(e) => setStudyPlanTitle(e.target.value)}
-              placeholder="e.g., Calculus Fundamentals Study Guide"
-              className="bg-gray-800 border-gray-700"
+              placeholder="Enter a title for your study plan"
+              className="glass-surface border-white/20 text-white placeholder:text-white/40"
             />
+            <DialogFooter>
+              <Button
+                variant="outline"
+                className="glass-surface border-white/20 text-white hover:bg-white/10"
+                onClick={() => setIsSaveStudyPlanDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                onClick={handleSaveStudyPlan}
+              >
+                Save
+              </Button>
+            </DialogFooter>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsSaveStudyPlanDialogOpen(false)} className="border-gray-700">
-              Cancel
-            </Button>
-            <Button onClick={handleSaveStudyPlan} className="bg-primary hover:bg-primary/80">
-              Save Study Plan
-            </Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

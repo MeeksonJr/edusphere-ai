@@ -1,14 +1,13 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
 import {
   BrainCircuit,
   Plus,
@@ -37,6 +36,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
+import { GlassSurface } from "@/components/shared/GlassSurface"
+import { AnimatedCard } from "@/components/shared/AnimatedCard"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 
 const subjects = [
   "Mathematics",
@@ -93,7 +96,6 @@ export default function FlashcardsPage() {
         setUser({ ...data.user, profile })
       }
     }
-
     getUser()
   }, [supabase])
 
@@ -215,11 +217,7 @@ export default function FlashcardsPage() {
 
     try {
       setGeneratingFlashcards(true)
-
-      // Track AI usage
       await trackAIUsage(supabase, user.id)
-
-      // Generate flashcards
       const cards = await generateFlashcards(flashcardTopic, Number.parseInt(flashcardCount))
 
       if (cards.length === 0) {
@@ -342,184 +340,199 @@ export default function FlashcardsPage() {
   }
 
   return (
-    <div className="p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold neon-text-pink">Flashcards</h1>
-        <p className="text-gray-400 mt-1">Create and study flashcards to boost your memory</p>
-      </div>
+    <div className="p-6 md:p-8 lg:p-12">
+      {/* Header */}
+      <ScrollReveal direction="up">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <span className="text-white">Flashcards</span>
+          </h1>
+          <p className="text-white/70">Create and study flashcards to boost your memory</p>
+        </div>
+      </ScrollReveal>
 
       {/* Filters and Search */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          <Input
-            placeholder="Search flashcard sets..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-gray-900 border-gray-700"
-          />
-        </div>
-        <div className="flex gap-2">
-          <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-            <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700">
-              <SelectValue placeholder="Filter by subject" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Subjects</SelectItem>
-              {subjects.map((subject) => (
-                <SelectItem key={subject} value={subject}>
-                  {subject}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <ScrollReveal direction="up" delay={0.1}>
+        <GlassSurface className="p-4 md:p-6 mb-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/40" aria-hidden="true" />
+              <Input
+                placeholder="Search flashcard sets..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Select value={subjectFilter} onValueChange={setSubjectFilter}>
+                <SelectTrigger className="w-[180px] glass-surface border-white/20 text-white">
+                  <SelectValue placeholder="Filter by subject" />
+                </SelectTrigger>
+                <SelectContent className="glass-surface border-white/20">
+                  <SelectItem value="all" className="text-white">All Subjects</SelectItem>
+                  {subjects.map((subject) => (
+                    <SelectItem key={subject} value={subject} className="text-white">
+                      {subject}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-          <Button className="bg-primary hover:bg-primary/80" onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> New Flashcards
-          </Button>
-        </div>
-      </div>
+              <Button
+                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                onClick={() => setIsCreateDialogOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+                New Flashcards
+              </Button>
+            </div>
+          </div>
+        </GlassSurface>
+      </ScrollReveal>
 
       {/* Flashcard Sets Grid */}
       {loading ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="glass-card animate-pulse">
-              <CardHeader className="pb-2">
-                <div className="h-6 bg-gray-800 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-800 rounded w-1/2"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-4 bg-gray-800 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-800 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-800 rounded w-3/4"></div>
-              </CardContent>
-              <CardFooter>
-                <div className="h-8 bg-gray-800 rounded w-full"></div>
-              </CardFooter>
-            </Card>
+            <div key={i} className="glass-surface p-6 animate-pulse">
+              <div className="h-6 bg-white/10 rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-white/10 rounded w-1/2 mb-4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-white/10 rounded w-full"></div>
+                <div className="h-4 bg-white/10 rounded w-full"></div>
+              </div>
+            </div>
           ))}
         </div>
       ) : flashcardSets.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {flashcardSets.map((set) => (
-            <Card key={set.id} className="glass-card hover:neon-border-pink transition-all">
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="line-clamp-1">{set.title}</CardTitle>
-                    <CardDescription className="line-clamp-1">{set.subject}</CardDescription>
+          {flashcardSets.map((set, index) => (
+            <ScrollReveal key={set.id} direction="up" delay={0.05 * index}>
+              <AnimatedCard variant="3d" delay={0.05 * index} className="cursor-pointer group">
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-bold text-white mb-1 truncate group-hover:text-purple-400 transition-colors">
+                        {set.title}
+                      </h3>
+                      <p className="text-sm text-white/60 truncate">{set.subject}</p>
+                    </div>
+                    <Badge className="glass-surface border-white/10 text-white/80">
+                      {set.cards.length} cards
+                    </Badge>
                   </div>
-                  <Badge variant="outline" className="bg-gray-800 text-gray-300">
-                    {set.cards.length} cards
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-400 line-clamp-3">
-                  {set.description || "Tap to study these flashcards"}
-                </p>
-                <div className="mt-3 space-y-1">
-                  <div className="flex justify-between text-xs text-gray-400">
-                    <span>Sample cards:</span>
-                    <span>
-                      {Math.min(3, set.cards.length)} of {set.cards.length}
-                    </span>
-                  </div>
-                  <div className="space-y-2">
-                    {set.cards.slice(0, 3).map((card: any, index: number) => (
-                      <div key={index} className="bg-gray-800 p-2 rounded text-xs">
-                        <p className="font-medium">
-                          Q: {card.question.substring(0, 50)}
-                          {card.question.length > 50 ? "..." : ""}
+                  <p className="text-sm text-white/70 line-clamp-2 mb-4">
+                    {set.description || "Tap to study these flashcards"}
+                  </p>
+                  <div className="space-y-2 mb-4">
+                    {set.cards.slice(0, 2).map((card: any, idx: number) => (
+                      <div key={idx} className="glass-surface border-white/10 p-2 rounded text-xs">
+                        <p className="font-medium text-white/80">
+                          Q: {card.question.substring(0, 40)}
+                          {card.question.length > 40 ? "..." : ""}
                         </p>
                       </div>
                     ))}
                   </div>
+                  <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                      onClick={() => handleStudySet(set)}
+                    >
+                      <BrainCircuit className="mr-2 h-4 w-4" aria-hidden="true" />
+                      Study
+                    </Button>
+                    <div className="flex space-x-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-white/60 hover:text-white"
+                        onClick={() => downloadFlashcards(set)}
+                        aria-label="Download flashcards"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-400 hover:text-red-300"
+                        onClick={() => handleDeleteSet(set.id)}
+                        aria-label="Delete flashcard set"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" className="border-gray-700" onClick={() => handleStudySet(set)}>
-                  <BrainCircuit className="mr-2 h-4 w-4" /> Study
-                </Button>
-                <div className="flex space-x-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-400 hover:text-white"
-                    onClick={() => downloadFlashcards(set)}
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-red-400 hover:text-red-300"
-                    onClick={() => handleDeleteSet(set.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardFooter>
-            </Card>
+              </AnimatedCard>
+            </ScrollReveal>
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <BrainCircuit className="mx-auto h-12 w-12 text-gray-600 mb-4" />
-          <h3 className="text-xl font-medium mb-2">No flashcard sets found</h3>
-          <p className="text-gray-400 mb-6">
-            {searchQuery || subjectFilter !== "all"
-              ? "Try adjusting your filters or search query."
-              : "Start by creating your first flashcard set."}
-          </p>
-          <Button className="bg-primary hover:bg-primary/80" onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Create Flashcards
-          </Button>
-        </div>
+        <ScrollReveal direction="up">
+          <GlassSurface className="p-12 text-center">
+            <BrainCircuit className="mx-auto h-16 w-16 text-white/20 mb-4" aria-hidden="true" />
+            <h3 className="text-xl font-semibold text-white mb-2">No flashcard sets found</h3>
+            <p className="text-white/60 mb-6">
+              {searchQuery || subjectFilter !== "all"
+                ? "Try adjusting your filters or search query."
+                : "Start by creating your first flashcard set."}
+            </p>
+            <Button
+              className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+              onClick={() => setIsCreateDialogOpen(true)}
+            >
+              <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+              Create Flashcards
+            </Button>
+          </GlassSurface>
+        </ScrollReveal>
       )}
 
       {/* Create Flashcard Set Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800 sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+        <DialogContent className="glass-surface border-white/20 sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create New Flashcard Set</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-white">Create New Flashcard Set</DialogTitle>
+            <DialogDescription className="text-white/70">
               Create your own flashcards or let AI generate them for you.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleCreateSet} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="title" className="text-sm font-medium">
-                  Title *
-                </label>
+              <div>
+                <Label htmlFor="title" className="text-white mb-2 block">
+                  Title <span className="text-red-400">*</span>
+                </Label>
                 <Input
                   id="title"
                   value={newSet.title}
                   onChange={(e) => setNewSet({ ...newSet, title: e.target.value })}
                   placeholder="e.g., Spanish Vocabulary"
-                  className="bg-gray-800 border-gray-700"
+                  className="glass-surface border-white/20 text-white placeholder:text-white/40"
                   required
                 />
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="subject" className="text-sm font-medium">
-                  Subject *
-                </label>
+              <div>
+                <Label htmlFor="subject" className="text-white mb-2 block">
+                  Subject <span className="text-red-400">*</span>
+                </Label>
                 <Select
                   value={newSet.subject}
                   onValueChange={(value) => setNewSet({ ...newSet, subject: value })}
                   required
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-700">
+                  <SelectTrigger className="glass-surface border-white/20 text-white">
                     <SelectValue placeholder="Select a subject" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="glass-surface border-white/20">
                     {subjects.map((subject) => (
-                      <SelectItem key={subject} value={subject}>
+                      <SelectItem key={subject} value={subject} className="text-white">
                         {subject}
                       </SelectItem>
                     ))}
@@ -528,83 +541,88 @@ export default function FlashcardsPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-medium">
+            <div>
+              <Label htmlFor="description" className="text-white mb-2 block">
                 Description
-              </label>
+              </Label>
               <Textarea
                 id="description"
                 value={newSet.description}
                 onChange={(e) => setNewSet({ ...newSet, description: e.target.value })}
                 placeholder="Brief description of this flashcard set"
-                className="bg-gray-800 border-gray-700"
+                className="glass-surface border-white/20 text-white placeholder:text-white/40 resize-none"
               />
             </div>
 
-            <div className="border-t border-gray-800 pt-4">
-              <h3 className="text-lg font-medium mb-4">Add Flashcards</h3>
+            <div className="border-t border-white/10 pt-4">
+              <h3 className="text-lg font-semibold text-white mb-4">Add Flashcards</h3>
 
               <div className="space-y-4 mb-6">
-                <div className="space-y-2">
-                  <label htmlFor="question" className="text-sm font-medium">
+                <div>
+                  <Label htmlFor="question" className="text-white mb-2 block">
                     Question
-                  </label>
+                  </Label>
                   <Textarea
                     id="question"
                     value={newCard.question}
                     onChange={(e) => setNewCard({ ...newCard, question: e.target.value })}
                     placeholder="Enter your question"
-                    className="bg-gray-800 border-gray-700"
+                    className="glass-surface border-white/20 text-white placeholder:text-white/40 resize-none"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label htmlFor="answer" className="text-sm font-medium">
+                <div>
+                  <Label htmlFor="answer" className="text-white mb-2 block">
                     Answer
-                  </label>
+                  </Label>
                   <Textarea
                     id="answer"
                     value={newCard.answer}
                     onChange={(e) => setNewCard({ ...newCard, answer: e.target.value })}
                     placeholder="Enter the answer"
-                    className="bg-gray-800 border-gray-700"
+                    className="glass-surface border-white/20 text-white placeholder:text-white/40 resize-none"
                   />
                 </div>
 
-                <Button type="button" onClick={handleAddCard} className="w-full bg-gray-800 hover:bg-gray-700">
-                  <Plus className="mr-2 h-4 w-4" /> Add Card
+                <Button
+                  type="button"
+                  onClick={handleAddCard}
+                  className="w-full glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                >
+                  <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+                  Add Card
                 </Button>
               </div>
 
-              <div className="border-t border-gray-800 pt-4">
-                <h3 className="text-lg font-medium mb-4">Or Generate with AI</h3>
+              <div className="border-t border-white/10 pt-4">
+                <h3 className="text-lg font-semibold text-white mb-4">Or Generate with AI</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="md:col-span-2 space-y-2">
-                    <label htmlFor="flashcard-topic" className="text-sm font-medium">
+                  <div className="md:col-span-2">
+                    <Label htmlFor="flashcard-topic" className="text-white mb-2 block">
                       Topic
-                    </label>
+                    </Label>
                     <Input
                       id="flashcard-topic"
                       value={flashcardTopic}
                       onChange={(e) => setFlashcardTopic(e.target.value)}
                       placeholder="e.g., Spanish Vocabulary, Chemical Elements"
-                      className="bg-gray-800 border-gray-700"
+                      className="glass-surface border-white/20 text-white placeholder:text-white/40"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="flashcard-count" className="text-sm font-medium">
+                  <div>
+                    <Label htmlFor="flashcard-count" className="text-white mb-2 block">
                       Number of Cards
-                    </label>
+                    </Label>
                     <Select value={flashcardCount} onValueChange={setFlashcardCount}>
-                      <SelectTrigger className="bg-gray-800 border-gray-700">
+                      <SelectTrigger className="glass-surface border-white/20 text-white">
                         <SelectValue placeholder="Select count" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="5">5 cards</SelectItem>
-                        <SelectItem value="10">10 cards</SelectItem>
-                        <SelectItem value="15">15 cards</SelectItem>
-                        <SelectItem value="20">20 cards</SelectItem>
+                      <SelectContent className="glass-surface border-white/20">
+                        <SelectItem value="5" className="text-white">5 cards</SelectItem>
+                        <SelectItem value="10" className="text-white">10 cards</SelectItem>
+                        <SelectItem value="15" className="text-white">15 cards</SelectItem>
+                        <SelectItem value="20" className="text-white">20 cards</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -614,42 +632,49 @@ export default function FlashcardsPage() {
                   type="button"
                   onClick={handleGenerateFlashcards}
                   disabled={generatingFlashcards || !flashcardTopic}
-                  className="w-full bg-primary hover:bg-primary/80"
+                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white disabled:opacity-50"
                 >
                   {generatingFlashcards ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                      Generating...
+                    </>
                   ) : (
-                    <Sparkles className="mr-2 h-4 w-4" />
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" aria-hidden="true" />
+                      Generate Flashcards
+                    </>
                   )}
-                  {generatingFlashcards ? "Generating..." : "Generate Flashcards"}
                 </Button>
               </div>
             </div>
 
             {newSet.cards.length > 0 && (
-              <div className="border-t border-gray-800 pt-4">
+              <div className="border-t border-white/10 pt-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-medium">Cards ({newSet.cards.length})</h3>
+                  <h3 className="text-lg font-semibold text-white">Cards ({newSet.cards.length})</h3>
                 </div>
 
                 <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
                   {newSet.cards.map((card, index) => (
-                    <div key={index} className="bg-gray-800 rounded-lg p-3 space-y-2">
+                    <div key={index} className="glass-surface border-white/10 p-3 rounded-lg space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-xs text-gray-400">Card {index + 1}</span>
+                        <span className="text-xs text-white/60">Card {index + 1}</span>
                         <Button
                           variant="ghost"
                           size="icon"
                           className="h-5 w-5 text-red-400 hover:text-red-300"
                           onClick={() => handleRemoveCard(index)}
+                          type="button"
+                          aria-label="Remove card"
                         >
                           <Trash2 className="h-3 w-3" />
                         </Button>
                       </div>
-                      <p className="text-sm">
+                      <p className="text-sm text-white/80">
                         <span className="font-medium">Q:</span> {card.question}
                       </p>
-                      <p className="text-sm">
+                      <p className="text-sm text-white/80">
                         <span className="font-medium">A:</span> {card.answer}
                       </p>
                     </div>
@@ -662,12 +687,16 @@ export default function FlashcardsPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="border-gray-700"
+                className="glass-surface border-white/20 text-white hover:bg-white/10"
                 onClick={() => setIsCreateDialogOpen(false)}
               >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-primary hover:bg-primary/80" disabled={newSet.cards.length === 0}>
+              <Button
+                type="submit"
+                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                disabled={newSet.cards.length === 0}
+              >
                 Create Flashcard Set
               </Button>
             </DialogFooter>
@@ -678,12 +707,12 @@ export default function FlashcardsPage() {
       {/* Study Flashcards Dialog */}
       {currentSet && (
         <Dialog open={isStudyDialogOpen} onOpenChange={setIsStudyDialogOpen}>
-          <DialogContent className="bg-gray-900 border-gray-800 sm:max-w-[700px]">
+          <DialogContent className="glass-surface border-white/20 sm:max-w-[700px]">
             <DialogHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <DialogTitle>{currentSet.title}</DialogTitle>
-                  <DialogDescription className="text-gray-300">
+                  <DialogTitle className="text-white">{currentSet.title}</DialogTitle>
+                  <DialogDescription className="text-white/70">
                     {currentSet.subject} • {currentSet.cards.length} cards
                   </DialogDescription>
                 </div>
@@ -691,15 +720,22 @@ export default function FlashcardsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-gray-700"
+                    className="glass-surface border-white/20 text-white"
                     onClick={shuffleCards}
                     disabled={studyMode === "shuffle"}
                   >
-                    <Shuffle className="h-4 w-4 mr-1" /> Shuffle
+                    <Shuffle className="h-4 w-4 mr-1" aria-hidden="true" />
+                    Shuffle
                   </Button>
                   {studyMode !== "normal" && (
-                    <Button variant="outline" size="sm" className="border-gray-700" onClick={resetCards}>
-                      <RotateCcw className="h-4 w-4 mr-1" /> Reset
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="glass-surface border-white/20 text-white"
+                      onClick={resetCards}
+                    >
+                      <RotateCcw className="h-4 w-4 mr-1" aria-hidden="true" />
+                      Reset
                     </Button>
                   )}
                 </div>
@@ -707,7 +743,7 @@ export default function FlashcardsPage() {
             </DialogHeader>
 
             <div className="py-4">
-              <div className="flex justify-between items-center mb-2 text-sm text-gray-400">
+              <div className="flex justify-between items-center mb-2 text-sm text-white/60">
                 <span>Progress</span>
                 <span>
                   {currentCardIndex + 1} of {currentSet.cards.length}
@@ -716,63 +752,76 @@ export default function FlashcardsPage() {
               <Progress value={((currentCardIndex + 1) / currentSet.cards.length) * 100} className="h-2" />
             </div>
 
-            <div className="bg-gray-800 rounded-lg p-6 min-h-[250px] flex flex-col justify-between">
+            <div className="glass-surface border-white/10 rounded-lg p-8 min-h-[250px] flex flex-col justify-between">
               <div>
-                <p className="font-medium mb-2">Question:</p>
-                <p className="text-gray-300 mb-6">{currentSet.cards[currentCardIndex]?.question}</p>
+                <p className="font-semibold text-white mb-3">Question:</p>
+                <p className="text-white/90 text-lg mb-6">{currentSet.cards[currentCardIndex]?.question}</p>
 
                 {showAnswer && (
                   <>
-                    <p className="font-medium mb-2">Answer:</p>
-                    <p className="text-gray-300">{currentSet.cards[currentCardIndex]?.answer}</p>
+                    <p className="font-semibold text-white mb-3">Answer:</p>
+                    <p className="text-white/90 text-lg">{currentSet.cards[currentCardIndex]?.answer}</p>
                   </>
                 )}
               </div>
 
-              <div className="flex justify-between items-center mt-4">
+              <div className="flex justify-between items-center mt-6">
                 <Button
                   variant="outline"
-                  className="border-gray-700"
+                  className="glass-surface border-white/20 text-white"
                   onClick={handlePrevCard}
                   disabled={currentCardIndex === 0}
                 >
-                  <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+                  <ChevronLeft className="h-4 w-4 mr-1" aria-hidden="true" />
+                  Previous
                 </Button>
                 <Button
-                  variant={showAnswer ? "outline" : "default"}
-                  className={showAnswer ? "border-gray-700" : "bg-primary hover:bg-primary/80"}
+                  className={
+                    showAnswer
+                      ? "glass-surface border-white/20 text-white"
+                      : "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                  }
                   onClick={() => setShowAnswer(!showAnswer)}
                 >
                   {showAnswer ? "Hide Answer" : "Show Answer"}
                 </Button>
                 <Button
                   variant="outline"
-                  className="border-gray-700"
+                  className="glass-surface border-white/20 text-white"
                   onClick={handleNextCard}
                   disabled={currentCardIndex === currentSet.cards.length - 1}
                 >
-                  Next <ChevronRight className="h-4 w-4 ml-1" />
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" aria-hidden="true" />
                 </Button>
               </div>
             </div>
 
-            <div className="flex justify-between items-center mt-2">
+            <div className="flex justify-between items-center mt-4">
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-gray-400 hover:text-white"
+                className="text-white/60 hover:text-white"
                 onClick={() => copyToClipboard(currentSet.cards[currentCardIndex]?.question, 0)}
               >
-                {copiedIndex === 0 ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                {copiedIndex === 0 ? (
+                  <Check className="h-3 w-3 mr-1" aria-hidden="true" />
+                ) : (
+                  <Copy className="h-3 w-3 mr-1" aria-hidden="true" />
+                )}
                 Copy Question
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-gray-400 hover:text-white"
+                className="text-white/60 hover:text-white"
                 onClick={() => copyToClipboard(currentSet.cards[currentCardIndex]?.answer, 1)}
               >
-                {copiedIndex === 1 ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
+                {copiedIndex === 1 ? (
+                  <Check className="h-3 w-3 mr-1" aria-hidden="true" />
+                ) : (
+                  <Copy className="h-3 w-3 mr-1" aria-hidden="true" />
+                )}
                 Copy Answer
               </Button>
             </div>

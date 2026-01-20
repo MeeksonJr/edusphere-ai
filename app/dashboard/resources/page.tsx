@@ -1,14 +1,13 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
 import {
   BookOpen,
   FileText,
@@ -34,6 +33,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { GlassSurface } from "@/components/shared/GlassSurface"
+import { AnimatedCard } from "@/components/shared/AnimatedCard"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 
 const resourceTypes = [
   { value: "notes", label: "Study Notes", icon: FileText },
@@ -83,7 +86,7 @@ export default function ResourcesPage() {
     subject: "",
     content: "",
     resource_type: "notes",
-    tags: [],
+    tags: [] as string[],
   })
   const [tagInput, setTagInput] = useState("")
 
@@ -95,7 +98,6 @@ export default function ResourcesPage() {
         setUser({ ...data.user, profile })
       }
     }
-
     getUser()
   }, [supabase])
 
@@ -204,15 +206,11 @@ export default function ResourcesPage() {
 
     try {
       setGeneratingResource(true)
-
-      // Track AI usage
       await trackAIUsage(supabase, user.id)
 
-      // Get resource type label
       const resourceTypeLabel =
         resourceTypes.find((type) => type.value === newResource.resource_type)?.label || newResource.resource_type
 
-      // Generate content
       const content = await generateStudyResource(newResource.subject, newResource.title, resourceTypeLabel)
 
       setNewResource((prev) => ({ ...prev, content }))
@@ -303,184 +301,209 @@ ${resource.content}
   const getResourceTypeIcon = (type: string) => {
     const resourceType = resourceTypes.find((t) => t.value === type)
     const Icon = resourceType?.icon || FileText
-    return <Icon className="h-5 w-5" />
+    return <Icon className="h-5 w-5 text-white/60" aria-hidden="true" />
   }
 
   return (
-    <div className="p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold neon-text-blue">Study Resources</h1>
-        <p className="text-gray-400 mt-1">Create and manage your study materials</p>
-      </div>
+    <div className="p-6 md:p-8 lg:p-12">
+      {/* Header */}
+      <ScrollReveal direction="up">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <span className="text-white">Study</span>{" "}
+            <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              Resources
+            </span>
+          </h1>
+          <p className="text-white/70">Create and manage your study materials</p>
+        </div>
+      </ScrollReveal>
 
       {/* Filters and Search */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          <Input
-            placeholder="Search resources..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-gray-900 border-gray-700"
-          />
-        </div>
-        <div className="flex gap-2">
-          <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-            <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700">
-              <SelectValue placeholder="Filter by subject" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Subjects</SelectItem>
-              {subjects.map((subject) => (
-                <SelectItem key={subject} value={subject}>
-                  {subject}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <ScrollReveal direction="up" delay={0.1}>
+        <GlassSurface className="p-4 md:p-6 mb-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/40" aria-hidden="true" />
+              <Input
+                placeholder="Search resources..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Select value={subjectFilter} onValueChange={setSubjectFilter}>
+                <SelectTrigger className="w-[180px] glass-surface border-white/20 text-white">
+                  <SelectValue placeholder="Filter by subject" />
+                </SelectTrigger>
+                <SelectContent className="glass-surface border-white/20">
+                  <SelectItem value="all" className="text-white">All Subjects</SelectItem>
+                  {subjects.map((subject) => (
+                    <SelectItem key={subject} value={subject} className="text-white">
+                      {subject}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-[180px] bg-gray-900 border-gray-700">
-              <SelectValue placeholder="Filter by type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              {resourceTypes.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  {type.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="w-[180px] glass-surface border-white/20 text-white">
+                  <SelectValue placeholder="Filter by type" />
+                </SelectTrigger>
+                <SelectContent className="glass-surface border-white/20">
+                  <SelectItem value="all" className="text-white">All Types</SelectItem>
+                  {resourceTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value} className="text-white">
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-          <Button className="bg-primary hover:bg-primary/80" onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> New Resource
-          </Button>
-        </div>
-      </div>
+              <Button
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                onClick={() => setIsCreateDialogOpen(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+                New Resource
+              </Button>
+            </div>
+          </div>
+        </GlassSurface>
+      </ScrollReveal>
 
       {/* Resources Grid */}
       {loading ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="glass-card animate-pulse">
-              <CardHeader className="pb-2">
-                <div className="h-6 bg-gray-800 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-800 rounded w-1/2"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-4 bg-gray-800 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-800 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-800 rounded w-3/4"></div>
-              </CardContent>
-              <CardFooter>
-                <div className="h-8 bg-gray-800 rounded w-full"></div>
-              </CardFooter>
-            </Card>
+            <div key={i} className="glass-surface p-6 animate-pulse">
+              <div className="h-6 bg-white/10 rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-white/10 rounded w-1/2 mb-4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-white/10 rounded w-full"></div>
+                <div className="h-4 bg-white/10 rounded w-full"></div>
+              </div>
+            </div>
           ))}
         </div>
       ) : resources.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {resources.map((resource) => (
-            <Card key={resource.id} className="glass-card hover:neon-border-blue transition-all">
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="line-clamp-1">{resource.title}</CardTitle>
-                    <CardDescription className="line-clamp-1">{resource.subject}</CardDescription>
+          {resources.map((resource, index) => (
+            <ScrollReveal key={resource.id} direction="up" delay={0.05 * index}>
+              <AnimatedCard variant="3d" delay={0.05 * index} className="cursor-pointer group">
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg font-bold text-white mb-1 truncate group-hover:text-blue-400 transition-colors">
+                        {resource.title}
+                      </h3>
+                      <p className="text-sm text-white/60 truncate">{resource.subject}</p>
+                    </div>
+                    <div className="flex items-center ml-2">{getResourceTypeIcon(resource.resource_type)}</div>
                   </div>
-                  <div className="flex items-center">{getResourceTypeIcon(resource.resource_type)}</div>
+                  <p className="text-sm text-white/70 line-clamp-3 mb-4">
+                    {resource.description || resource.content.substring(0, 150) + "..."}
+                  </p>
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {resource.tags?.slice(0, 3).map((tag: string) => (
+                      <Badge key={tag} className="glass-surface border-white/10 text-white/80 text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                    {resource.ai_generated && (
+                      <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs">
+                        <Sparkles className="h-3 w-3 mr-1" aria-hidden="true" />
+                        AI
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="glass-surface border-white/20 hover:border-blue-500/50 text-white"
+                      onClick={() => handleViewResource(resource)}
+                    >
+                      View Resource
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white/60 hover:text-white"
+                      onClick={() => downloadResource(resource)}
+                      aria-label="Download resource"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-400 line-clamp-3">
-                  {resource.description || resource.content.substring(0, 150) + "..."}
-                </p>
-                <div className="flex flex-wrap gap-1 mt-3">
-                  {resource.tags?.map((tag: string) => (
-                    <Badge key={tag} variant="outline" className="bg-gray-800 text-gray-300">
-                      {tag}
-                    </Badge>
-                  ))}
-                  {resource.ai_generated && (
-                    <Badge className="bg-primary/20 text-primary">
-                      <Sparkles className="h-3 w-3 mr-1" /> AI Generated
-                    </Badge>
-                  )}
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" className="border-gray-700" onClick={() => handleViewResource(resource)}>
-                  View Resource
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-gray-400 hover:text-white"
-                  onClick={() => downloadResource(resource)}
-                >
-                  <Download className="h-4 w-4" />
-                </Button>
-              </CardFooter>
-            </Card>
+              </AnimatedCard>
+            </ScrollReveal>
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <BookOpen className="mx-auto h-12 w-12 text-gray-600 mb-4" />
-          <h3 className="text-xl font-medium mb-2">No resources found</h3>
-          <p className="text-gray-400 mb-6">
-            {searchQuery || subjectFilter !== "all" || typeFilter !== "all"
-              ? "Try adjusting your filters or search query."
-              : "Start by creating your first study resource."}
-          </p>
-          <Button className="bg-primary hover:bg-primary/80" onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Create Resource
-          </Button>
-        </div>
+        <ScrollReveal direction="up">
+          <GlassSurface className="p-12 text-center">
+            <BookOpen className="mx-auto h-16 w-16 text-white/20 mb-4" aria-hidden="true" />
+            <h3 className="text-xl font-semibold text-white mb-2">No resources found</h3>
+            <p className="text-white/60 mb-6">
+              {searchQuery || subjectFilter !== "all" || typeFilter !== "all"
+                ? "Try adjusting your filters or search query."
+                : "Start by creating your first study resource."}
+            </p>
+            <Button
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+              onClick={() => setIsCreateDialogOpen(true)}
+            >
+              <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+              Create Resource
+            </Button>
+          </GlassSurface>
+        </ScrollReveal>
       )}
 
       {/* Create Resource Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-800 sm:max-w-[700px]">
+        <DialogContent className="glass-surface border-white/20 sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create New Study Resource</DialogTitle>
-            <DialogDescription className="text-gray-400">
+            <DialogTitle className="text-white">Create New Study Resource</DialogTitle>
+            <DialogDescription className="text-white/70">
               Create your own study material or let AI generate content for you.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleCreateResource} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="title" className="text-sm font-medium">
-                  Title *
-                </label>
+              <div>
+                <Label htmlFor="title" className="text-white mb-2 block">
+                  Title <span className="text-red-400">*</span>
+                </Label>
                 <Input
                   id="title"
                   value={newResource.title}
                   onChange={(e) => setNewResource({ ...newResource, title: e.target.value })}
                   placeholder="e.g., Quantum Physics Fundamentals"
-                  className="bg-gray-800 border-gray-700"
+                  className="glass-surface border-white/20 text-white placeholder:text-white/40"
                   required
                 />
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="subject" className="text-sm font-medium">
-                  Subject *
-                </label>
+              <div>
+                <Label htmlFor="subject" className="text-white mb-2 block">
+                  Subject <span className="text-red-400">*</span>
+                </Label>
                 <Select
                   value={newResource.subject}
                   onValueChange={(value) => setNewResource({ ...newResource, subject: value })}
                   required
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-700">
+                  <SelectTrigger className="glass-surface border-white/20 text-white">
                     <SelectValue placeholder="Select a subject" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="glass-surface border-white/20">
                     {subjects.map((subject) => (
-                      <SelectItem key={subject} value={subject}>
+                      <SelectItem key={subject} value={subject} className="text-white">
                         {subject}
                       </SelectItem>
                     ))}
@@ -489,124 +512,134 @@ ${resource.content}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-medium">
+            <div>
+              <Label htmlFor="description" className="text-white mb-2 block">
                 Description
-              </label>
+              </Label>
               <Textarea
                 id="description"
                 value={newResource.description}
                 onChange={(e) => setNewResource({ ...newResource, description: e.target.value })}
                 placeholder="Brief description of this resource"
-                className="bg-gray-800 border-gray-700"
+                className="glass-surface border-white/20 text-white placeholder:text-white/40 resize-none"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="resource_type" className="text-sm font-medium">
+              <div>
+                <Label htmlFor="resource_type" className="text-white mb-2 block">
                   Resource Type
-                </label>
+                </Label>
                 <Select
                   value={newResource.resource_type}
                   onValueChange={(value) => setNewResource({ ...newResource, resource_type: value })}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-700">
-                    <SelectValue placeholder="Select type" />
+                  <SelectTrigger className="glass-surface border-white/20 text-white">
+                    <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="glass-surface border-white/20">
                     {resourceTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        <div className="flex items-center">
-                          <type.icon className="h-4 w-4 mr-2" />
-                          {type.label}
-                        </div>
+                      <SelectItem key={type.value} value={type.value} className="text-white">
+                        {type.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="tags" className="text-sm font-medium">
+              <div>
+                <Label htmlFor="tags" className="text-white mb-2 block">
                   Tags
-                </label>
+                </Label>
                 <div className="flex gap-2">
                   <Input
                     id="tags"
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
-                    placeholder="Add a tag"
-                    className="bg-gray-800 border-gray-700"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault()
                         handleAddTag()
                       }
                     }}
+                    placeholder="Add a tag and press Enter"
+                    className="glass-surface border-white/20 text-white placeholder:text-white/40"
                   />
-                  <Button type="button" variant="outline" className="border-gray-700" onClick={handleAddTag}>
-                    Add
+                  <Button
+                    type="button"
+                    onClick={handleAddTag}
+                    className="glass-surface border-white/20 hover:border-blue-500/50 text-white"
+                  >
+                    <Plus className="h-4 w-4" aria-hidden="true" />
                   </Button>
                 </div>
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {newResource.tags.map((tag) => (
-                    <Badge key={tag} variant="outline" className="bg-gray-800 text-gray-300">
-                      {tag}
-                      <button
-                        type="button"
-                        className="ml-1 text-gray-400 hover:text-white"
+                {newResource.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {newResource.tags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        className="glass-surface border-white/10 text-white/80"
                         onClick={() => handleRemoveTag(tag)}
                       >
-                        ×
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
+                        {tag}
+                        <span className="ml-2 cursor-pointer">×</span>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label htmlFor="content" className="text-sm font-medium">
-                  Content *
-                </label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleGenerateResource}
-                  disabled={generatingResource || !newResource.title || !newResource.subject}
-                  className="border-primary text-primary hover:bg-primary/10"
-                >
-                  {generatingResource ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Sparkles className="mr-2 h-4 w-4" />
-                  )}
-                  {generatingResource ? "Generating..." : "Generate with AI"}
-                </Button>
-              </div>
+            <div>
+              <Label htmlFor="content" className="text-white mb-2 block">
+                Content <span className="text-red-400">*</span>
+              </Label>
               <Textarea
                 id="content"
                 value={newResource.content}
                 onChange={(e) => setNewResource({ ...newResource, content: e.target.value })}
-                placeholder="Your study content here..."
-                className="bg-gray-800 border-gray-700 min-h-[200px]"
+                placeholder="Enter your study resource content..."
+                rows={8}
+                className="glass-surface border-white/20 text-white placeholder:text-white/40 resize-none font-mono text-sm"
                 required
               />
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGenerateResource}
+                disabled={generatingResource || !newResource.subject || !newResource.title}
+                className="flex-1 glass-surface border-white/20 hover:border-purple-500/50 text-white"
+              >
+                {generatingResource ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" aria-hidden="true" />
+                    Generate with AI
+                  </>
+                )}
+              </Button>
             </div>
 
             <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
-                className="border-gray-700"
+                className="glass-surface border-white/20 text-white hover:bg-white/10"
                 onClick={() => setIsCreateDialogOpen(false)}
               >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-primary hover:bg-primary/80">
+              <Button
+                type="submit"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+              >
                 Create Resource
               </Button>
             </DialogFooter>
@@ -617,16 +650,22 @@ ${resource.content}
       {/* View Resource Dialog */}
       {currentResource && (
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-          <DialogContent className="bg-gray-900 border-gray-800 sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+          <DialogContent className="glass-surface border-white/20 sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <div className="flex justify-between items-start">
-                <DialogTitle>{currentResource.title}</DialogTitle>
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <DialogTitle className="text-white">{currentResource.title}</DialogTitle>
+                  <DialogDescription className="text-white/70">
+                    {currentResource.subject} • {resourceTypes.find((t) => t.value === currentResource.resource_type)?.label}
+                  </DialogDescription>
+                </div>
+                <div className="flex gap-2">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="text-gray-400 hover:text-white"
+                    className="text-white/60 hover:text-white"
                     onClick={() => downloadResource(currentResource)}
+                    aria-label="Download resource"
                   >
                     <Download className="h-4 w-4" />
                   </Button>
@@ -634,49 +673,34 @@ ${resource.content}
                     variant="ghost"
                     size="icon"
                     className="text-red-400 hover:text-red-300"
-                    onClick={() => handleDeleteResource(currentResource.id)}
+                    onClick={() => {
+                      handleDeleteResource(currentResource.id)
+                    }}
+                    aria-label="Delete resource"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
-              <div className="flex items-center space-x-2 mt-2">
-                <Badge variant="outline" className="bg-gray-800 text-gray-300">
-                  {currentResource.subject}
-                </Badge>
-                <Badge variant="outline" className="bg-gray-800 text-gray-300">
-                  {resourceTypes.find((t) => t.value === currentResource.resource_type)?.label ||
-                    currentResource.resource_type}
-                </Badge>
-                {currentResource.ai_generated && (
-                  <Badge className="bg-primary/20 text-primary">
-                    <Sparkles className="h-3 w-3 mr-1" /> AI Generated
-                  </Badge>
-                )}
-              </div>
-              {currentResource.description && (
-                <DialogDescription className="text-gray-300 mt-2">{currentResource.description}</DialogDescription>
-              )}
             </DialogHeader>
 
-            <div className="mt-4 space-y-4">
-              <div className="bg-gray-800 rounded-lg p-4 whitespace-pre-wrap">{currentResource.content}</div>
-
-              {currentResource.tags?.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
+            <div className="space-y-4">
+              {currentResource.description && (
+                <p className="text-white/80">{currentResource.description}</p>
+              )}
+              {currentResource.tags && currentResource.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
                   {currentResource.tags.map((tag: string) => (
-                    <Badge key={tag} variant="outline" className="bg-gray-800 text-gray-300">
+                    <Badge key={tag} className="glass-surface border-white/10 text-white/80">
                       {tag}
                     </Badge>
                   ))}
                 </div>
               )}
-
-              <div className="text-xs text-gray-400">
-                Created: {new Date(currentResource.created_at).toLocaleString()}
-                {currentResource.updated_at !== currentResource.created_at && (
-                  <span> | Updated: {new Date(currentResource.updated_at).toLocaleString()}</span>
-                )}
+              <div className="glass-surface border-white/10 p-4 rounded-lg">
+                <pre className="whitespace-pre-wrap text-white/90 font-mono text-sm leading-relaxed">
+                  {currentResource.content}
+                </pre>
               </div>
             </div>
           </DialogContent>
@@ -685,3 +709,4 @@ ${resource.content}
     </div>
   )
 }
+
