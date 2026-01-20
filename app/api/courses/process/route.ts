@@ -88,6 +88,7 @@ export async function POST(request: NextRequest) {
     console.log("Status updated to processing, starting AI generation...")
 
     // Generate course layout using AI (this can take time)
+    // NOTE: Optimized for Vercel Hobby (60s max). We keep full-course reasonably small.
     const systemPrompt = `You are an expert course designer. Generate a comprehensive course layout in JSON format based on the user's topic and requirements.
 
 Requirements:
@@ -99,8 +100,8 @@ Requirements:
 
 Course structure:
 - For "quick-explainer": 1-3 chapters, 3-5 slides per chapter
-- For "full-course": 5-20 chapters, 5-10 slides per chapter
-- For "tutorial": 3-10 chapters, 3-7 slides per chapter
+- For "full-course": 6-10 chapters, 4-6 slides per chapter (optimize for fast generation)
+- For "tutorial": 3-6 chapters, 3-5 slides per chapter
 
 Generate unique IDs for courseId, chapterId, and slideId (use UUID format).
 
@@ -139,36 +140,37 @@ Return the JSON in this exact format:
     let aiResponseText: string
     let lastError: any = null
 
-    // Try Gemini first (with internal model fallbacks)
-    console.log("Attempting AI generation with Gemini...")
+    // Try Groq first (fast, good for Vercel 60s limit)
+    console.log("Attempting AI generation with Groq...")
     try {
-      const aiResponse = await generateAIResponse({
-        provider: "gemini",
+      const groqResponse = await generateAIResponse({
+        provider: "groq",
         prompt: userPrompt,
         systemPrompt,
-        temperature: 0.7,
-        maxTokens: 4000,
+        temperature: 0.6,
+        maxTokens: 3200,
       })
-      aiResponseText = aiResponse.text
-      console.log("Gemini generation successful, response length:", aiResponseText.length)
-    } catch (geminiError: any) {
-      console.error("Gemini AI generation error:", geminiError)
-      lastError = geminiError
+      aiResponseText = groqResponse.text
+      console.log("Groq generation successful, response length:", aiResponseText.length)
+    } catch (groqError: any) {
+      console.error("Groq AI generation error:", groqError)
+      lastError = groqError
 
-      // Try Groq as second fallback
+      // Try Gemini as second fallback
       try {
-        console.log("Falling back to Groq...")
-        const groqResponse = await generateAIResponse({
-          provider: "groq",
+        console.log("Falling back to Gemini...")
+        const aiResponse = await generateAIResponse({
+          provider: "gemini",
           prompt: userPrompt,
           systemPrompt,
           temperature: 0.7,
-          maxTokens: 4000,
+          maxTokens: 3200,
         })
-        aiResponseText = groqResponse.text
-      } catch (groqError: any) {
-        console.error("Groq fallback also failed:", groqError)
-        lastError = groqError
+        aiResponseText = aiResponse.text
+        console.log("Gemini generation successful, response length:", aiResponseText.length)
+      } catch (geminiError: any) {
+        console.error("Gemini fallback also failed:", geminiError)
+        lastError = geminiError
 
         // Try Hugging Face as final fallback
         try {
@@ -178,11 +180,11 @@ Return the JSON in this exact format:
             prompt: `${systemPrompt}\n\n${userPrompt}`,
             systemPrompt: undefined,
             temperature: 0.7,
-            maxTokens: 4000,
+            maxTokens: 3200,
           })
           aiResponseText = hfResponse.text
         } catch (hfError: any) {
-          console.error("All AI providers failed:", { geminiError, groqError, hfError })
+          console.error("All AI providers failed:", { groqError, geminiError, hfError })
           await supabase
             .from("courses")
             .update({ status: "failed" })
