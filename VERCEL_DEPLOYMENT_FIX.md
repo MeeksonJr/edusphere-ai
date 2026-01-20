@@ -1,87 +1,81 @@
-# Vercel Deployment Fix - Supabase Environment Variables
+# Vercel Deployment Fix - maxDuration Limit
 
-## Problem
-The application is trying to connect to the old Supabase URL (`avzfoqvnvpyvsxtkparn.supabase.co`) instead of the new one (`qyqbqgubsuxepnloduvd.supabase.co`). This happens because:
+## Issue
 
-1. **Next.js bakes `NEXT_PUBLIC_*` variables into the client bundle at build time**
-2. Vercel is using a cached build that was created with the old environment variables
-3. Even though you updated the env vars in Vercel, the build cache still has the old values
+**Error:** `Builder returned invalid maxDuration value for Serverless Function "api/courses/process". Serverless Functions must have a maxDuration between 1 and 60 for plan hobby.`
+
+**Cause:** The `maxDuration` was set to 300 seconds (5 minutes), but Vercel's Hobby plan only allows 1-60 seconds.
 
 ## Solution
 
-### Step 1: Clear Vercel Build Cache
+Changed `maxDuration` from 300 to 60 seconds (the maximum allowed for Hobby plan).
 
-1. Go to your Vercel project dashboard
-2. Navigate to **Settings** → **General**
-3. Scroll down to **Build & Development Settings**
-4. Click **Clear Build Cache** (or similar option)
-5. Alternatively, you can trigger a new deployment with cache cleared
+**File:** `app/api/courses/process/route.ts`
 
-### Step 2: Verify Environment Variables in Vercel
+```typescript
+export const maxDuration = 60 // Maximum allowed for Vercel Hobby plan (60 seconds)
+```
 
-Make sure these are set correctly in **Settings** → **Environment Variables**:
+## Considerations
 
-**Required Variables:**
-- `NEXT_PUBLIC_SUPABASE_URL` = `https://qyq..............`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `ey......cm9......U......`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` = `sb_......_YS...._...j...`
+### Current Limitation
+- AI generation might take longer than 60 seconds for complex courses
+- If generation exceeds 60 seconds, the function will timeout
 
-**Important:** Make sure these are set for **ALL environments** (Production, Preview, Development)
+### Workarounds
 
-### Step 3: Force a New Deployment
+1. **Optimize AI Prompts:**
+   - Reduce `maxTokens` for faster responses
+   - Use faster models (Gemini Flash instead of Pro)
+   - Simplify course structure requests
 
-**Option A: Via Vercel Dashboard**
-1. Go to **Deployments** tab
-2. Click the **"..."** menu on the latest deployment
-3. Select **"Redeploy"**
-4. Check **"Use existing Build Cache"** = **OFF** (unchecked)
-5. Click **Redeploy**
+2. **Split Processing:**
+   - Generate layout in chunks (one chapter at a time)
+   - Use multiple API calls instead of one large call
+   - Process chapters sequentially with status updates
 
-**Option B: Via Git**
-1. Make a small change to any file (e.g., add a comment)
-2. Commit and push to your main branch
-3. This will trigger a new build automatically
+3. **Upgrade Plan:**
+   - Vercel Pro plan allows up to 300 seconds (5 minutes)
+   - Vercel Enterprise allows up to 900 seconds (15 minutes)
 
-### Step 4: Verify the Fix
+4. **Alternative Solutions:**
+   - Use Vercel Cron Jobs for background processing
+   - Use external queue system (BullMQ, Inngest, etc.)
+   - Use Supabase Edge Functions (60 second limit but separate from Vercel)
 
-After redeployment:
+## Current Implementation
 
-1. Open your deployed site
-2. Open browser DevTools (F12)
-3. Check the Console for:
-   - ✅ Should see: "Supabase Client Initialization" with the new URL
-   - ❌ Should NOT see: Any errors about `avz........rn`
-4. Try to sign up/login
-5. Check Network tab - all requests should go to `qy.........supabase.co`
+The process endpoint will:
+1. Try to complete within 60 seconds
+2. If it times out, the course status will remain "processing"
+3. Frontend can poll for status updates
+4. User can manually retry if needed
 
-## Code Changes Made
+## Future Improvements
 
-I've also fixed the following issues in the code:
+1. **Implement Chunked Processing:**
+   ```typescript
+   // Process one chapter at a time
+   for (const chapter of layoutJson.chapters) {
+     await processChapter(chapter)
+     // Update progress
+   }
+   ```
 
-1. **`components/supabase-provider.tsx`**:
-   - Added debug logging to show which URL is being used
-   - Added validation to warn if old URL is detected
+2. **Add Progress Tracking:**
+   - Store progress percentage in database
+   - Update status as chapters complete
+   - Allow resuming from last completed chapter
 
-2. **`contexts/settings-context.tsx`**:
-   - Added null checks for Supabase client
-   - Prevents "Cannot read properties of null" errors
+3. **Use Queue System:**
+   - Integrate with Inngest or similar
+   - Queue jobs that can run longer than 60 seconds
+   - Better error handling and retries
 
-## Troubleshooting
+## Testing
 
-If the issue persists after clearing cache:
-
-1. **Double-check environment variables** in Vercel match exactly what's in `.env.local`
-2. **Check deployment logs** in Vercel to see what values were used during build
-3. **Try a different browser** or clear browser cache (Ctrl+Shift+Delete)
-4. **Check if you have multiple Vercel projects** - make sure you're updating the correct one
-
-## Quick Test
-
-After redeployment, you can test by:
-
-1. Opening browser console
-2. Running: `console.log(process.env.NEXT_PUBLIC_SUPABASE_URL)`
-3. Should output: `https://qy..........supabase.co`
-
-If it shows the old URL, the build cache wasn't cleared properly.
-
+After deployment:
+1. Test course generation with simple topics (should complete in < 60s)
+2. Monitor Vercel logs for timeout errors
+3. Test with complex topics to see if timeout occurs
+4. Verify course status updates correctly

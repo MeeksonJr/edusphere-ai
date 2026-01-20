@@ -4,7 +4,7 @@ import { generateAIResponse } from "@/lib/ai-service-wrapper"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
-export const maxDuration = 300 // 5 minutes for background processing
+export const maxDuration = 60 // Maximum allowed for Vercel Hobby plan (60 seconds)
 
 interface CourseLayout {
   courseId: string
