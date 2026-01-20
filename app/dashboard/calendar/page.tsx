@@ -40,10 +40,15 @@ export default function CalendarPage() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser()
-      if (data.user) {
-        const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
-        setUser({ ...data.user, profile })
+      if (!supabase) return
+      try {
+        const { data } = await supabase.auth.getUser()
+        if (data.user) {
+          const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
+          setUser({ ...data.user, profile })
+        }
+      } catch (error) {
+        console.error("Error loading user:", error)
       }
     }
     getUser()
@@ -51,7 +56,7 @@ export default function CalendarPage() {
 
   useEffect(() => {
     const fetchAssignments = async () => {
-      if (!user) return
+      if (!user || !supabase) return
 
       try {
         setLoading(true)

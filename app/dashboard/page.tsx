@@ -13,14 +13,24 @@ export default async function Dashboard() {
     data: { user },
   } = await supabase.auth.getUser()
 
+  if (!user) {
+    return (
+      <div className="p-6 md:p-8 lg:p-12">
+        <GlassSurface className="p-8 text-center">
+          <p className="text-white/70">Please log in to view your dashboard.</p>
+        </GlassSurface>
+      </div>
+    )
+  }
+
   // Get user profile
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user?.id).single()
+  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
 
   // Get upcoming assignments (limit to 3)
   const { data: assignments } = await supabase
     .from("assignments")
     .select("*")
-    .eq("user_id", user?.id)
+    .eq("user_id", user.id)
     .eq("status", "ongoing")
     .order("due_date", { ascending: true })
     .limit(3)
@@ -29,7 +39,7 @@ export default async function Dashboard() {
   const { count: completedCount } = await supabase
     .from("assignments")
     .select("*", { count: "exact", head: true })
-    .eq("user_id", user?.id)
+    .eq("user_id", user.id)
     .eq("status", "completed")
 
   // Get assignments due this week
@@ -39,7 +49,7 @@ export default async function Dashboard() {
   const { count: dueThisWeekCount } = await supabase
     .from("assignments")
     .select("*", { count: "exact", head: true })
-    .eq("user_id", user?.id)
+    .eq("user_id", user.id)
     .eq("status", "ongoing")
     .lt("due_date", oneWeekFromNow.toISOString())
 

@@ -22,9 +22,9 @@ The application is trying to connect to the old Supabase URL (`avzfoqvnvpyvsxtkp
 Make sure these are set correctly in **Settings** → **Environment Variables**:
 
 **Required Variables:**
-- `NEXT_PUBLIC_SUPABASE_URL` = `https://qyqbqgubsuxepnloduvd.supabase.co`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF5cWJxZ3Vic3V4ZXBubG9kdXZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4ODY3MDYsImV4cCI6MjA4NDQ2MjcwNn0.uUzR15-zu1s4N5v_gLWeUk6hLkERARSnF_rghnniFuU`
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` = `sb_publishable_YS2ZZDwrDA9NkJ6m8Ab5Pg_RiEoNU2j`
+- `NEXT_PUBLIC_SUPABASE_URL` = `https://qyq..............`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `ey......cm9......U......`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` = `sb_......_YS...._...j...`
 
 **Important:** Make sure these are set for **ALL environments** (Production, Preview, Development)
 
@@ -50,9 +50,9 @@ After redeployment:
 2. Open browser DevTools (F12)
 3. Check the Console for:
    - ✅ Should see: "Supabase Client Initialization" with the new URL
-   - ❌ Should NOT see: Any errors about `avzfoqvnvpyvsxtkparn`
+   - ❌ Should NOT see: Any errors about `avz........rn`
 4. Try to sign up/login
-5. Check Network tab - all requests should go to `qyqbqgubsuxepnloduvd.supabase.co`
+5. Check Network tab - all requests should go to `qy.........supabase.co`
 
 ## Code Changes Made
 
@@ -81,7 +81,7 @@ After redeployment, you can test by:
 
 1. Opening browser console
 2. Running: `console.log(process.env.NEXT_PUBLIC_SUPABASE_URL)`
-3. Should output: `https://qyqbqgubsuxepnloduvd.supabase.co`
+3. Should output: `https://qy..........supabase.co`
 
 If it shows the old URL, the build cache wasn't cleared properly.
 

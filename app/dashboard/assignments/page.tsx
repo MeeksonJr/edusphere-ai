@@ -19,6 +19,16 @@ export default async function AssignmentsPage({
     data: { user },
   } = await supabase.auth.getUser()
 
+  if (!user) {
+    return (
+      <div className="p-6 md:p-8 lg:p-12">
+        <GlassSurface className="p-8 text-center">
+          <p className="text-white/70">Please log in to view your assignments.</p>
+        </GlassSurface>
+      </div>
+    )
+  }
+
   // Get filter parameters
   const status = searchParams.status || "all"
   const subject = searchParams.subject || "all"
@@ -26,7 +36,7 @@ export default async function AssignmentsPage({
   const [sortField, sortOrder] = sort.split("-")
 
   // Build query
-  let query = supabase.from("assignments").select("*").eq("user_id", user?.id)
+  let query = supabase.from("assignments").select("*").eq("user_id", user.id)
 
   // Apply filters
   if (status !== "all") {
@@ -49,10 +59,10 @@ export default async function AssignmentsPage({
   const { data: subjects } = await supabase
     .from("assignments")
     .select("subject")
-    .eq("user_id", user?.id)
+    .eq("user_id", user.id)
     .not("subject", "is", null)
 
-  const uniqueSubjects = Array.from(new Set(subjects?.map((item) => item.subject)))
+  const uniqueSubjects = Array.from(new Set(subjects?.map((item: any) => item.subject) || []))
 
   const statusFilters = [
     { value: "all", label: "All", icon: CheckSquare },

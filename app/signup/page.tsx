@@ -93,7 +93,14 @@ export default function SignupPage() {
       if (error) throw error;
 
       if (data.user) {
-        router.push("/dashboard");
+        // Check if email confirmation is required
+        if (data.user.email_confirmed_at) {
+          // Email already confirmed, go to dashboard
+          router.push("/dashboard")
+        } else {
+          // Email confirmation required, go to verification page
+          router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`)
+        }
       }
     } catch (error: any) {
       setError(error.message || "An error occurred during signup");

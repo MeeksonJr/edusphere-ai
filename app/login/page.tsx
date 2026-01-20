@@ -69,8 +69,15 @@ export default function LoginPage() {
       if (error) throw error;
 
       if (data.user) {
-        router.push("/dashboard");
-        router.refresh();
+        // Check if email is verified
+        if (!data.user.email_confirmed_at) {
+          // Email not verified, redirect to verification page
+          router.push(`/verify-email?email=${encodeURIComponent(data.user.email || "")}`)
+        } else {
+          // Email verified, go to dashboard
+          router.push("/dashboard")
+          router.refresh()
+        }
       }
     } catch (error: any) {
       setError(error.message || "An error occurred during login");

@@ -35,7 +35,12 @@ export async function GET(request: NextRequest) {
     )
 
     // Exchange the code for a session
-    await supabase.auth.exchangeCodeForSession(code)
+    const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (sessionError) {
+      console.error("Error exchanging code for session:", sessionError)
+      return NextResponse.redirect(requestUrl.origin + "/login?error=invalid_token")
+    }
 
     // Get the user
     const {
@@ -56,6 +61,14 @@ export async function GET(request: NextRequest) {
             ai_requests_count: 0,
           },
         ])
+      }
+
+      // Check if email is verified
+      if (!user.email_confirmed_at) {
+        // Email not verified, redirect to verification page
+        return NextResponse.redirect(
+          requestUrl.origin + `/verify-email?email=${encodeURIComponent(user.email || "")}`
+        )
       }
     }
   }
