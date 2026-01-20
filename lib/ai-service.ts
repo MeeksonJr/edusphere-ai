@@ -122,9 +122,10 @@ export async function generateAIResponse(options: AIRequestOptions): Promise<AIR
         setTimeout(() => reject(new Error("Gemini request timeout")), 6000)
       })
 
-      const generatePromise = geminiModelInstance.generateContent(geminiPrompt)
-      const result = await Promise.race([generatePromise, timeoutPromise]) as any
-      
+      try {
+        const generatePromise = geminiModelInstance.generateContent(geminiPrompt)
+        const result = await Promise.race([generatePromise, timeoutPromise]) as any
+        
         const response = await result.response
         const text = response.text()
 
