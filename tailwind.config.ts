@@ -18,7 +18,17 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#b026ff", // Neon purple
+          DEFAULT: "hsl(var(--primary-hue), var(--primary-saturation), var(--primary-lightness))",
+          50: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 25%))",
+          100: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 20%))",
+          200: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 15%))",
+          300: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 10%))",
+          400: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 5%))",
+          500: "hsl(var(--primary-hue), var(--primary-saturation), var(--primary-lightness))",
+          600: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) - 5%))",
+          700: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) - 10%))",
+          800: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) - 15%))",
+          900: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) - 20%))",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
@@ -44,6 +54,10 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        glass: {
+          bg: "var(--glass-bg)",
+          border: "var(--glass-border)",
         },
       },
       borderRadius: {
