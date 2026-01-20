@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   Upload,
   X,
+  Plus,
 } from "lucide-react"
 import { useSupabase } from "@/components/supabase-provider"
 import { useToast } from "@/hooks/use-toast"
