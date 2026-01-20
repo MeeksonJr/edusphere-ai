@@ -23,7 +23,16 @@ export function Navbar({ variant = "default" }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<any>(null);
   const pathname = usePathname();
-  const { supabase } = useSupabase();
+  
+  // Safely get supabase client - handle case where it might not be available during SSR
+  let supabase: any = null;
+  try {
+    const context = useSupabase();
+    supabase = context.supabase;
+  } catch (error) {
+    // Supabase not available (e.g., during SSR or build)
+    supabase = null;
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,9 +44,16 @@ export function Navbar({ variant = "default" }: NavbarProps) {
   }, []);
 
   useEffect(() => {
+    if (!supabase) return;
+    
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
+      try {
+        const { data } = await supabase.auth.getUser();
+        setUser(data.user);
+      } catch (error) {
+        // Silently fail if auth check fails
+        console.error("Failed to get user:", error);
+      }
     };
     getUser();
   }, [supabase]);
@@ -115,7 +131,9 @@ export function Navbar({ variant = "default" }: NavbarProps) {
                 <Button
                   variant="ghost"
                   onClick={async () => {
-                    await supabase.auth.signOut();
+                    if (supabase) {
+                      await supabase.auth.signOut();
+                    }
                     window.location.href = "/";
                   }}
                   className="text-white/70 hover:text-white"
@@ -208,7 +226,9 @@ export function Navbar({ variant = "default" }: NavbarProps) {
                     <Button
                       variant="ghost"
                       onClick={async () => {
-                        await supabase.auth.signOut();
+                        if (supabase) {
+                          await supabase.auth.signOut();
+                        }
                         window.location.href = "/";
                         setIsOpen(false);
                       }}

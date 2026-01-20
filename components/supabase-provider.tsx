@@ -2,21 +2,40 @@
 
 import type React from "react"
 
-import { createContext, useContext, useState, useEffect } from "react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import type { SupabaseClient } from "@supabase/auth-helpers-nextjs"
+import { createContext, useContext, useState, useEffect, useMemo } from "react"
+import { createBrowserClient } from "@supabase/ssr"
+import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "@/types/supabase"
 
 type SupabaseContext = {
-  supabase: SupabaseClient<Database>
+  supabase: SupabaseClient<Database> | null
 }
 
 const Context = createContext<SupabaseContext | undefined>(undefined)
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  const [supabase] = useState(() => createClientComponentClient<Database>())
+  const [supabase, setSupabase] = useState<SupabaseClient<Database> | null>(null)
 
   useEffect(() => {
+    // Only create client on the client side after mount
+    if (typeof window === "undefined") {
+      return
+    }
+
+    try {
+      const client = createBrowserClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
+      setSupabase(client)
+    } catch (error) {
+      console.error("Failed to create Supabase client:", error)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!supabase) return
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
@@ -29,7 +48,9 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     }
   }, [supabase])
 
-  return <Context.Provider value={{ supabase }}>{children}</Context.Provider>
+  const value = useMemo(() => ({ supabase }), [supabase])
+
+  return <Context.Provider value={value}>{children}</Context.Provider>
 }
 
 export const useSupabase = () => {
@@ -37,5 +58,6 @@ export const useSupabase = () => {
   if (context === undefined) {
     throw new Error("useSupabase must be used inside SupabaseProvider")
   }
-  return context
+  // Return supabase even if null - let components handle the null case
+  return { supabase: context.supabase }
 }

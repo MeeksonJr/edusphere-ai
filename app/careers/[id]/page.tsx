@@ -3,6 +3,8 @@
 import { useParams } from "next/navigation"
 import Link from "next/link"
 
+export const dynamic = 'force-dynamic';
+
 export default function CareerDetailPage() {
   const params = useParams()
   const id = params.id as string

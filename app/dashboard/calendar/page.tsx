@@ -376,12 +376,12 @@ export default function CalendarPage() {
       <ImportCalendarDialog
         open={isImportDialogOpen}
         onOpenChange={setIsImportDialogOpen}
-        onImportSuccess={handleImportSuccess}
+        onImport={handleImportSuccess}
       />
       <CalendarAIDialog
         open={isAIDialogOpen}
         onOpenChange={setIsAIDialogOpen}
-        assignment={selectedEvent}
+        event={selectedEvent}
       />
     </div>
   )

@@ -1,34 +1,66 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+"use client"
+
+export const dynamic = 'force-dynamic'
+
+import { useState, useEffect } from "react"
+import { useRouter, useParams } from "next/navigation"
 import Link from "next/link"
-import { notFound, redirect } from "next/navigation"
 import { CheckSquare, ChevronLeft, Clock, Calendar, Sparkles } from "lucide-react"
-import type { Database } from "@/types/supabase"
+import { useSupabase } from "@/components/supabase-provider"
 import { AssignmentActions } from "./assignment-actions"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { Badge } from "@/components/ui/badge"
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 
-export default async function AssignmentDetailPage({ params }: { params: { id: string } }) {
-  const supabase = createServerComponentClient<Database>({ cookies })
+export default function AssignmentDetailPage() {
+  const router = useRouter()
+  const params = useParams()
+  const { supabase } = useSupabase()
+  const [assignment, setAssignment] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  useEffect(() => {
+    const fetchAssignment = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          router.push("/login")
+          return
+        }
 
-  if (!session) {
-    redirect("/login")
-  }
+        const { data, error } = await supabase
+          .from("assignments")
+          .select("*")
+          .eq("id", params.id)
+          .eq("user_id", user.id)
+          .single()
 
-  const { data: assignment, error } = await supabase
-    .from("assignments")
-    .select("*")
-    .eq("id", params.id)
-    .eq("user_id", session.user.id)
-    .single()
+        if (error || !data) {
+          router.push("/dashboard/assignments")
+          return
+        }
 
-  if (error || !assignment) {
-    notFound()
+        setAssignment(data)
+      } catch (error) {
+        console.error("Error fetching assignment:", error)
+        router.push("/dashboard/assignments")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (supabase && params.id) {
+      fetchAssignment()
+    }
+  }, [supabase, params.id, router])
+
+  if (loading || !assignment) {
+    return (
+      <div className="p-6 md:p-8 lg:p-12 flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    )
   }
 
   const formattedDate = assignment.due_date

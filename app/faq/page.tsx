@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { GlassSurface } from "@/components/shared/GlassSurface";

@@ -1,12 +1,68 @@
-import { HfInference } from "@huggingface/inference"
-import { GoogleGenerativeAI } from "@google/generative-ai"
+// Server-side only - prevent any initialization during build
+// All client initialization is done lazily at runtime
 
-// Initialize the Hugging Face client
-const hf = new HfInference(process.env.HUGGING_FACE_API_KEY)
+let hf: any = null
+let geminiModel: any = null
 
-// Initialize the Gemini client
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "AIzaSyDbRZylWEIFX0RkHC9lMV8RNIdde3yrxWw")
-const geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+async function getHfClient() {
+  if (typeof window !== "undefined") {
+    throw new Error("AI service can only be used on the server side")
+  }
+  
+  // Check if we're in a build context
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    throw new Error("AI service cannot be used during build")
+  }
+  
+  if (!hf) {
+    try {
+      const { HfInference } = await import("@huggingface/inference")
+      const apiKey = process.env.HUGGING_FACE_API_KEY
+      if (!apiKey) {
+        throw new Error("HUGGING_FACE_API_KEY is not set")
+      }
+      hf = new HfInference(apiKey)
+    } catch (error) {
+      console.error("Failed to initialize Hugging Face client:", error)
+      throw error
+    }
+  }
+  return hf
+}
+
+async function getGeminiModel() {
+  if (typeof window !== "undefined") {
+    throw new Error("AI service can only be used on the server side")
+  }
+  
+  // Check if we're in a build context
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    throw new Error("AI service cannot be used during build")
+  }
+  
+  if (!geminiModel) {
+    try {
+      const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
+      if (!apiKey) {
+        console.warn("GEMINI_API_KEY not found")
+        return null
+      }
+      const { GoogleGenerativeAI } = await import("@google/generative-ai")
+      const genAI = new GoogleGenerativeAI(apiKey)
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+      // Verify the model has the generateContent method
+      if (model && typeof model.generateContent === "function") {
+        geminiModel = model
+      } else {
+        throw new Error("Gemini model does not have generateContent method")
+      }
+    } catch (error) {
+      console.error("Failed to initialize Gemini model:", error)
+      return null
+    }
+  }
+  return geminiModel
+}
 
 export type AIProvider = "gemini" | "huggingface"
 
@@ -30,9 +86,19 @@ export async function generateAIResponse(options: AIRequestOptions): Promise<AIR
 
   try {
     if (provider === "gemini") {
+      const geminiModelInstance = await getGeminiModel()
+      if (!geminiModelInstance) {
+        throw new Error("Gemini model not available. Make sure GEMINI_API_KEY is set.")
+      }
+
       const geminiPrompt = systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt
 
-      const result = await geminiModel.generateContent(geminiPrompt)
+      // Check if generateContent method exists
+      if (typeof geminiModelInstance.generateContent !== "function") {
+        throw new Error("Gemini model does not have generateContent method. Please check the API version.")
+      }
+
+      const result = await geminiModelInstance.generateContent(geminiPrompt)
       const response = await result.response
       const text = response.text()
 
@@ -42,11 +108,16 @@ export async function generateAIResponse(options: AIRequestOptions): Promise<AIR
         model: "gemini-1.5-flash",
       }
     } else if (provider === "huggingface") {
-      // Use the specified model or default to a general text generation model
-      const hfModel = model || "google/flan-t5-base"
+      const client = await getHfClient()
+      if (!client) {
+        throw new Error("Hugging Face client not available. Make sure HUGGING_FACE_API_KEY is set.")
+      }
 
-      const response = await hf.textGeneration({
-        model: hfModel,
+      // Use the specified model or default to a general text generation model
+      const hfModelName = model || "google/flan-t5-base"
+
+      const response = await client.textGeneration({
+        model: hfModelName,
         inputs: prompt,
         parameters: {
           temperature,
@@ -57,7 +128,7 @@ export async function generateAIResponse(options: AIRequestOptions): Promise<AIR
       return {
         text: response.generated_text,
         provider: "huggingface",
-        model: hfModel,
+        model: hfModelName,
       }
     } else {
       throw new Error("Invalid AI provider specified")
