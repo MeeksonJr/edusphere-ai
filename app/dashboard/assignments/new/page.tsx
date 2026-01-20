@@ -363,13 +363,13 @@ export default function NewAssignmentPage() {
 
         {/* Actions */}
         <ScrollReveal direction="up" delay={0.3}>
-          <div className="flex flex-col sm:flex-row gap-4 justify-between">
+          <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center">
             <Button
               type="button"
               variant="outline"
               onClick={generateAiSummary}
               disabled={aiLoading || !formData.title || !formData.description}
-              className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+              className="glass-surface border-white/20 hover:border-purple-500/50 text-white w-full sm:w-auto"
             >
               {aiLoading ? (
                 <>
@@ -384,16 +384,16 @@ export default function NewAssignmentPage() {
               )}
             </Button>
 
-            <div className="flex gap-4">
-              <Link href="/dashboard/assignments">
-                <Button type="button" variant="ghost" className="text-white/70 hover:text-white">
+            <div className="flex gap-4 w-full sm:w-auto">
+              <Link href="/dashboard/assignments" className="flex-1 sm:flex-initial">
+                <Button type="button" variant="ghost" className="text-white/70 hover:text-white w-full sm:w-auto">
                   Cancel
                 </Button>
               </Link>
               <Button
                 type="submit"
                 disabled={loading}
-                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white flex-1 sm:flex-initial"
               >
                 {loading ? (
                   <>

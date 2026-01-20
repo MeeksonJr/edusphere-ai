@@ -34,6 +34,7 @@ export function CalendarAIDialog({ open, onOpenChange, event }: CalendarAIDialog
   const [prompt, setPrompt] = useState("")
   const [file, setFile] = useState<File | null>(null)
   const [copied, setCopied] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   const handleGenerateResources = async () => {
     if (!event) return
@@ -191,6 +192,49 @@ Provide:
     URL.revokeObjectURL(url)
   }
 
+  const handleSaveStudyGuide = async () => {
+    if (!aiResponse || !event || !supabase) {
+      toast({
+        title: "Error",
+        description: "No content to save or authentication error",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      setSaving(true)
+
+      const { data: userData } = await supabase.auth.getUser()
+      if (!userData.user) {
+        throw new Error("You must be logged in to save study guides")
+      }
+
+      const { error } = await supabase.from("study_guides").insert({
+        user_id: userData.user.id,
+        title: `Study Guide: ${event.title}`,
+        content: aiResponse,
+        subject: event.subject || null,
+        topic: event.title,
+      })
+
+      if (error) throw error
+
+      toast({
+        title: "Study Guide Saved!",
+        description: "Your study guide has been saved and can be viewed in the Study Guides section.",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save study guide",
+        variant: "destructive",
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-gray-900 border-gray-800 sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
@@ -270,6 +314,25 @@ Provide:
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium">AI Response</h3>
               <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-700 bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-500/30"
+                  onClick={handleSaveStudyGuide}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="h-4 w-4 mr-1" />
+                      Save Study Guide
+                    </>
+                  )}
+                </Button>
                 <Button variant="outline" size="sm" className="border-gray-700" onClick={copyToClipboard}>
                   {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />}
                   {copied ? "Copied" : "Copy"}

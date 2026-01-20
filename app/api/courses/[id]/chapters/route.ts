@@ -56,12 +56,25 @@ export async function POST(
         body: JSON.stringify({
           action: "generateAIResponse",
           provider: "gemini",
-          prompt: `Generate a comprehensive chapter for a course about "${course.title}". 
-      
+          prompt: `You are an expert course content creator. Generate a comprehensive, detailed chapter for a course about "${course.title}".
+
 Chapter Title: ${title}
 Number of Topics: ${validTopicCount}
 
-Create a well-structured chapter with ${validTopicCount} main topics. Each topic should have 2-3 slides (title slide + content slides) that flow smoothly from one topic to the next. The chapter should be organized, detailed, and provide enough context for each topic while maintaining a logical flow throughout.
+CRITICAL REQUIREMENTS:
+1. Create ${validTopicCount} distinct, well-developed topics that are directly related to "${title}"
+2. Each topic must have SUBSTANTIAL, DETAILED content - not placeholders or generic statements
+3. Each slide should contain 3-5 paragraphs of actual educational content with specific examples, explanations, and context
+4. Content must be informative, educational, and provide real value - like a professional course
+5. Slides should flow logically from one topic to the next, building upon previous concepts
+6. Use specific examples, case studies, or real-world applications where relevant
+7. Each slide's body content should be at least 200-300 words of actual educational material
+8. Narration scripts should be natural, engaging, and match the slide content
+
+For each topic, create:
+- A title slide introducing the topic (with meaningful content, not just "Topic X: Introduction")
+- 2-3 content slides with detailed explanations, examples, and context
+- Smooth transitions between topics
 
 Return a JSON object with this structure:
 {
@@ -84,8 +97,8 @@ Return a JSON object with this structure:
 }
 
 Return ONLY the JSON object, no markdown formatting.`,
-          systemPrompt: "You are an educational AI assistant that creates course chapters. Return valid JSON only.",
-          maxTokens: 2000,
+          systemPrompt: "You are an expert educational content creator. Your chapters must contain REAL, DETAILED educational content - never use placeholders like 'This is topic 1 of 5' or 'Here are the key details for topic X'. Every slide must have substantial, informative content that teaches the user. Return valid JSON only.",
+          maxTokens: 4000,
         }),
       })
 
