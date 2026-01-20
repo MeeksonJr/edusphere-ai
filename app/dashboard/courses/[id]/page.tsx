@@ -18,6 +18,12 @@ import {
   Video,
   Edit,
   Download,
+  HelpCircle,
+  BookOpen,
+  TrendingUp,
+  Plus,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react"
 import Link from "next/link"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
@@ -51,6 +57,11 @@ function CourseDetailContent() {
   const [course, setCourse] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [questions, setQuestions] = useState<any[]>([])
+  const [progress, setProgress] = useState<any>(null)
+  const [resources, setResources] = useState<any[]>([])
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
+  const [generatingQuestions, setGeneratingQuestions] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -120,6 +131,150 @@ function CourseDetailContent() {
     // Cleanup interval on unmount
     return () => clearInterval(pollInterval)
   }, [supabase, params.id, toast])
+
+  // Fetch questions, progress, and resources
+  useEffect(() => {
+    if (!supabase || !params.id || !course || course.status !== "completed") return
+
+    const fetchAdditionalData = async () => {
+      try {
+        // Fetch questions
+        const { data: questionsData } = await supabase
+          .from("course_questions")
+          .select("*")
+          .eq("course_id", params.id)
+          .order("order_index", { ascending: true })
+
+        if (questionsData) {
+          setQuestions(questionsData)
+        }
+
+        // Fetch progress
+        const { data: progressData } = await supabase
+          .from("course_progress")
+          .select("*")
+          .eq("course_id", params.id)
+          .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+
+        if (progressData && progressData.length > 0) {
+          const totalSlides = course.layout?.chapters?.reduce(
+            (total: number, ch: any) => total + (ch.slides?.length || 0),
+            0
+          ) || 0
+          const completedSlides = progressData.filter((p) => p.completed).length
+          setProgress({
+            totalSlides,
+            completedSlides,
+            progressPercentage: totalSlides > 0 ? Math.round((completedSlides / totalSlides) * 100) : 0,
+            data: progressData,
+          })
+        }
+
+        // Fetch resources
+        const { data: resourcesData } = await supabase
+          .from("course_resources")
+          .select("*")
+          .eq("course_id", params.id)
+          .order("order_index", { ascending: true })
+
+        if (resourcesData) {
+          setResources(resourcesData)
+        }
+      } catch (err) {
+        console.error("Error fetching additional data:", err)
+      }
+    }
+
+    fetchAdditionalData()
+  }, [supabase, params.id, course])
+
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionId]: !prev[sectionId],
+    }))
+  }
+
+  const handleGenerateQuestions = async (slideId: string, chapterId: string, content: string) => {
+    if (!supabase || !params.id) return
+
+    setGeneratingQuestions(slideId)
+    try {
+      const response = await fetch(`/api/courses/${params.id}/questions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generate",
+          slideId,
+          chapterId,
+          content,
+          count: 3,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to generate questions")
+      }
+
+      toast({
+        id: `questions-generated-${Date.now()}`,
+        title: "Questions Generated",
+        description: `Generated ${result.questions?.length || 0} questions for this slide.`,
+      })
+
+      // Refresh questions
+      const { data: questionsData } = await supabase
+        .from("course_questions")
+        .select("*")
+        .eq("course_id", params.id)
+        .order("order_index", { ascending: true })
+
+      if (questionsData) {
+        setQuestions(questionsData)
+      }
+    } catch (err: any) {
+      toast({
+        id: `questions-error-${Date.now()}`,
+        title: "Error",
+        description: err.message || "Failed to generate questions",
+        variant: "destructive",
+      })
+    } finally {
+      setGeneratingQuestions(null)
+    }
+  }
+
+  const handleUpdateProgress = async (slideId: string, completed: boolean, timeSpent: number) => {
+    if (!supabase || !params.id) return
+
+    try {
+      if (params.id) {
+        await fetch(`/api/courses/${params.id}/progress`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slideId,
+            completed,
+            timeSpent,
+          }),
+        })
+
+        // Track analytics
+        await fetch(`/api/courses/${params.id}/analytics`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventType: completed ? "complete" : "view",
+            eventData: { slideId, timeSpent },
+          }),
+        })
+      }
+    } catch (err) {
+      console.error("Error updating progress:", err)
+    }
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {

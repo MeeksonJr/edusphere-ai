@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { generateAIResponse } from "@/lib/ai-service-wrapper"
+import { generateSlideQuestions } from "@/lib/question-service"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -35,6 +36,7 @@ interface CourseLayout {
  * This handles AI generation asynchronously to avoid timeouts
  */
 export async function POST(request: NextRequest) {
+  let body: any = {}
   try {
     const supabase = createClient()
     const {
@@ -45,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const body = await request.json()
+    body = await request.json()
     const { courseId, topic, courseType, style } = body
 
     if (!courseId) {
@@ -234,6 +236,12 @@ Return the JSON in this exact format:
       )
     }
 
+    // Generate questions for each slide (background task - don't await)
+    generateQuestionsForCourse(supabase, courseId, layoutJson).catch((error) => {
+      console.error("Error generating questions:", error)
+      // Don't fail the request if question generation fails
+    })
+
     return NextResponse.json({
       success: true,
       message: "Course layout generated successfully",
@@ -247,7 +255,7 @@ Return the JSON in this exact format:
       await supabase
         .from("courses")
         .update({ status: "failed" })
-        .eq("id", body?.courseId)
+        .eq("id", body?.courseId || "")
     } catch (updateError) {
       console.error("Failed to update course status:", updateError)
     }
@@ -256,6 +264,75 @@ Return the JSON in this exact format:
       { error: error.message || "Internal server error" },
       { status: 500 }
     )
+  }
+}
+
+/**
+ * Generate questions for all slides in a course (background task)
+ */
+async function generateQuestionsForCourse(
+  supabase: any,
+  courseId: string,
+  layout: CourseLayout
+) {
+  try {
+    if (!layout.chapters || layout.chapters.length === 0) {
+      return
+    }
+
+    // Generate questions for each slide
+    for (const chapter of layout.chapters) {
+      if (!chapter.slides) continue
+
+      for (const slide of chapter.slides) {
+        // Skip title slides for questions
+        if (slide.type === "title-slide" || slide.type === "transition-slide") {
+          continue
+        }
+
+        try {
+          const slideContent = slide.content?.body || ""
+          const narrationScript = slide.narrationScript || ""
+
+          if (!slideContent && !narrationScript) {
+            continue
+          }
+
+          // Generate 2-3 questions per slide
+          const questions = await generateSlideQuestions(
+            slideContent,
+            narrationScript,
+            3
+          )
+
+          // Save questions to database
+          if (questions.length > 0) {
+            const questionsToInsert = questions.map((q: any, index: number) => ({
+              course_id: courseId,
+              slide_id: slide.slideId,
+              chapter_id: chapter.chapterId,
+              question_type: q.questionType,
+              question: q.question,
+              options: q.options || null,
+              correct_answer: q.correctAnswer,
+              explanation: q.explanation || null,
+              difficulty: q.difficulty,
+              order_index: index,
+            }))
+
+            await supabase.from("course_questions").insert(questionsToInsert)
+          }
+        } catch (slideError) {
+          console.error(`Error generating questions for slide ${slide.slideId}:`, slideError)
+          // Continue with next slide
+        }
+      }
+    }
+
+    console.log(`Generated questions for course ${courseId}`)
+  } catch (error) {
+    console.error("Error in generateQuestionsForCourse:", error)
+    // Don't throw - this is a background task
   }
 }
 

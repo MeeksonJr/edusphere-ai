@@ -16,8 +16,12 @@ Execute the SQL files in the following order:
 8. **08-create-render-jobs-table.sql** - Render jobs table (depends on courses)
 9. **09-create-course-slides-table.sql** - Course slides table (depends on courses)
 10. **10-create-storage-buckets.sql** - Storage buckets for file uploads
-11. **11-create-user-settings-table.sql** - User settings table (NEW - Required for settings page)
-12. **create-study-guides-table.sql** - Study guides table (updated with RLS)
+11. **11-create-user-settings-table.sql** - User settings table (Required for settings page)
+12. **12-create-course-questions-table.sql** - Course questions table (NEW - For AI-generated quizzes)
+13. **13-create-course-resources-table.sql** - Course resources table (NEW - For links and references)
+14. **14-create-course-progress-table.sql** - Course progress tracking table (NEW - For user progress)
+15. **15-create-course-analytics-table.sql** - Course analytics table (NEW - For tracking user behavior)
+16. **create-study-guides-table.sql** - Study guides table (updated with RLS)
 
 ## How to Execute
 
