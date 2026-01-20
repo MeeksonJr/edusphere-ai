@@ -3,12 +3,15 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useSupabase } from "@/components/supabase-provider"
 import { useToast } from "@/hooks/use-toast"
 import { PayPalButton } from "@/components/paypal-button"
-import { Loader2, CheckCircle2 } from "lucide-react"
+import { Loader2, CheckCircle2, CreditCard, Sparkles, Zap, Users, Mic } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { GlassSurface } from "@/components/shared/GlassSurface"
+import { AnimatedCard } from "@/components/shared/AnimatedCard"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 
 export default function SubscriptionPage() {
   const router = useRouter()
@@ -18,10 +21,9 @@ export default function SubscriptionPage() {
   const [loading, setLoading] = useState(true)
   const [selectedPlan, setSelectedPlan] = useState<"pro" | "ultimate" | null>(null)
 
-  // PayPal plan IDs (these would be created in the PayPal dashboard)
   const planIds = {
-    pro: "P-5ML4271244454362WXNWU5NQ", // Replace with your actual plan ID
-    ultimate: "P-3RX095426H3469222XNWU5VY", // Replace with your actual plan ID
+    pro: "P-5ML4271244454362WXNWU5NQ",
+    ultimate: "P-3RX095426H3469222XNWU5VY",
   }
 
   useEffect(() => {
@@ -63,8 +65,6 @@ export default function SubscriptionPage() {
     try {
       if (!user) return
 
-      // In a real app, you would call the PayPal API to cancel the subscription
-      // For now, we'll just update the database
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -82,7 +82,6 @@ export default function SubscriptionPage() {
         description: "Your subscription has been cancelled successfully.",
       })
 
-      // Refresh user data
       const { data: profileData } = await supabase.from("profiles").select("*").eq("id", user.id).single()
       setUser({ ...user, profile: profileData })
     } catch (error: any) {
@@ -96,239 +95,250 @@ export default function SubscriptionPage() {
 
   if (loading) {
     return (
-      <div className="p-6 md:p-8 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="p-6 md:p-8 flex items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" text="Loading subscription..." />
       </div>
     )
   }
 
+  const currentTier = user?.profile?.subscription_tier || "free"
+
   return (
-    <div className="p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold neon-text-purple">Subscription Plans</h1>
-        <p className="text-gray-400 mt-1">Choose the plan that works best for you</p>
-      </div>
+    <div className="p-6 md:p-8 lg:p-12">
+      {/* Header */}
+      <ScrollReveal direction="up">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <span className="text-white">Subscription</span>{" "}
+            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Plans
+            </span>
+          </h1>
+          <p className="text-white/70">Choose the plan that works best for you</p>
+        </div>
+      </ScrollReveal>
 
       {/* Current Plan */}
-      <Card className="glass-card mb-8">
-        <CardHeader>
-          <CardTitle>Current Plan</CardTitle>
-          <CardDescription>Your current subscription details</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-bold">
-                {user?.profile?.subscription_tier === "ultimate"
-                  ? "Ultimate Plan"
-                  : user?.profile?.subscription_tier === "pro"
-                    ? "Pro Plan"
-                    : "Free Plan"}
-              </h3>
-              <p className="text-gray-400 mt-1">
-                {user?.profile?.subscription_tier === "ultimate"
-                  ? "$12.99/month"
-                  : user?.profile?.subscription_tier === "pro"
-                    ? "$6.99/month"
-                    : "Free"}
-              </p>
+      {currentTier !== "free" && (
+        <ScrollReveal direction="up" delay={0.1}>
+          <GlassSurface className="p-6 lg:p-8 mb-8 border-purple-500/30">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  {currentTier === "ultimate" ? "Ultimate Plan" : "Pro Plan"}
+                </h2>
+                <p className="text-white/70">
+                  {currentTier === "ultimate" ? "$12.99/month" : "$6.99/month"}
+                </p>
+              </div>
+              <Badge
+                className={
+                  currentTier === "ultimate"
+                    ? "bg-gradient-to-r from-pink-500 to-pink-600 text-white"
+                    : "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+                }
+              >
+                {currentTier === "ultimate" ? "Ultimate" : "Pro"}
+              </Badge>
             </div>
-            <Badge
-              className={
-                user?.profile?.subscription_tier === "free"
-                  ? "bg-gray-600"
-                  : user?.profile?.subscription_tier === "pro"
-                    ? "bg-blue-600"
-                    : "bg-pink-600"
-              }
-            >
-              {user?.profile?.subscription_tier === "ultimate"
-                ? "Ultimate"
-                : user?.profile?.subscription_tier === "pro"
-                  ? "Pro"
-                  : "Free"}
-            </Badge>
-          </div>
 
-          {user?.profile?.subscription_tier !== "free" && (
-            <div className="mt-4">
-              <p className="text-sm text-gray-400">
-                Subscription ID: {user?.profile?.subscription_id || "N/A"}
-                <br />
-                Status: {user?.profile?.subscription_status || "Active"}
-                <br />
-                Last Updated: {new Date(user?.profile?.subscription_updated_at || Date.now()).toLocaleDateString()}
-              </p>
-            </div>
-          )}
-        </CardContent>
-        {user?.profile?.subscription_tier !== "free" && (
-          <CardFooter>
+            {user?.profile?.subscription_id && (
+              <div className="space-y-2 text-sm text-white/60 mb-6">
+                <p>Subscription ID: {user.profile.subscription_id}</p>
+                <p>Status: {user.profile.subscription_status || "Active"}</p>
+                <p>
+                  Last Updated:{" "}
+                  {new Date(user.profile.subscription_updated_at || Date.now()).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+
             <Button
               variant="outline"
-              className="border-red-900 text-red-500 hover:text-red-400 hover:bg-red-900/20"
+              className="border-red-500/30 text-red-400 hover:text-red-300 hover:bg-red-500/10"
               onClick={handleCancelSubscription}
             >
               Cancel Subscription
             </Button>
-          </CardFooter>
-        )}
-      </Card>
+          </GlassSurface>
+        </ScrollReveal>
+      )}
 
       {/* Available Plans */}
-      {user?.profile?.subscription_tier === "free" && (
-        <div className="space-y-8">
-          <h2 className="text-2xl font-bold">Available Plans</h2>
+      {currentTier === "free" && (
+        <ScrollReveal direction="up" delay={0.2}>
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-6">Available Plans</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Pro Plan */}
+              <AnimatedCard
+                variant="3d"
+                className={`cursor-pointer transition-all ${
+                  selectedPlan === "pro" ? "border-blue-500/50 scale-105" : ""
+                }`}
+                onClick={() => handleSelectPlan("pro")}
+              >
+                <div className="p-6 lg:p-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-2xl font-bold text-white">Pro Plan</h3>
+                    {selectedPlan === "pro" && (
+                      <CheckCircle2 className="h-6 w-6 text-blue-400" aria-hidden="true" />
+                    )}
+                  </div>
+                  <div className="mb-6">
+                    <span className="text-4xl font-bold text-white">$6.99</span>
+                    <span className="text-white/60">/month</span>
+                  </div>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-center text-white/80">
+                      <Zap className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                      Unlimited AI prompts
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <Sparkles className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                      Priority support
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <CreditCard className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                      Premium Gemini features
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <Sparkles className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                      Flashcard & quiz generator
+                    </li>
+                  </ul>
+                  {selectedPlan === "pro" ? (
+                    <PayPalButton planId={planIds.pro} tier="pro" />
+                  ) : (
+                    <Button
+                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleSelectPlan("pro")
+                      }}
+                    >
+                      Select Pro Plan
+                    </Button>
+                  )}
+                </div>
+              </AnimatedCard>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Pro Plan */}
-            <Card
-              className={`glass-card transition-all ${
-                selectedPlan === "pro" ? "neon-border-blue" : "hover:border-blue-600"
-              }`}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  Pro Plan
-                  {selectedPlan === "pro" && <CheckCircle2 className="h-5 w-5 text-blue-500" />}
-                </CardTitle>
-                <CardDescription>
-                  <span className="text-xl font-bold text-white">$6.99</span>
-                  <span className="text-gray-400">/month</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  <li className="flex items-center">
-                    <span className="mr-2 text-green-400">✓</span>
-                    Unlimited AI prompts
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-green-400">✓</span>
-                    Priority support
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-green-400">✓</span>
-                    Premium Gemini features
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-green-400">✓</span>
-                    Flashcard & quiz generator
-                  </li>
-                </ul>
-              </CardContent>
-              <CardFooter className="flex flex-col space-y-4">
-                {selectedPlan === "pro" ? (
-                  <PayPalButton planId={planIds.pro} tier="pro" />
-                ) : (
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => handleSelectPlan("pro")}>
-                    Select Pro Plan
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-
-            {/* Ultimate Plan */}
-            <Card
-              className={`glass-card transition-all ${
-                selectedPlan === "ultimate" ? "neon-border-pink" : "hover:border-pink-600"
-              }`}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  Ultimate Plan
-                  {selectedPlan === "ultimate" && <CheckCircle2 className="h-5 w-5 text-pink-500" />}
-                </CardTitle>
-                <CardDescription>
-                  <span className="text-xl font-bold text-white">$12.99</span>
-                  <span className="text-gray-400">/month</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2">
-                  <li className="flex items-center">
-                    <span className="mr-2 text-green-400">✓</span>
-                    Everything in Pro
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-green-400">✓</span>
-                    Multi-project/class support
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-green-400">✓</span>
-                    Study groups (peer-to-peer)
-                  </li>
-                  <li className="flex items-center">
-                    <span className="mr-2 text-green-400">✓</span>
-                    Voice assistant for Gemini AI
-                  </li>
-                </ul>
-              </CardContent>
-              <CardFooter className="flex flex-col space-y-4">
-                {selectedPlan === "ultimate" ? (
-                  <PayPalButton planId={planIds.ultimate} tier="ultimate" />
-                ) : (
-                  <Button className="w-full bg-pink-600 hover:bg-pink-700" onClick={() => handleSelectPlan("ultimate")}>
-                    Select Ultimate Plan
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
+              {/* Ultimate Plan */}
+              <AnimatedCard
+                variant="3d"
+                delay={0.1}
+                className={`cursor-pointer transition-all ${
+                  selectedPlan === "ultimate" ? "border-pink-500/50 scale-105" : ""
+                }`}
+                onClick={() => handleSelectPlan("ultimate")}
+              >
+                <div className="p-6 lg:p-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-2xl font-bold text-white">Ultimate Plan</h3>
+                    {selectedPlan === "ultimate" && (
+                      <CheckCircle2 className="h-6 w-6 text-pink-400" aria-hidden="true" />
+                    )}
+                  </div>
+                  <div className="mb-6">
+                    <span className="text-4xl font-bold text-white">$12.99</span>
+                    <span className="text-white/60">/month</span>
+                  </div>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-center text-white/80">
+                      <CheckCircle2 className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                      Everything in Pro
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                      Multi-project/class support
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                      Study groups (peer-to-peer)
+                    </li>
+                    <li className="flex items-center text-white/80">
+                      <Mic className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                      Voice assistant for Gemini AI
+                    </li>
+                  </ul>
+                  {selectedPlan === "ultimate" ? (
+                    <PayPalButton planId={planIds.ultimate} tier="ultimate" />
+                  ) : (
+                    <Button
+                      className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleSelectPlan("ultimate")
+                      }}
+                    >
+                      Select Ultimate Plan
+                    </Button>
+                  )}
+                </div>
+              </AnimatedCard>
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
       )}
 
       {/* Upgrade Plan */}
-      {user?.profile?.subscription_tier === "pro" && (
-        <div className="space-y-8">
-          <h2 className="text-2xl font-bold">Upgrade Your Plan</h2>
-
-          <Card
-            className={`glass-card transition-all ${
-              selectedPlan === "ultimate" ? "neon-border-pink" : "hover:border-pink-600"
-            }`}
-          >
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Ultimate Plan
-                {selectedPlan === "ultimate" && <CheckCircle2 className="h-5 w-5 text-pink-500" />}
-              </CardTitle>
-              <CardDescription>
-                <span className="text-xl font-bold text-white">$12.99</span>
-                <span className="text-gray-400">/month</span>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                <li className="flex items-center">
-                  <span className="mr-2 text-green-400">✓</span>
-                  Everything in Pro
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2 text-green-400">✓</span>
-                  Multi-project/class support
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2 text-green-400">✓</span>
-                  Study groups (peer-to-peer)
-                </li>
-                <li className="flex items-center">
-                  <span className="mr-2 text-green-400">✓</span>
-                  Voice assistant for Gemini AI
-                </li>
-              </ul>
-            </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
-              {selectedPlan === "ultimate" ? (
-                <PayPalButton planId={planIds.ultimate} tier="ultimate" />
-              ) : (
-                <Button className="w-full bg-pink-600 hover:bg-pink-700" onClick={() => handleSelectPlan("ultimate")}>
-                  Upgrade to Ultimate
-                </Button>
-              )}
-            </CardFooter>
-          </Card>
-        </div>
+      {currentTier === "pro" && (
+        <ScrollReveal direction="up" delay={0.2}>
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-6">Upgrade Your Plan</h2>
+            <AnimatedCard
+              variant="3d"
+              className={`cursor-pointer transition-all max-w-2xl ${
+                selectedPlan === "ultimate" ? "border-pink-500/50 scale-105" : ""
+              }`}
+              onClick={() => handleSelectPlan("ultimate")}
+            >
+              <div className="p-6 lg:p-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-2xl font-bold text-white">Ultimate Plan</h3>
+                  {selectedPlan === "ultimate" && (
+                    <CheckCircle2 className="h-6 w-6 text-pink-400" aria-hidden="true" />
+                  )}
+                </div>
+                <div className="mb-6">
+                  <span className="text-4xl font-bold text-white">$12.99</span>
+                  <span className="text-white/60">/month</span>
+                </div>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-center text-white/80">
+                    <CheckCircle2 className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                    Everything in Pro
+                  </li>
+                  <li className="flex items-center text-white/80">
+                    <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                    Multi-project/class support
+                  </li>
+                  <li className="flex items-center text-white/80">
+                    <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                    Study groups (peer-to-peer)
+                  </li>
+                  <li className="flex items-center text-white/80">
+                    <Mic className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
+                    Voice assistant for Gemini AI
+                  </li>
+                </ul>
+                {selectedPlan === "ultimate" ? (
+                  <PayPalButton planId={planIds.ultimate} tier="ultimate" />
+                ) : (
+                  <Button
+                    className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleSelectPlan("ultimate")
+                    }}
+                  >
+                    Upgrade to Ultimate
+                  </Button>
+                )}
+              </div>
+            </AnimatedCard>
+          </div>
+        </ScrollReveal>
       )}
     </div>
   )

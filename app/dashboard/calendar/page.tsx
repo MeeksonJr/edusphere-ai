@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   ChevronLeft,
   ChevronRight,
@@ -19,6 +18,11 @@ import { useToast } from "@/hooks/use-toast"
 import { CalendarView } from "@/components/calendar-view"
 import { ImportCalendarDialog } from "@/components/import-calendar-dialog"
 import { CalendarAIDialog } from "@/components/calendar-ai-dialog"
+import { GlassSurface } from "@/components/shared/GlassSurface"
+import { AnimatedCard } from "@/components/shared/AnimatedCard"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
+import { Badge } from "@/components/ui/badge"
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 
 export default function CalendarPage() {
   const router = useRouter()
@@ -42,7 +46,6 @@ export default function CalendarPage() {
         setUser({ ...data.user, profile })
       }
     }
-
     getUser()
   }, [supabase])
 
@@ -56,7 +59,6 @@ export default function CalendarPage() {
 
         if (error) throw error
 
-        // Transform assignments to calendar events
         const assignmentEvents = data.map((assignment) => ({
           id: assignment.id,
           title: assignment.title,
@@ -71,7 +73,6 @@ export default function CalendarPage() {
 
         setAssignments(assignmentEvents.filter((event) => event.start !== null))
 
-        // Fetch calendar events
         const { data: eventsData, error: eventsError } = await supabase
           .from("calendar_events")
           .select("*")
@@ -141,12 +142,9 @@ export default function CalendarPage() {
 
   const handleEventClick = (event: any) => {
     if (event.type === "assignment") {
-      // Option to view assignment details or get AI assistance
       setSelectedEvent(event)
       setIsAIDialogOpen(true)
     } else {
-      // For regular events, just navigate to the event detail
-      // In a real app, you might have an event detail page
       toast({
         title: event.title,
         description: event.description || "No description available",
@@ -188,34 +186,65 @@ export default function CalendarPage() {
     }
   }
 
-  return (
-    <div className="p-6 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold neon-text-blue">Calendar</h1>
-        <p className="text-gray-400 mt-1">Manage your schedule and deadlines</p>
-      </div>
+  const upcomingAssignments = assignments
+    .filter((a) => a.status !== "completed")
+    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+    .slice(0, 5)
 
-      <Card className="glass-card mb-6">
-        <CardHeader className="pb-2">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+  return (
+    <div className="p-6 md:p-8 lg:p-12">
+      {/* Header */}
+      <ScrollReveal direction="up">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            <span className="text-white">Calendar</span>
+          </h1>
+          <p className="text-white/70">Manage your schedule and deadlines</p>
+        </div>
+      </ScrollReveal>
+
+      {/* Calendar Controls */}
+      <ScrollReveal direction="up" delay={0.1}>
+        <GlassSurface className="p-4 md:p-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="icon" className="border-gray-700" onClick={handlePrevious}>
-                <ChevronLeft className="h-4 w-4" />
+              <Button
+                variant="outline"
+                size="icon"
+                className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                onClick={handlePrevious}
+                aria-label="Previous"
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
               </Button>
-              <Button variant="outline" size="icon" className="border-gray-700" onClick={handleNext}>
-                <ChevronRight className="h-4 w-4" />
+              <Button
+                variant="outline"
+                size="icon"
+                className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                onClick={handleNext}
+                aria-label="Next"
+              >
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </Button>
-              <Button variant="outline" className="border-gray-700" onClick={handleToday}>
+              <Button
+                variant="outline"
+                className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                onClick={handleToday}
+              >
                 Today
               </Button>
-              <h2 className="text-xl font-semibold ml-2">{formatDateRange()}</h2>
+              <h2 className="text-xl font-semibold text-white ml-2">{formatDateRange()}</h2>
             </div>
-            <div className="flex items-center space-x-2 mt-4 sm:mt-0">
-              <div className="bg-gray-800 rounded-md p-1 flex">
+            <div className="flex items-center space-x-2 flex-wrap">
+              <div className="glass-surface border-white/20 rounded-lg p-1 flex">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`${view === "month" ? "bg-gray-700" : ""}`}
+                  className={`${
+                    view === "month"
+                      ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white"
+                      : "text-white/70 hover:text-white"
+                  }`}
                   onClick={() => handleViewChange("month")}
                 >
                   Month
@@ -223,7 +252,11 @@ export default function CalendarPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`${view === "week" ? "bg-gray-700" : ""}`}
+                  className={`${
+                    view === "week"
+                      ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white"
+                      : "text-white/70 hover:text-white"
+                  }`}
                   onClick={() => handleViewChange("week")}
                 >
                   Week
@@ -231,192 +264,125 @@ export default function CalendarPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`${view === "day" ? "bg-gray-700" : ""}`}
+                  className={`${
+                    view === "day"
+                      ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white"
+                      : "text-white/70 hover:text-white"
+                  }`}
                   onClick={() => handleViewChange("day")}
                 >
                   Day
                 </Button>
               </div>
-              <Button variant="outline" className="border-gray-700" onClick={() => setIsImportDialogOpen(true)}>
-                <Upload className="h-4 w-4 mr-2" />
+              <Button
+                variant="outline"
+                className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                onClick={() => setIsImportDialogOpen(true)}
+              >
+                <Upload className="h-4 w-4 mr-2" aria-hidden="true" />
                 Import
               </Button>
               <Button
-                className="bg-primary hover:bg-primary/80"
+                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
                 onClick={() => router.push("/dashboard/assignments/new")}
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
                 New
               </Button>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="mt-4">
-            <CalendarView
-              view={view}
-              date={currentDate}
-              events={[...assignments, ...events]}
-              onEventClick={handleEventClick}
-              isLoading={loading}
-            />
-          </div>
-        </CardContent>
-      </Card>
+        </GlassSurface>
+      </ScrollReveal>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle>Upcoming Assignments</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="flex items-start space-x-4 animate-pulse">
-                    <div className="bg-gray-800 p-2 rounded-md h-9 w-9"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-gray-800 rounded w-3/4"></div>
-                      <div className="h-3 bg-gray-800 rounded w-1/2"></div>
-                    </div>
-                  </div>
-                ))}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Calendar View */}
+        <div className="lg:col-span-2">
+          <ScrollReveal direction="up" delay={0.2}>
+            <GlassSurface className="p-4 md:p-6">
+              <CalendarView
+                view={view}
+                date={currentDate}
+                events={[...assignments, ...events]}
+                onEventClick={handleEventClick}
+                isLoading={loading}
+              />
+            </GlassSurface>
+          </ScrollReveal>
+        </div>
+
+        {/* Upcoming Assignments Sidebar */}
+        <div>
+          <ScrollReveal direction="up" delay={0.3}>
+            <GlassSurface className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white">Upcoming</h2>
+                <Sparkles className="h-5 w-5 text-purple-400" aria-hidden="true" />
               </div>
-            ) : assignments.filter((a) => a.status !== "completed").length > 0 ? (
-              <div className="space-y-4">
-                {assignments
-                  .filter((a) => a.status !== "completed")
-                  .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
-                  .slice(0, 5)
-                  .map((assignment) => (
+              {loading ? (
+                <LoadingSpinner size="sm" text="Loading..." />
+              ) : upcomingAssignments.length > 0 ? (
+                <div className="space-y-3">
+                  {upcomingAssignments.map((assignment, index) => (
                     <div
                       key={assignment.id}
-                      className="flex items-start space-x-4 cursor-pointer hover:bg-gray-800/50 p-2 rounded-md transition-colors"
+                      className="p-3 rounded-lg glass-surface border-white/10 hover:border-purple-500/30 transition-colors cursor-pointer group"
                       onClick={() => {
                         setSelectedEvent(assignment)
                         setIsAIDialogOpen(true)
                       }}
                     >
-                      <div className="bg-gray-800 p-2 rounded-md">
-                        <CheckSquare className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-center justify-between">
-                          <p className="font-medium">{assignment.title}</p>
-                          <div className="flex items-center text-xs text-gray-400">
-                            <Clock className="mr-1 h-3 w-3" />
-                            {assignment.start ? new Date(assignment.start).toLocaleDateString() : "No due date"}
-                          </div>
+                      <div className="flex items-start space-x-3">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-2 flex-shrink-0">
+                          <CheckSquare className="h-full w-full text-purple-400" aria-hidden="true" />
                         </div>
-                        <div className="flex items-center justify-between pt-1">
-                          <div className="flex items-center">
-                            {assignment.subject && (
-                              <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full">{assignment.subject}</span>
-                            )}
-                            {assignment.priority && (
-                              <span
-                                className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                                  assignment.priority === "high"
-                                    ? "bg-red-900/30 text-red-400"
-                                    : assignment.priority === "medium"
-                                      ? "bg-yellow-900/30 text-yellow-400"
-                                      : "bg-green-900/30 text-green-400"
-                                }`}
-                              >
-                                {assignment.priority.charAt(0).toUpperCase() + assignment.priority.slice(1)}
-                              </span>
-                            )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-white mb-1 group-hover:text-purple-400 transition-colors truncate">
+                            {assignment.title}
+                          </h3>
+                          <div className="flex items-center space-x-2 text-xs text-white/60">
+                            <Clock className="h-3 w-3" aria-hidden="true" />
+                            <span>{new Date(assignment.start).toLocaleDateString()}</span>
                           </div>
-                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                            <Sparkles className="h-3.5 w-3.5 text-primary" />
-                          </Button>
+                          {assignment.priority && (
+                            <Badge
+                              className={`mt-2 text-xs ${
+                                assignment.priority === "high"
+                                  ? "bg-red-500/20 text-red-400 border-red-500/30"
+                                  : assignment.priority === "medium"
+                                    ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                                    : "bg-green-500/20 text-green-400 border-green-500/30"
+                              }`}
+                            >
+                              {assignment.priority}
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     </div>
                   ))}
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <p className="text-gray-400">No upcoming assignments</p>
-                <Button
-                  className="mt-4 bg-primary hover:bg-primary/80"
-                  onClick={() => router.push("/dashboard/assignments/new")}
-                >
-                  Create Assignment
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle>Upcoming Events</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} className="flex items-start space-x-4 animate-pulse">
-                    <div className="bg-gray-800 p-2 rounded-md h-9 w-9"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-gray-800 rounded w-3/4"></div>
-                      <div className="h-3 bg-gray-800 rounded w-1/2"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : events.length > 0 ? (
-              <div className="space-y-4">
-                {events
-                  .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
-                  .slice(0, 5)
-                  .map((event) => (
-                    <div key={event.id} className="flex items-start space-x-4 p-2 rounded-md">
-                      <div className="bg-gray-800 p-2 rounded-md">
-                        <CalendarComponent className="h-5 w-5 text-blue-400" />
-                      </div>
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-center justify-between">
-                          <p className="font-medium">{event.title}</p>
-                          <div className="flex items-center text-xs text-gray-400">
-                            <Clock className="mr-1 h-3 w-3" />
-                            {new Date(event.start).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-400">{event.description || "No description"}</p>
-                        {event.location && (
-                          <div className="flex items-center pt-1">
-                            <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full">{event.location}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <p className="text-gray-400">No upcoming events</p>
-                <Button className="mt-4 bg-primary hover:bg-primary/80" onClick={() => setIsImportDialogOpen(true)}>
-                  Import Calendar
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <CalendarComponent className="h-12 w-12 text-white/20 mx-auto mb-3" aria-hidden="true" />
+                  <p className="text-white/60 text-sm">No upcoming assignments</p>
+                </div>
+              )}
+            </GlassSurface>
+          </ScrollReveal>
+        </div>
       </div>
 
-      {isImportDialogOpen && (
-        <ImportCalendarDialog
-          open={isImportDialogOpen}
-          onOpenChange={setIsImportDialogOpen}
-          onImportSuccess={handleImportSuccess}
-        />
-      )}
-
-      {isAIDialogOpen && selectedEvent && (
-        <CalendarAIDialog open={isAIDialogOpen} onOpenChange={setIsAIDialogOpen} event={selectedEvent} />
-      )}
+      {/* Dialogs */}
+      <ImportCalendarDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        onImportSuccess={handleImportSuccess}
+      />
+      <CalendarAIDialog
+        open={isAIDialogOpen}
+        onOpenChange={setIsAIDialogOpen}
+        assignment={selectedEvent}
+      />
     </div>
   )
 }
