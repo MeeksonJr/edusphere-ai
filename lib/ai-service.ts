@@ -117,14 +117,28 @@ export async function generateAIResponse(options: AIRequestOptions): Promise<AIR
         throw new Error("Gemini model does not have generateContent method. Please check the API version.")
       }
 
-      const result = await geminiModelInstance.generateContent(geminiPrompt)
-      const response = await result.response
-      const text = response.text()
+      // Add timeout protection (6 seconds max for Gemini to leave room for fallback)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Gemini request timeout")), 6000)
+      })
 
-      return {
-        text,
-        provider: "gemini",
-        model: modelId,
+      const generatePromise = geminiModelInstance.generateContent(geminiPrompt)
+      const result = await Promise.race([generatePromise, timeoutPromise]) as any
+      
+        const response = await result.response
+        const text = response.text()
+
+        return {
+          text,
+          provider: "gemini",
+          model: modelId,
+        }
+      } catch (geminiError: any) {
+        // Check for 503 or overloaded errors
+        if (geminiError.status === 503 || geminiError.message?.includes("overloaded") || geminiError.message?.includes("timeout")) {
+          throw new Error(`Gemini unavailable: ${geminiError.message || "Service overloaded"}`)
+        }
+        throw geminiError
       }
     } else if (provider === "huggingface") {
       const client = await getHfClient()
@@ -190,7 +204,12 @@ async function generateGroqResponse(
 
     for (const modelId of modelsToTry) {
       try {
-        const completion = await groq.chat.completions.create({
+        // Add timeout protection (6 seconds max for Groq - it's fast)
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error("Groq request timeout")), 6000)
+        })
+
+        const completionPromise = groq.chat.completions.create({
           messages: [
             ...(systemPrompt ? [{ role: "system" as const, content: systemPrompt }] : []),
             { role: "user" as const, content: prompt },
@@ -199,6 +218,8 @@ async function generateGroqResponse(
           temperature,
           max_tokens: maxTokens,
         })
+
+        const completion = await Promise.race([completionPromise, timeoutPromise]) as any
 
         const text = completion.choices[0]?.message?.content || ""
         if (text) {

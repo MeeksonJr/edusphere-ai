@@ -77,30 +77,44 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
         ? `Chapter: ${chapter.title}\n\n${chapter.slides?.map((s: any) => s.content?.body).join("\n\n") || ""}`
         : ""
 
+      // Optimize prompt for faster generation
       const prompt = slide
-        ? `Provide a detailed, comprehensive explanation about this slide content. Include context, examples, and related concepts. Make it educational and engaging.`
-        : `Provide a detailed, comprehensive overview of this chapter. Include key concepts, learning objectives, and how it fits into the broader course.`
+        ? `Provide a concise but comprehensive explanation (2-3 paragraphs) about this slide content. Include key concepts and examples.`
+        : `Provide a concise overview (3-4 paragraphs) of this chapter. Include key concepts and learning objectives.`
 
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "generateAIResponse",
-          provider: "gemini", // Will automatically fallback if not available
-          prompt: `${prompt}\n\nContent:\n${content}`,
-          systemPrompt: "You are an expert educational tutor. Provide clear, detailed explanations that help students understand concepts deeply.",
+          provider: "groq", // Try Groq first (fastest), will auto-fallback
+          prompt: `${prompt}\n\nContent:\n${content.substring(0, 2000)}`, // Limit content length
+          systemPrompt: "You are an expert educational tutor. Provide clear, concise explanations.",
+          maxTokens: 800, // Reduced for faster response
         }),
       })
 
       const result = await response.json()
-      if (result.success) {
+      if (result.success && result.data?.text) {
         setLearnMoreContent(result.data.text)
       } else {
-        setLearnMoreContent("Unable to generate additional content at this time.")
+        // Show user-friendly error message
+        const errorMsg = result.error || "Unknown error"
+        if (errorMsg.includes("timeout") || errorMsg.includes("overloaded") || errorMsg.includes("unavailable")) {
+          setLearnMoreContent(
+            "The AI service is temporarily busy. Please try again in a few moments. The system will automatically retry with a different provider."
+          )
+        } else {
+          setLearnMoreContent(
+            `Unable to generate content: ${errorMsg}. Please try again.`
+          )
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating learn more:", error)
-      setLearnMoreContent("Unable to generate additional content at this time.")
+      setLearnMoreContent(
+        "Unable to generate additional content at this time. The service may be temporarily unavailable. Please try again in a moment."
+      )
     } finally {
       setLoading(false)
     }
