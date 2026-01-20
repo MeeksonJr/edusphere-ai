@@ -378,9 +378,28 @@ export default function NewFlashcardPage() {
         {newSet.cards.length > 0 && (
           <ScrollReveal direction="up" delay={0.4}>
             <GlassSurface className="p-6">
-              <h2 className="text-xl font-bold text-white mb-4">
-                Flashcards ({newSet.cards.length})
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-white">
+                  Flashcards ({newSet.cards.length})
+                </h2>
+                <Button
+                  type="submit"
+                  disabled={loading || !newSet.title || !newSet.cards.length}
+                  className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <BrainCircuit className="mr-2 h-4 w-4" />
+                      Save Flashcard Set
+                    </>
+                  )}
+                </Button>
+              </div>
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {newSet.cards.map((card, index) => (
                   <div key={index} className="glass-surface border-white/10 p-4 rounded-lg">

@@ -730,61 +730,103 @@ ${resource.content}
         </DialogContent>
       </Dialog>
 
-      {/* View Resource Dialog */}
+      {/* View Resource Dialog - Redesigned */}
       {currentResource && (
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-          <DialogContent className="glass-surface border-white/20 sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <DialogTitle className="text-white">{currentResource.title}</DialogTitle>
-                  <DialogDescription className="text-white/70">
-                    {currentResource.subject} • {resourceTypes.find((t) => t.value === currentResource.resource_type)?.label}
-                  </DialogDescription>
+          <DialogContent className="glass-surface border-white/20 sm:max-w-[900px] max-w-[95vw] max-h-[90vh] p-0 flex flex-col">
+            {/* Header */}
+            <div className="p-6 border-b border-white/10 flex-shrink-0">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <DialogTitle className="text-white text-2xl mb-2">{currentResource.title}</DialogTitle>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {currentResource.subject && (
+                      <Badge className="glass-surface border-white/20 text-white/90">
+                        {currentResource.subject}
+                      </Badge>
+                    )}
+                    <Badge className="glass-surface border-white/20 text-white/90">
+                      {resourceTypes.find((t) => t.value === currentResource.resource_type)?.label || currentResource.resource_type}
+                    </Badge>
+                    {currentResource.ai_generated && (
+                      <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                        <Sparkles className="h-3 w-3 mr-1" aria-hidden="true" />
+                        AI Generated
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 ml-4">
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-white/60 hover:text-white"
+                    variant="outline"
+                    size="sm"
+                    className="glass-surface border-white/20 text-white hover:bg-white/10"
                     onClick={() => downloadResource(currentResource)}
                     aria-label="Download resource"
                   >
-                    <Download className="h-4 w-4" />
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
                   </Button>
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-red-400 hover:text-red-300"
+                    variant="outline"
+                    size="sm"
+                    className="glass-surface border-red-500/30 text-red-400 hover:bg-red-500/10"
                     onClick={() => {
                       handleDeleteResource(currentResource.id)
                     }}
                     aria-label="Delete resource"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
                   </Button>
                 </div>
               </div>
-            </DialogHeader>
 
-            <div className="space-y-4">
               {currentResource.description && (
-                <p className="text-white/80">{currentResource.description}</p>
+                <p className="text-white/80 text-sm leading-relaxed">{currentResource.description}</p>
               )}
+
               {currentResource.tags && currentResource.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mt-3">
                   {currentResource.tags.map((tag: string) => (
-                    <Badge key={tag} className="glass-surface border-white/10 text-white/80">
+                    <Badge key={tag} className="glass-surface border-white/10 text-white/80 text-xs">
                       {tag}
                     </Badge>
                   ))}
                 </div>
               )}
-              <div className="glass-surface border-white/10 p-4 rounded-lg">
-                <pre className="whitespace-pre-wrap text-white/90 font-mono text-sm leading-relaxed">
-                  {currentResource.content}
-                </pre>
+            </div>
+
+            {/* Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="max-w-4xl mx-auto">
+                {currentResource.image_url && (
+                  <div className="mb-6">
+                    <img
+                      src={currentResource.image_url}
+                      alt={currentResource.title}
+                      className="w-full h-auto rounded-lg object-cover max-h-96"
+                    />
+                  </div>
+                )}
+                <div className="glass-surface border-white/10 p-6 md:p-8 rounded-xl">
+                  <div className="prose prose-invert max-w-none">
+                    <div className="whitespace-pre-wrap text-white/90 leading-relaxed text-base md:text-lg">
+                      {currentResource.content}
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-white/10 flex-shrink-0 text-center">
+              <p className="text-white/50 text-xs">
+                Created {new Date(currentResource.created_at).toLocaleDateString()}
+                {currentResource.updated_at !== currentResource.created_at && (
+                  <> • Updated {new Date(currentResource.updated_at).toLocaleDateString()}</>
+                )}
+              </p>
             </div>
           </DialogContent>
         </Dialog>

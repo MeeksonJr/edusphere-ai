@@ -731,23 +731,24 @@ export default function FlashcardsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Study Flashcards Dialog */}
+      {/* Study Flashcards Dialog - Redesigned */}
       {currentSet && (
         <Dialog open={isStudyDialogOpen} onOpenChange={setIsStudyDialogOpen}>
-          <DialogContent className="glass-surface border-white/20 sm:max-w-[700px]">
-            <DialogHeader>
-              <div className="flex justify-between items-start">
+          <DialogContent className="glass-surface border-white/20 sm:max-w-[900px] max-w-[95vw] max-h-[90vh] p-0 flex flex-col">
+            {/* Header */}
+            <div className="p-6 border-b border-white/10 flex-shrink-0">
+              <div className="flex justify-between items-start mb-4">
                 <div>
-                  <DialogTitle className="text-white">{currentSet.title}</DialogTitle>
+                  <DialogTitle className="text-white text-2xl mb-1">{currentSet.title}</DialogTitle>
                   <DialogDescription className="text-white/70">
                     {currentSet.subject} • {currentSet.cards.length} cards
                   </DialogDescription>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="glass-surface border-white/20 text-white"
+                    className="glass-surface border-white/20 text-white hover:bg-white/10"
                     onClick={shuffleCards}
                     disabled={studyMode === "shuffle"}
                   >
@@ -758,7 +759,7 @@ export default function FlashcardsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="glass-surface border-white/20 text-white"
+                      className="glass-surface border-white/20 text-white hover:bg-white/10"
                       onClick={resetCards}
                     >
                       <RotateCcw className="h-4 w-4 mr-1" aria-hidden="true" />
@@ -767,46 +768,64 @@ export default function FlashcardsPage() {
                   )}
                 </div>
               </div>
-            </DialogHeader>
 
-            <div className="py-4">
-              <div className="flex justify-between items-center mb-2 text-sm text-white/60">
-                <span>Progress</span>
-                <span>
-                  {currentCardIndex + 1} of {currentSet.cards.length}
-                </span>
+              {/* Progress Bar */}
+              <div className="mt-4">
+                <div className="flex justify-between items-center mb-2 text-sm text-white/70">
+                  <span>Progress</span>
+                  <span className="font-medium">
+                    {currentCardIndex + 1} / {currentSet.cards.length}
+                  </span>
+                </div>
+                <Progress value={((currentCardIndex + 1) / currentSet.cards.length) * 100} className="h-2" />
               </div>
-              <Progress value={((currentCardIndex + 1) / currentSet.cards.length) * 100} className="h-2" />
             </div>
 
-            <div className="glass-surface border-white/10 rounded-lg p-8 min-h-[250px] flex flex-col justify-between">
-              <div>
-                <p className="font-semibold text-white mb-3">Question:</p>
-                <p className="text-white/90 text-lg mb-6">{currentSet.cards[currentCardIndex]?.question}</p>
+            {/* Card Content - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="max-w-3xl mx-auto">
+                <div className="glass-surface border-white/20 rounded-xl p-8 md:p-12 min-h-[400px] flex flex-col justify-center items-center text-center">
+                  <div className="w-full space-y-6">
+                    <div>
+                      <p className="text-sm font-medium text-purple-400 mb-4 uppercase tracking-wide">Question</p>
+                      <p className="text-white text-xl md:text-2xl leading-relaxed font-medium">
+                        {currentSet.cards[currentCardIndex]?.question}
+                      </p>
+                    </div>
 
-                {showAnswer && (
-                  <>
-                    <p className="font-semibold text-white mb-3">Answer:</p>
-                    <p className="text-white/90 text-lg">{currentSet.cards[currentCardIndex]?.answer}</p>
-                  </>
-                )}
+                    {showAnswer && (
+                      <div className="mt-8 pt-8 border-t border-white/10 animate-in fade-in slide-in-from-bottom-4">
+                        <p className="text-sm font-medium text-green-400 mb-4 uppercase tracking-wide">Answer</p>
+                        <p className="text-white/90 text-lg md:text-xl leading-relaxed">
+                          {currentSet.cards[currentCardIndex]?.answer}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
+            </div>
 
-              <div className="flex justify-between items-center mt-6">
+            {/* Footer Controls */}
+            <div className="p-6 border-t border-white/10 flex-shrink-0 space-y-4">
+              {/* Navigation Buttons */}
+              <div className="flex justify-between items-center gap-4">
                 <Button
                   variant="outline"
-                  className="glass-surface border-white/20 text-white"
+                  size="lg"
+                  className="glass-surface border-white/20 text-white hover:bg-white/10 flex-1"
                   onClick={handlePrevCard}
                   disabled={currentCardIndex === 0}
                 >
-                  <ChevronLeft className="h-4 w-4 mr-1" aria-hidden="true" />
+                  <ChevronLeft className="h-5 w-5 mr-2" aria-hidden="true" />
                   Previous
                 </Button>
                 <Button
+                  size="lg"
                   className={
                     showAnswer
-                      ? "glass-surface border-white/20 text-white"
-                      : "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                      ? "glass-surface border-white/20 text-white hover:bg-white/10 flex-1"
+                      : "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white flex-1"
                   }
                   onClick={() => setShowAnswer(!showAnswer)}
                 >
@@ -814,43 +833,55 @@ export default function FlashcardsPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="glass-surface border-white/20 text-white"
+                  size="lg"
+                  className="glass-surface border-white/20 text-white hover:bg-white/10 flex-1"
                   onClick={handleNextCard}
                   disabled={currentCardIndex === currentSet.cards.length - 1}
                 >
                   Next
-                  <ChevronRight className="h-4 w-4 ml-1" aria-hidden="true" />
+                  <ChevronRight className="h-5 w-5 ml-2" aria-hidden="true" />
                 </Button>
               </div>
-            </div>
 
-            <div className="flex justify-between items-center mt-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-white/60 hover:text-white"
-                onClick={() => copyToClipboard(currentSet.cards[currentCardIndex]?.question, 0)}
-              >
-                {copiedIndex === 0 ? (
-                  <Check className="h-3 w-3 mr-1" aria-hidden="true" />
-                ) : (
-                  <Copy className="h-3 w-3 mr-1" aria-hidden="true" />
-                )}
-                Copy Question
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-white/60 hover:text-white"
-                onClick={() => copyToClipboard(currentSet.cards[currentCardIndex]?.answer, 1)}
-              >
-                {copiedIndex === 1 ? (
-                  <Check className="h-3 w-3 mr-1" aria-hidden="true" />
-                ) : (
-                  <Copy className="h-3 w-3 mr-1" aria-hidden="true" />
-                )}
-                Copy Answer
-              </Button>
+              {/* Copy Actions */}
+              <div className="flex justify-center gap-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/60 hover:text-white"
+                  onClick={() => copyToClipboard(currentSet.cards[currentCardIndex]?.question, 0)}
+                >
+                  {copiedIndex === 0 ? (
+                    <>
+                      <Check className="h-4 w-4 mr-1" aria-hidden="true" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-1" aria-hidden="true" />
+                      Copy Question
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white/60 hover:text-white"
+                  onClick={() => copyToClipboard(currentSet.cards[currentCardIndex]?.answer, 1)}
+                >
+                  {copiedIndex === 1 ? (
+                    <>
+                      <Check className="h-4 w-4 mr-1" aria-hidden="true" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-1" aria-hidden="true" />
+                      Copy Answer
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
