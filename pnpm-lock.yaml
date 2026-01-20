@@ -104,6 +104,9 @@ importers:
       '@remotion/cli':
         specifier: 4.0.407
         version: 4.0.407(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@remotion/player':
+        specifier: ^4.0.407
+        version: 4.0.407(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@supabase/auth-helpers-nextjs':
         specifier: latest
         version: 0.15.0(@supabase/supabase-js@2.90.1)

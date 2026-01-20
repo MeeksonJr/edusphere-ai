@@ -88,6 +88,7 @@ export function DashboardSidebar() {
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
+    { name: "Courses", href: "/dashboard/courses", icon: Sparkles },
     { name: "Assignments", href: "/dashboard/assignments", icon: CheckSquare },
     { name: "AI Lab", href: "/dashboard/ai-lab", icon: Beaker },
     { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
