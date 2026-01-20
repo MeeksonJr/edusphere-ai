@@ -28,7 +28,6 @@ import {
   Plus,
 } from "lucide-react"
 import { useSupabase } from "@/components/supabase-provider"
-import { answerQuestion, generateFlashcards, generateStudyPlan, generateSummary, trackAIUsage } from "@/lib/ai-service"
 import { useToast } from "@/hooks/use-toast"
 import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -84,6 +83,10 @@ export default function AILabPage() {
 
   useEffect(() => {
     const getUser = async () => {
+      if (!supabase) {
+        return
+      }
+
       const { data } = await supabase.auth.getUser()
       if (data.user) {
         const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
@@ -167,16 +170,34 @@ export default function AILabPage() {
       setChatInput("")
 
       if (!user) throw new Error("You must be logged in to use the AI Lab")
-      await trackAIUsage(supabase, user.id)
       setIsThinking(true)
 
-      const response = await answerQuestion(userMessage)
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generateAIResponse",
+          provider: aiProvider,
+          prompt: userMessage,
+          systemPrompt:
+            "You are a helpful AI tutor. Provide clear, accurate, and educational answers to student questions.",
+          maxTokens: 800,
+        }),
+      })
+
+      const result = await response.json()
       setIsThinking(false)
-      setChatHistory((prev) => [...prev, { role: "assistant", content: response }])
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to get AI response")
+      }
+
+      const text = result.data?.text || ""
+      setChatHistory((prev) => [...prev, { role: "assistant", content: text }])
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to get AI response",
         variant: "destructive",
       })
     } finally {
@@ -270,13 +291,29 @@ export default function AILabPage() {
     try {
       setLoading(true)
       if (!user) throw new Error("You must be logged in to use the AI Lab")
-      await trackAIUsage(supabase, user.id)
-      const summary = await generateSummary(summaryInput)
-      setSummaryResult(summary)
+
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generateAIResponse",
+          provider: aiProvider,
+          prompt: `Summarize the following text in a concise way:\n\n${summaryInput}`,
+          systemPrompt: "You are a helpful AI assistant that specializes in summarizing text.",
+          maxTokens: 600,
+        }),
+      })
+
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to generate summary")
+      }
+
+      setSummaryResult(result.data?.text || "")
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to generate summary",
         variant: "destructive",
       })
     } finally {
@@ -290,14 +327,31 @@ export default function AILabPage() {
     try {
       setLoading(true)
       if (!user) throw new Error("You must be logged in to use the AI Lab")
-      await trackAIUsage(supabase, user.id)
-      const plan = await generateStudyPlan(studySubject, studyTopic)
-      setStudyPlan(plan)
+
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generateAIResponse",
+          provider: aiProvider,
+          prompt: `Create a detailed study plan for learning about ${studyTopic} in ${studySubject}.`,
+          systemPrompt: "You are an educational AI assistant that creates effective study plans.",
+          maxTokens: 1200,
+        }),
+      })
+
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to generate study plan")
+      }
+
+      const planText = result.data?.text || ""
+      setStudyPlan(planText)
       setStudyPlanTitle(`${studySubject}: ${studyTopic}`)
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to generate study plan",
         variant: "destructive",
       })
     } finally {

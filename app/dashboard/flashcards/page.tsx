@@ -25,7 +25,6 @@ import {
 } from "lucide-react"
 import { useSupabase } from "@/components/supabase-provider"
 import { useToast } from "@/hooks/use-toast"
-import { generateFlashcards, trackAIUsage } from "@/lib/ai-service"
 import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
@@ -90,6 +89,8 @@ export default function FlashcardsPage() {
 
   useEffect(() => {
     const getUser = async () => {
+      if (!supabase) return
+
       const { data } = await supabase.auth.getUser()
       if (data.user) {
         const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
@@ -217,10 +218,36 @@ export default function FlashcardsPage() {
 
     try {
       setGeneratingFlashcards(true)
-      await trackAIUsage(supabase, user.id)
-      const cards = await generateFlashcards(flashcardTopic, Number.parseInt(flashcardCount))
 
-      if (cards.length === 0) {
+      const count = Number.parseInt(flashcardCount)
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generateAIResponse",
+          provider: "gemini",
+          prompt: `Generate ${count} flashcards for studying ${flashcardTopic}. Format each flashcard as a JSON object with 'question' and 'answer' fields, and return a JSON array.`,
+          systemPrompt:
+            "You are an educational AI assistant that creates effective flashcards for studying. Respond ONLY with a JSON array.",
+          maxTokens: 1200,
+        }),
+      })
+
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to generate flashcards")
+      }
+
+      let cards: { question: string; answer: string }[] = []
+      try {
+        const text: string = result.data?.text || ""
+        const jsonStr = text.match(/\[[\s\S]*\]/)?.[0] || "[]"
+        cards = JSON.parse(jsonStr)
+      } catch {
+        cards = []
+      }
+
+      if (!cards.length) {
         throw new Error("Failed to generate flashcards. Please try again with a different topic.")
       }
 

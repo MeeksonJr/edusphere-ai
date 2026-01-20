@@ -1,7 +1,19 @@
 import { createClient } from "@/utils/supabase/server"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { CheckSquare, Clock, Calendar, Beaker, ArrowRight, BookOpen, BrainCircuit, TrendingUp, Award, Zap } from "lucide-react"
+import {
+  CheckSquare,
+  Clock,
+  Calendar,
+  Beaker,
+  ArrowRight,
+  BookOpen,
+  BrainCircuit,
+  TrendingUp,
+  Award,
+  Zap,
+  Video,
+} from "lucide-react"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
@@ -52,6 +64,14 @@ export default async function Dashboard() {
     .eq("user_id", user.id)
     .eq("status", "ongoing")
     .lt("due_date", oneWeekFromNow.toISOString())
+
+  // Get latest 3 courses for this user
+  const { data: latestCourses } = await supabase
+    .from("courses")
+    .select("id,title,created_at,estimated_duration,status,layout")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(3)
 
   const stats = [
     {
@@ -119,9 +139,7 @@ export default async function Dashboard() {
               <AnimatedCard variant="glow" delay={0.1 * index}>
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <div
-                      className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.gradient} p-3`}
-                    >
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.gradient} p-3`}>
                       <Icon className="h-full w-full text-white" aria-hidden="true" />
                     </div>
                   </div>
@@ -167,7 +185,7 @@ export default async function Dashboard() {
 
             {assignments && assignments.length > 0 ? (
               <div className="space-y-4">
-                {assignments.map((assignment, index) => (
+                {assignments.map((assignment) => (
                   <div
                     key={assignment.id}
                     className="p-4 rounded-lg glass-surface border border-white/10 hover:border-purple-500/30 transition-colors"
@@ -184,9 +202,7 @@ export default async function Dashboard() {
                             {new Date(assignment.due_date || "").toLocaleDateString()}
                           </div>
                         </div>
-                        <p className="text-sm text-white/70 line-clamp-2 mb-3">
-                          {assignment.description}
-                        </p>
+                        <p className="text-sm text-white/70 line-clamp-2 mb-3">{assignment.description}</p>
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-xs px-2 py-1 rounded-full glass-surface border-white/10">
                             {assignment.subject}
@@ -232,9 +248,7 @@ export default async function Dashboard() {
                 const Icon = action.icon
                 return (
                   <Link key={action.href} href={action.href}>
-                    <div
-                      className="p-4 rounded-lg glass-surface border border-white/10 hover:border-purple-500/30 transition-all group cursor-pointer"
-                    >
+                    <div className="p-4 rounded-lg glass-surface border border-white/10 hover:border-purple-500/30 transition-all group cursor-pointer">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <div
@@ -246,7 +260,10 @@ export default async function Dashboard() {
                             {action.name}
                           </span>
                         </div>
-                        <ArrowRight className="h-4 w-4 text-white/40 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" aria-hidden="true" />
+                        <ArrowRight
+                          className="h-4 w-4 text-white/40 group-hover:text-purple-400 group-hover:translate-x-1 transition-all"
+                          aria-hidden="true"
+                        />
                       </div>
                     </div>
                   </Link>
@@ -256,6 +273,70 @@ export default async function Dashboard() {
           </GlassSurface>
         </ScrollReveal>
       </div>
+
+      {/* Latest Courses */}
+      <ScrollReveal direction="up" delay={0.6}>
+        <GlassSurface className="mt-8 p-6 lg:p-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-white">Latest Courses</h2>
+            <Link href="/dashboard/courses">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-purple-400 hover:text-purple-300"
+                aria-label="View all courses"
+              >
+                View All
+                <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+              </Button>
+            </Link>
+          </div>
+          {latestCourses && latestCourses.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-3">
+              {latestCourses.map((course) => (
+                <Link key={course.id} href={`/dashboard/courses/${course.id}`}>
+                  <AnimatedCard variant="3d" className="cursor-pointer h-full">
+                    <div className="p-4 flex flex-col h-full">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                            <Video className="h-4 w-4 text-white" aria-hidden="true" />
+                          </div>
+                          <h3 className="text-sm font-semibold text-white line-clamp-2">
+                            {course.title || "Untitled course"}
+                          </h3>
+                        </div>
+                      </div>
+                      <p className="text-xs text-white/60 mb-3">
+                        Created on{" "}
+                        {course.created_at ? new Date(course.created_at).toLocaleDateString() : "N/A"}
+                      </p>
+                      <div className="mt-auto flex items-center justify-between text-xs text-white/60">
+                        <span>
+                          {course.estimated_duration
+                            ? `${Math.round(course.estimated_duration / 60)} min`
+                            : "Duration N/A"}
+                        </span>
+                        <span className="capitalize">{course.status || "pending"}</span>
+                      </div>
+                    </div>
+                  </AnimatedCard>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Video className="h-10 w-10 text-white/20 mx-auto mb-3" aria-hidden="true" />
+              <p className="text-white/60 mb-3">No courses created yet</p>
+              <Link href="/dashboard/courses/new">
+                <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+                  Create your first course
+                </Button>
+              </Link>
+            </div>
+          )}
+        </GlassSurface>
+      </ScrollReveal>
     </div>
   )
 }

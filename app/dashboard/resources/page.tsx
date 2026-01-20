@@ -23,7 +23,6 @@ import {
 } from "lucide-react"
 import { useSupabase } from "@/components/supabase-provider"
 import { useToast } from "@/hooks/use-toast"
-import { generateStudyResource, trackAIUsage } from "@/lib/ai-service"
 import { Badge } from "@/components/ui/badge"
 import {
   Dialog,
@@ -92,6 +91,8 @@ export default function ResourcesPage() {
 
   useEffect(() => {
     const getUser = async () => {
+      if (!supabase) return
+
       const { data } = await supabase.auth.getUser()
       if (data.user) {
         const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
@@ -206,13 +207,29 @@ export default function ResourcesPage() {
 
     try {
       setGeneratingResource(true)
-      await trackAIUsage(supabase, user.id)
 
       const resourceTypeLabel =
         resourceTypes.find((type) => type.value === newResource.resource_type)?.label || newResource.resource_type
 
-      const content = await generateStudyResource(newResource.subject, newResource.title, resourceTypeLabel)
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generateAIResponse",
+          provider: "gemini",
+          prompt: `Create a comprehensive ${resourceTypeLabel} about "${newResource.title}" in the subject of ${newResource.subject}. Include key concepts, explanations, and examples.`,
+          systemPrompt:
+            "You are an educational AI assistant that creates high-quality study resources. Respond in markdown format.",
+          maxTokens: 1600,
+        }),
+      })
 
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to generate content")
+      }
+
+      const content = result.data?.text || ""
       setNewResource((prev) => ({ ...prev, content }))
 
       toast({
