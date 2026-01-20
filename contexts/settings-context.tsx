@@ -83,20 +83,40 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
           if (error && error.code !== "PGRST116") {
             console.error("Error fetching settings:", error)
+            // If fetch failed but not because record doesn't exist, try to upsert default settings
+            const { error: upsertError } = await (supabase
+              .from("user_settings") as any)
+              .upsert(
+                {
+                  user_id: user.id,
+                  settings: defaultSettings,
+                },
+                {
+                  onConflict: "user_id",
+                }
+              )
+            if (upsertError) {
+              console.error("Error upserting settings:", upsertError)
+            }
           } else if (data) {
             // If settings exist, use them
-            setSettings(data.settings as UserSettings)
+            setSettings((data as any).settings as UserSettings)
           } else {
-            // If no settings exist, create default settings
-            const { error: insertError } = await supabase.from("user_settings").insert([
-              {
-                user_id: user.id,
-                settings: defaultSettings,
-              },
-            ])
+            // If no settings exist, upsert default settings (handles race conditions)
+            const { error: upsertError } = await (supabase
+              .from("user_settings") as any)
+              .upsert(
+                {
+                  user_id: user.id,
+                  settings: defaultSettings,
+                },
+                {
+                  onConflict: "user_id",
+                }
+              )
 
-            if (insertError) {
-              console.error("Error creating settings:", insertError)
+            if (upsertError) {
+              console.error("Error creating settings:", upsertError)
             }
           }
         }
@@ -129,24 +149,31 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       } = await supabase.auth.getUser()
 
       if (user) {
-        const { error } = await supabase.from("user_settings").upsert([
-          {
-            user_id: user.id,
-            settings: updatedSettings,
-          },
-        ])
+        const { error } = await (supabase
+          .from("user_settings") as any)
+          .upsert(
+            {
+              user_id: user.id,
+              settings: updatedSettings,
+            },
+            {
+              onConflict: "user_id",
+            }
+          )
 
         if (error) {
           throw error
         }
 
         toast({
+          id: `settings-updated-${Date.now()}`,
           title: "Settings updated",
           description: "Your settings have been saved successfully.",
         })
       }
     } catch (error: any) {
       toast({
+        id: `settings-error-${Date.now()}`,
         title: "Error",
         description: error.message || "Failed to update settings",
         variant: "destructive",
