@@ -30,6 +30,8 @@ import {
 import Link from "next/link"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 import dynamic from "next/dynamic"
+import { CourseSidePanel } from "@/components/courses/CourseSidePanel"
+import { CourseSidePanel } from "@/components/courses/CourseSidePanel"
 
 // Dynamically import Remotion Player to avoid SSR issues
 const RemotionPlayer = dynamic(
@@ -503,7 +505,7 @@ function CourseDetailContent() {
                       {chapter.slides.map((slide: any, slideIndex: number) => (
                         <div
                           key={slide.slideId || slideIndex}
-                          className="p-3 rounded bg-white/5 border border-white/5"
+                          className="p-3 rounded bg-white/5 border border-white/5 hover:border-purple-500/30 transition-colors group"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
@@ -521,14 +523,42 @@ function CourseDetailContent() {
                                 </p>
                               )}
                             </div>
-                            <div className="text-white/50 text-xs ml-4">
-                              {slide.estimatedDuration || 30}s
+                            <div className="flex items-center gap-2 ml-4">
+                              <div className="text-white/50 text-xs">
+                                {slide.estimatedDuration || 30}s
+                              </div>
+                              <Button
+                                onClick={() => {
+                                  setSelectedSlide(slide)
+                                  setSelectedChapter(chapter)
+                                  setSidePanelOpen(true)
+                                }}
+                                variant="ghost"
+                                size="sm"
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-white/70 hover:text-white hover:bg-white/10 h-7 px-2"
+                              >
+                                <Sparkles className="h-3 w-3" />
+                              </Button>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <Button
+                      onClick={() => {
+                        setSelectedChapter(chapter)
+                        setSelectedSlide(null)
+                        setSidePanelOpen(true)
+                      }}
+                      variant="outline"
+                      className="w-full border-white/20 text-white hover:bg-white/10 text-sm"
+                    >
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Learn More About This Chapter
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -552,6 +582,19 @@ function CourseDetailContent() {
           </GlassSurface>
         </ScrollReveal>
       )}
+
+      {/* Interactive Side Panel */}
+      <CourseSidePanel
+        isOpen={sidePanelOpen}
+        onClose={() => {
+          setSidePanelOpen(false)
+          setSelectedChapter(null)
+          setSelectedSlide(null)
+        }}
+        chapter={selectedChapter}
+        slide={selectedSlide}
+        courseTitle={course?.title}
+      />
     </div>
   )
 }
