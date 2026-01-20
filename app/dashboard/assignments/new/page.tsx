@@ -14,7 +14,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format, parse, isValid } from "date-fns"
 import { useSupabase } from "@/components/supabase-provider"
-import { generateAssignmentApproach, trackAIUsage } from "@/lib/ai-service"
+// AI functions are now called via API route
 import { useToast } from "@/hooks/use-toast"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
@@ -115,6 +115,11 @@ export default function NewAssignmentPage() {
       return
     }
 
+    if (!supabase) {
+      setError("Authentication service is not available")
+      return
+    }
+
     setAiLoading(true)
     setError(null)
 
@@ -125,18 +130,37 @@ export default function NewAssignmentPage() {
 
       if (!user) throw new Error("You must be logged in to use the AI features")
 
-      await trackAIUsage(supabase, user.id)
-      const aiSummary = await generateAssignmentApproach(formData.title, formData.description, formData.subject)
+      const subjectContext = formData.subject ? ` for the subject ${formData.subject}` : ""
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generateAIResponse",
+          provider: "gemini",
+          prompt: `Assignment Title: ${formData.title}\nDescription: ${formData.description}\n\nProvide a strategic approach to complete this assignment${subjectContext}. Include steps, resources, and time management tips.`,
+          systemPrompt: "You are an educational AI assistant that helps students approach assignments effectively.",
+          maxTokens: 1200,
+        }),
+      })
+
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to generate AI summary")
+      }
+
+      const aiSummary = result.data?.text || ""
 
       setFormData((prev) => ({ ...prev, ai_summary: aiSummary }))
 
       toast({
+        id: `ai-summary-success-${Date.now()}`,
         title: "AI Summary Generated",
         description: "The AI has analyzed your assignment and provided an approach.",
       })
     } catch (error: any) {
       setError(error.message || "Failed to generate AI summary")
       toast({
+        id: `ai-summary-error-${Date.now()}`,
         title: "Error",
         description: error.message || "Failed to generate AI summary",
         variant: "destructive",

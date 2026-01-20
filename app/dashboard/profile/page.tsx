@@ -191,12 +191,25 @@ function ProfileContent() {
       if (!user) return
 
       let avatarUrl = profile.avatar_url
-      if (avatarFile) {
+      if (avatarFile && supabase) {
         const fileExt = avatarFile.name.split(".").pop()
         const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`
-        const filePath = `avatars/${fileName}`
+        // Remove 'avatars/' prefix if bucket name is already 'avatars'
+        const filePath = fileName
 
-        const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, avatarFile)
+        // Delete old avatar if exists
+        if (profile.avatar_url) {
+          const oldPath = profile.avatar_url.split("/").pop()
+          if (oldPath) {
+            await supabase.storage.from("avatars").remove([oldPath]).catch(() => {
+              // Ignore errors if file doesn't exist
+            })
+          }
+        }
+
+        const { error: uploadError } = await supabase.storage.from("avatars").upload(filePath, avatarFile, {
+          upsert: true,
+        })
         if (uploadError) throw uploadError
 
         const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(filePath)

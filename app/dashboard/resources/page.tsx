@@ -86,8 +86,11 @@ export default function ResourcesPage() {
     content: "",
     resource_type: "notes",
     tags: [] as string[],
+    image_url: "",
   })
   const [tagInput, setTagInput] = useState("")
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [imageFile, setImageFile] = useState<File | null>(null)
 
   useEffect(() => {
     const getUser = async () => {
@@ -156,6 +159,40 @@ export default function ResourcesPage() {
     }
 
     try {
+      let imageUrl = newResource.image_url
+      
+      // Upload image if provided
+      if (imageFile && supabase) {
+        try {
+          setUploadingImage(true)
+          const fileExt = imageFile.name.split(".").pop()
+          const fileName = `${user.id}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`
+          const filePath = `resources/${fileName}`
+
+          const { error: uploadError } = await supabase.storage
+            .from("course-media")
+            .upload(filePath, imageFile, { upsert: true })
+
+          if (uploadError) throw uploadError
+
+          const { data: urlData } = supabase.storage
+            .from("course-media")
+            .getPublicUrl(filePath)
+          
+          imageUrl = urlData.publicUrl
+        } catch (uploadErr: any) {
+          console.error("Image upload error:", uploadErr)
+          toast({
+            id: `image-upload-error-${Date.now()}`,
+            title: "Image Upload Failed",
+            description: "Resource created but image upload failed. You can add it later.",
+            variant: "destructive",
+          })
+        } finally {
+          setUploadingImage(false)
+        }
+      }
+
       const { data, error } = await supabase.from("study_resources").insert([
         {
           user_id: user.id,
@@ -165,6 +202,7 @@ export default function ResourcesPage() {
           content: newResource.content,
           resource_type: newResource.resource_type,
           tags: newResource.tags,
+          image_url: imageUrl || null,
           ai_generated: false,
         },
       ])
@@ -184,7 +222,9 @@ export default function ResourcesPage() {
         content: "",
         resource_type: "notes",
         tags: [],
+        image_url: "",
       })
+      setImageFile(null)
       fetchResources()
     } catch (error: any) {
       toast({
@@ -482,15 +522,15 @@ ${resource.content}
 
       {/* Create Resource Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="glass-surface border-white/20 sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="glass-surface border-white/20 sm:max-w-[700px] max-h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-white">Create New Study Resource</DialogTitle>
             <DialogDescription className="text-white/70">
               Create your own study material or let AI generate content for you.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleCreateResource} className="space-y-4">
+          <form onSubmit={handleCreateResource} className="space-y-4 overflow-y-auto flex-1 pr-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="title" className="text-white mb-2 block">
@@ -622,6 +662,31 @@ ${resource.content}
               />
             </div>
 
+            <div>
+              <Label htmlFor="image" className="text-white mb-2 block">
+                Image (Optional)
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      setImageFile(e.target.files[0])
+                    }
+                  }}
+                  className="glass-surface border-white/20 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-500 file:text-white hover:file:bg-purple-600"
+                  disabled={uploadingImage}
+                />
+                {imageFile && (
+                  <Badge className="glass-surface border-white/10 text-white/80">
+                    {imageFile.name}
+                  </Badge>
+                )}
+              </div>
+            </div>
+
             <div className="flex gap-2">
               <Button
                 type="button"
@@ -644,7 +709,7 @@ ${resource.content}
               </Button>
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="flex-shrink-0 pt-4 border-t border-white/10">
               <Button
                 type="button"
                 variant="outline"

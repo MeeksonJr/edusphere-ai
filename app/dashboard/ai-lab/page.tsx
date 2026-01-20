@@ -362,8 +362,19 @@ export default function AILabPage() {
   const handleSaveStudyPlan = async () => {
     if (!studyPlan) {
       toast({
+        id: `save-plan-empty-${Date.now()}`,
         title: "Nothing to save",
         description: "Generate a study plan first before saving.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!supabase || !user) {
+      toast({
+        id: `save-plan-auth-${Date.now()}`,
+        title: "Error",
+        description: "You must be logged in to save study plans.",
         variant: "destructive",
       })
       return
@@ -375,7 +386,7 @@ export default function AILabPage() {
         .insert([
           {
             user_id: user.id,
-            title: studyPlanTitle,
+            title: studyPlanTitle || `${studySubject}: ${studyTopic}`,
             content: studyPlan,
             subject: studySubject,
             topic: studyTopic,
@@ -389,7 +400,7 @@ export default function AILabPage() {
         setSavedStudyPlans((prev) => [
           {
             id: data[0].id,
-            title: studyPlanTitle,
+            title: studyPlanTitle || `${studySubject}: ${studyTopic}`,
             content: studyPlan,
             subject: studySubject,
             topic: studyTopic,
@@ -398,6 +409,7 @@ export default function AILabPage() {
         ])
 
         toast({
+          id: `save-plan-success-${Date.now()}`,
           title: "Study Plan Saved",
           description: "Your study plan has been saved successfully.",
         })
@@ -405,6 +417,7 @@ export default function AILabPage() {
       }
     } catch (error: any) {
       toast({
+        id: `save-plan-error-${Date.now()}`,
         title: "Error",
         description: error.message || "Failed to save study plan",
         variant: "destructive",
@@ -446,13 +459,45 @@ export default function AILabPage() {
     try {
       setLoading(true)
       if (!user) throw new Error("You must be logged in to use the AI Lab")
-      await trackAIUsage(supabase, user.id)
-      const cards = await generateFlashcards(flashcardTopic, Number.parseInt(flashcardCount))
+
+      const count = Number.parseInt(flashcardCount)
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generateAIResponse",
+          provider: aiProvider,
+          prompt: `Generate ${count} flashcards for studying ${flashcardTopic}. Format each flashcard as a JSON object with 'question' and 'answer' fields, and return a JSON array.`,
+          systemPrompt:
+            "You are an educational AI assistant that creates effective flashcards for studying. Respond ONLY with a JSON array.",
+          maxTokens: 1200,
+        }),
+      })
+
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to generate flashcards")
+      }
+
+      let cards: { question: string; answer: string }[] = []
+      try {
+        const text: string = result.data?.text || ""
+        const jsonStr = text.match(/\[[\s\S]*\]/)?.[0] || "[]"
+        cards = JSON.parse(jsonStr)
+      } catch {
+        cards = []
+      }
+
+      if (!cards.length) {
+        throw new Error("Failed to generate flashcards. Please try again with a different topic.")
+      }
+
       setFlashcards(cards)
       setActiveFlashcard(0)
       setShowAnswer(false)
     } catch (error: any) {
       toast({
+        id: `generate-flashcards-error-${Date.now()}`,
         title: "Error",
         description: error.message,
         variant: "destructive",

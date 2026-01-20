@@ -489,13 +489,46 @@ function CourseDetailContent() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white">Course Structure</h2>
               <Button
-                onClick={() => {
-                  // TODO: Add new chapter functionality
-                  toast({
-                    id: `add-chapter-${Date.now()}`,
-                    title: "Coming Soon",
-                    description: "Chapter editing feature will be available soon.",
-                  })
+                onClick={async () => {
+                  if (!supabase || !params.id) return
+
+                  const title = prompt("Enter chapter title:")
+                  if (!title) return
+
+                  const topic = prompt("Enter chapter topic:")
+                  if (!topic) return
+
+                  try {
+                    const response = await fetch(`/api/courses/${params.id}/chapters`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ title, topic }),
+                    })
+
+                    const result = await response.json()
+
+                    if (!response.ok) {
+                      throw new Error(result.error || "Failed to add chapter")
+                    }
+
+                    toast({
+                      id: `chapter-added-${Date.now()}`,
+                      title: "Chapter Added!",
+                      description: `Successfully added "${title}" with ${result.chapter?.slides?.length || 0} slides.`,
+                    })
+
+                    // Refresh the page to show the new chapter
+                    setTimeout(() => {
+                      window.location.reload()
+                    }, 1000)
+                  } catch (err: any) {
+                    toast({
+                      id: `chapter-error-${Date.now()}`,
+                      title: "Error",
+                      description: err.message || "Failed to add chapter",
+                      variant: "destructive",
+                    })
+                  }
                 }}
                 variant="outline"
                 size="sm"
