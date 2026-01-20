@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X, Sparkles, MessageSquare, Volume2, BookOpen, Loader2 } from "lucide-react"
+import { X, Sparkles, MessageSquare, Volume2, BookOpen, Loader2, Pause, Play, VolumeX } from "lucide-react"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -29,6 +29,12 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
   const [answer, setAnswer] = useState("")
   const [answering, setAnswering] = useState(false)
   const [isReading, setIsReading] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
+  const [selectedVoice, setSelectedVoice] = useState<string>("")
+  const [speechRate, setSpeechRate] = useState(0.9)
+  const [speechPitch, setSpeechPitch] = useState(1)
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([])
+  const [currentUtterance, setCurrentUtterance] = useState<SpeechSynthesisUtterance | null>(null)
 
   const { supabase } = useSupabase()
 
@@ -38,6 +44,27 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
       generateLearnMore()
     }
   }, [isOpen, activeTab])
+
+  // Load available voices when component mounts
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      const loadVoices = () => {
+        const voices = window.speechSynthesis.getVoices()
+        setAvailableVoices(voices)
+        if (voices.length > 0 && !selectedVoice) {
+          // Default to first English voice or first available
+          const englishVoice = voices.find((v) => v.lang.startsWith("en")) || voices[0]
+          setSelectedVoice(englishVoice?.name || voices[0].name)
+        }
+      }
+      
+      loadVoices()
+      // Some browsers load voices asynchronously
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = loadVoices
+      }
+    }
+  }, [])
 
   const generateLearnMore = async () => {
     if (!chapter && !slide) return
@@ -59,7 +86,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "generateAIResponse",
-          provider: "groq",
+          provider: "gemini", // Will automatically fallback if not available
           prompt: `${prompt}\n\nContent:\n${content}`,
           systemPrompt: "You are an expert educational tutor. Provide clear, detailed explanations that help students understand concepts deeply.",
         }),
@@ -96,7 +123,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "generateAIResponse",
-          provider: "groq",
+          provider: "gemini", // Will automatically fallback if not available
           prompt: `Question: ${question}\n\nContext: ${context}\n\nProvide a clear, educational answer based on the context.`,
           systemPrompt: "You are an expert tutor. Answer questions clearly and helpfully based on the provided context.",
         }),
@@ -117,12 +144,30 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
   }
 
   const handleReadAloud = () => {
+    if (!window.speechSynthesis) {
+      return
+    }
+
+    if (isReading && !isPaused) {
+      // Pause reading
+      window.speechSynthesis.pause()
+      setIsPaused(true)
+      return
+    }
+
+    if (isPaused) {
+      // Resume reading
+      window.speechSynthesis.resume()
+      setIsPaused(false)
+      return
+    }
+
     if (isReading) {
       // Stop reading
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel()
-      }
+      window.speechSynthesis.cancel()
       setIsReading(false)
+      setIsPaused(false)
+      setCurrentUtterance(null)
       return
     }
 
@@ -132,25 +177,49 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
       ? `${chapter.title}\n\n${chapter.slides?.map((s: any) => `${s.content?.title || ""}\n${s.content?.body || ""}`).join("\n\n") || ""}`
       : ""
 
-    if (!textToRead || !window.speechSynthesis) {
+    if (!textToRead) {
       return
     }
 
     setIsReading(true)
+    setIsPaused(false)
+    
     const utterance = new SpeechSynthesisUtterance(textToRead)
-    utterance.rate = 0.9
-    utterance.pitch = 1
+    utterance.rate = speechRate
+    utterance.pitch = speechPitch
     utterance.volume = 1
+
+    // Set voice if selected
+    if (selectedVoice) {
+      const voice = availableVoices.find((v) => v.name === selectedVoice)
+      if (voice) {
+        utterance.voice = voice
+      }
+    }
 
     utterance.onend = () => {
       setIsReading(false)
+      setIsPaused(false)
+      setCurrentUtterance(null)
     }
 
     utterance.onerror = () => {
       setIsReading(false)
+      setIsPaused(false)
+      setCurrentUtterance(null)
     }
 
+    setCurrentUtterance(utterance)
     window.speechSynthesis.speak(utterance)
+  }
+
+  const handleStopReading = () => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel()
+      setIsReading(false)
+      setIsPaused(false)
+      setCurrentUtterance(null)
+    }
   }
 
   if (!isOpen) return null
@@ -282,33 +351,133 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
 
           {activeTab === "read" && (
             <GlassSurface className="p-6">
-              <div className="text-center py-8">
-                <Volume2 className="h-16 w-16 text-purple-400 mx-auto mb-4" />
-                <p className="text-white/70 mb-6">
-                  {slide
-                    ? "Listen to this slide's content read aloud"
-                    : "Listen to this chapter's content read aloud"}
-                </p>
-                <Button
-                  onClick={handleReadAloud}
-                  className={`${
-                    isReading
-                      ? "bg-red-500 hover:bg-red-600"
-                      : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                  } text-white`}
-                >
-                  {isReading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Stop Reading
-                    </>
-                  ) : (
-                    <>
-                      <Volume2 className="mr-2 h-4 w-4" />
-                      Start Reading
-                    </>
+              <div className="space-y-6">
+                <div className="text-center">
+                  <Volume2 className="h-12 w-12 text-purple-400 mx-auto mb-3" />
+                  <p className="text-white/70 mb-6">
+                    {slide
+                      ? "Listen to this slide's content read aloud"
+                      : "Listen to this chapter's content read aloud"}
+                  </p>
+                </div>
+
+                {/* Voice Selection */}
+                <div>
+                  <label className="block text-white/70 text-sm font-medium mb-2">
+                    Voice
+                  </label>
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    disabled={isReading}
+                    aria-label="Voice selection"
+                    className="w-full glass-surface border border-white/20 text-white bg-white/5 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                  >
+                    {availableVoices.length === 0 ? (
+                      <option value="">Loading voices...</option>
+                    ) : (
+                      availableVoices.map((voice) => (
+                        <option key={voice.name} value={voice.name} className="bg-gray-800">
+                          {voice.name} ({voice.lang})
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                {/* Speed Control */}
+                <div>
+                  <label className="block text-white/70 text-sm font-medium mb-2">
+                    Speed: {speechRate.toFixed(1)}x
+                  </label>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="2"
+                    step="0.1"
+                    value={speechRate}
+                    onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
+                    disabled={isReading}
+                    aria-label="Speech speed control"
+                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 disabled:opacity-50"
+                  />
+                  <div className="flex justify-between text-xs text-white/50 mt-1">
+                    <span>0.5x</span>
+                    <span>1.0x</span>
+                    <span>2.0x</span>
+                  </div>
+                </div>
+
+                {/* Pitch Control */}
+                <div>
+                  <label className="block text-white/70 text-sm font-medium mb-2">
+                    Pitch: {speechPitch.toFixed(1)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="2"
+                    step="0.1"
+                    value={speechPitch}
+                    onChange={(e) => setSpeechPitch(parseFloat(e.target.value))}
+                    disabled={isReading}
+                    aria-label="Speech pitch control"
+                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 disabled:opacity-50"
+                  />
+                  <div className="flex justify-between text-xs text-white/50 mt-1">
+                    <span>Lower</span>
+                    <span>Normal</span>
+                    <span>Higher</span>
+                  </div>
+                </div>
+
+                {/* Control Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={handleReadAloud}
+                    disabled={!window.speechSynthesis}
+                    className={`flex-1 ${
+                      isReading && !isPaused
+                        ? "bg-yellow-500 hover:bg-yellow-600"
+                        : isPaused
+                        ? "bg-green-500 hover:bg-green-600"
+                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    } text-white border-0`}
+                  >
+                    {isReading && !isPaused ? (
+                      <>
+                        <Pause className="mr-2 h-4 w-4" />
+                        Pause
+                      </>
+                    ) : isPaused ? (
+                      <>
+                        <Play className="mr-2 h-4 w-4" />
+                        Resume
+                      </>
+                    ) : (
+                      <>
+                        <Volume2 className="mr-2 h-4 w-4" />
+                        Start Reading
+                      </>
+                    )}
+                  </Button>
+                  {isReading && (
+                    <Button
+                      onClick={handleStopReading}
+                      className="bg-red-500 hover:bg-red-600 text-white border-0"
+                    >
+                      <VolumeX className="h-4 w-4" />
+                    </Button>
                   )}
-                </Button>
+                </div>
+
+                {!window.speechSynthesis && (
+                  <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                    <p className="text-yellow-400 text-sm">
+                      Text-to-speech is not supported in your browser.
+                    </p>
+                  </div>
+                )}
               </div>
             </GlassSurface>
           )}

@@ -11,13 +11,39 @@ export async function POST(request: NextRequest) {
 
     if (action === "generateAIResponse") {
       const { provider, prompt, systemPrompt, temperature, maxTokens } = params
-      const response = await generateAIResponse({
-        provider: provider || "groq",
-        prompt,
-        systemPrompt,
-        temperature: temperature || 0.7,
-        maxTokens: maxTokens || 2000,
-      })
+      
+      // Try the requested provider first, with fallbacks
+      let response
+      let lastError: any = null
+      
+      const providersToTry = provider 
+        ? [provider, "gemini", "huggingface"]
+        : process.env.GROQ_API_KEY 
+        ? ["groq", "gemini", "huggingface"]
+        : process.env.GEMINI_API_KEY
+        ? ["gemini", "huggingface"]
+        : ["huggingface"]
+      
+      for (const providerToTry of providersToTry) {
+        try {
+          response = await generateAIResponse({
+            provider: providerToTry as any,
+            prompt,
+            systemPrompt,
+            temperature: temperature || 0.7,
+            maxTokens: maxTokens || 2000,
+          })
+          break // Success, exit loop
+        } catch (error: any) {
+          console.error(`${providerToTry} generation error:`, error.message)
+          lastError = error
+          continue // Try next provider
+        }
+      }
+      
+      if (!response) {
+        throw new Error(`All AI providers failed. Last error: ${lastError?.message || "Unknown error"}`)
+      }
 
       return NextResponse.json({
         success: true,
