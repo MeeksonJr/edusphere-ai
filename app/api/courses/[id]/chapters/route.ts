@@ -42,10 +42,16 @@ export async function POST(
     const existingChapters = currentLayout.chapters || []
     const newChapterOrder = existingChapters.length + 1
 
-    // Generate chapter content using AI
-    const response = await generateAIResponse({
-      provider: "gemini",
-      prompt: `Generate a chapter for a course about "${course.title}". 
+    // Generate chapter content using AI via API route (with fallback)
+    let response: any
+    try {
+      const aiResponse = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generateAIResponse",
+          provider: "gemini",
+          prompt: `Generate a chapter for a course about "${course.title}". 
       
 Chapter Title: ${title}
 Chapter Topic: ${topic}
@@ -71,9 +77,52 @@ Create a chapter with 3-5 slides covering this topic. Return a JSON object with 
 }
 
 Return ONLY the JSON object, no markdown formatting.`,
-      systemPrompt: "You are an educational AI assistant that creates course chapters. Return valid JSON only.",
-      maxTokens: 2000,
-    })
+          systemPrompt: "You are an educational AI assistant that creates course chapters. Return valid JSON only.",
+          maxTokens: 2000,
+        }),
+      })
+
+      const result = await aiResponse.json()
+      if (!aiResponse.ok || !result.success) {
+        throw new Error(result.error || "AI generation failed")
+      }
+
+      response = { text: result.data?.text || "" }
+    } catch (aiError: any) {
+      console.error("AI generation error, using fallback:", aiError)
+      // Fallback: Create basic chapter structure
+      response = {
+        text: JSON.stringify({
+          chapterId: `chapter-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          title: title,
+          order: newChapterOrder,
+          slides: [
+            {
+              slideId: `slide-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+              type: "title-slide",
+              content: {
+                title: title,
+                body: `This chapter covers ${topic}.`,
+                visualElements: [],
+              },
+              narrationScript: `Welcome to ${title}. This chapter will cover ${topic}.`,
+              estimatedDuration: 30,
+            },
+            {
+              slideId: `slide-${Date.now()}-1-${Math.random().toString(36).substring(2, 9)}`,
+              type: "content-slide",
+              content: {
+                title: `Introduction to ${topic}`,
+                body: `Let's explore ${topic} in detail.`,
+                visualElements: [],
+              },
+              narrationScript: `In this section, we'll dive into ${topic}.`,
+              estimatedDuration: 30,
+            },
+          ],
+        }),
+      }
+    }
 
     let newChapter: any
     try {

@@ -71,6 +71,24 @@ export function DashboardSidebar() {
     }
   }, [collapsed, isMobile]);
 
+  // Keyboard shortcut: Ctrl+B to toggle sidebar (check settings)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if shortcuts are enabled (default to true)
+      const shortcutsEnabled = localStorage.getItem("keyboardShortcuts") !== "false";
+      
+      if (shortcutsEnabled && (e.ctrlKey || e.metaKey) && e.key === "b") {
+        e.preventDefault();
+        if (!isMobile) {
+          setOpen((prev) => !prev);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isMobile]);
+
   const handleSignOut = async () => {
     if (!supabase) {
       router.push("/");

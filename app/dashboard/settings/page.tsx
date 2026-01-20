@@ -282,6 +282,37 @@ export default function SettingsPage() {
                   </Select>
                   <p className="text-xs text-white/50 mt-2">Note: Language support is limited in the current version.</p>
                 </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4">Keyboard Shortcuts</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Label htmlFor="sidebar-toggle" className="text-white">
+                          Toggle Sidebar (Ctrl+B / Cmd+B)
+                        </Label>
+                        <p className="text-xs text-white/50 mt-1">
+                          Press Ctrl+B (or Cmd+B on Mac) to quickly toggle the sidebar
+                        </p>
+                      </div>
+                      <Switch
+                        id="sidebar-toggle"
+                        checked={localSettings.keyboardShortcuts?.sidebarToggle !== false}
+                        onCheckedChange={(checked) => {
+                          setLocalSettings({
+                            ...localSettings,
+                            keyboardShortcuts: {
+                              ...localSettings.keyboardShortcuts,
+                              sidebarToggle: checked,
+                            },
+                          })
+                          // Update localStorage immediately for instant effect
+                          localStorage.setItem("keyboardShortcuts", checked.toString())
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </GlassSurface>
           </ScrollReveal>

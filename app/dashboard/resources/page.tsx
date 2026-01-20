@@ -166,8 +166,9 @@ export default function ResourcesPage() {
         try {
           setUploadingImage(true)
           const fileExt = imageFile.name.split(".").pop()
-          const fileName = `${user.id}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`
-          const filePath = `resources/${fileName}`
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`
+          // Upload to user-specific folder to match RLS policy
+          const filePath = `${user.id}/resources/${fileName}`
 
           const { error: uploadError } = await supabase.storage
             .from("course-media")

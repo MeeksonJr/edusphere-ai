@@ -521,7 +521,7 @@ export default function FlashcardsPage() {
 
       {/* Create Flashcard Set Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="glass-surface border-white/20 sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+        <DialogContent className="glass-surface border-white/20 sm:max-w-[700px] max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-white">Create New Flashcard Set</DialogTitle>
             <DialogDescription className="text-white/70">
@@ -529,7 +529,7 @@ export default function FlashcardsPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleCreateSet} className="space-y-4">
+          <form onSubmit={handleCreateSet} className="space-y-4 overflow-y-auto flex-1 pr-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="title" className="text-white mb-2 block">
@@ -710,7 +710,7 @@ export default function FlashcardsPage() {
               </div>
             )}
 
-            <DialogFooter>
+            <DialogFooter className="flex-shrink-0 pt-4 border-t border-white/10">
               <Button
                 type="button"
                 variant="outline"

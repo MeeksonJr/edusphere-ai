@@ -27,6 +27,9 @@ export interface UserSettings {
   notifications: NotificationSettings
   language: string
   calendar: CalendarSettings
+  keyboardShortcuts: {
+    sidebarToggle: boolean
+  }
 }
 
 interface SettingsContextType {
@@ -48,6 +51,9 @@ const defaultSettings: UserSettings = {
     defaultView: "month",
     showWeekends: true,
     firstDayOfWeek: "sunday",
+  },
+  keyboardShortcuts: {
+    sidebarToggle: true,
   },
 }
 

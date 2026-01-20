@@ -193,17 +193,25 @@ function ProfileContent() {
       let avatarUrl = profile.avatar_url
       if (avatarFile && supabase) {
         const fileExt = avatarFile.name.split(".").pop()
-        const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`
-        // Remove 'avatars/' prefix if bucket name is already 'avatars'
-        const filePath = fileName
+        const fileName = `${Math.random().toString(36).substring(2, 9)}.${fileExt}`
+        // Upload to user-specific folder to match RLS policy: {user_id}/{filename}
+        const filePath = `${user.id}/${fileName}`
 
         // Delete old avatar if exists
         if (profile.avatar_url) {
-          const oldPath = profile.avatar_url.split("/").pop()
-          if (oldPath) {
-            await supabase.storage.from("avatars").remove([oldPath]).catch(() => {
-              // Ignore errors if file doesn't exist
-            })
+          // Extract path from URL - look for pattern /avatars/{user_id}/{filename}
+          try {
+            const urlParts = profile.avatar_url.split("/")
+            const avatarsIndex = urlParts.findIndex((part) => part.includes("avatars"))
+            if (avatarsIndex >= 0 && avatarsIndex < urlParts.length - 1) {
+              // Path should be {user_id}/{filename}
+              const oldPath = `${urlParts[avatarsIndex + 1]}/${urlParts[avatarsIndex + 2]}`
+              await supabase.storage.from("avatars").remove([oldPath]).catch(() => {
+                // Ignore errors if file doesn't exist
+              })
+            }
+          } catch (err) {
+            // Ignore errors when parsing old URL
           }
         }
 
