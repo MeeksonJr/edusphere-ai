@@ -20,21 +20,45 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
+    // Wait a bit for Supabase to initialize
+    const timer = setTimeout(() => {
+      setInitializing(false);
+    }, 500);
+
     const checkUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        router.push("/dashboard");
+      if (!supabase) {
+        setInitializing(false);
+        return;
+      }
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (data.user) {
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        // Ignore errors during initial check
+      } finally {
+        setInitializing(false);
       }
     };
     checkUser();
+
+    return () => clearTimeout(timer);
   }, [supabase, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!supabase) {
+      setError("Authentication service is not available. Please refresh the page.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -46,6 +70,7 @@ export default function LoginPage() {
 
       if (data.user) {
         router.push("/dashboard");
+        router.refresh();
       }
     } catch (error: any) {
       setError(error.message || "An error occurred during login");
@@ -77,6 +102,14 @@ export default function LoginPage() {
 
             {/* Login Form */}
             <GlassSurface className="p-8">
+              {initializing && (
+                <div className="mb-6 p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
+                  <p className="text-blue-400 text-sm flex items-center">
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Initializing...
+                  </p>
+                </div>
+              )}
               {error && (
                 <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30">
                   <p className="text-red-400 text-sm">{error}</p>
@@ -150,7 +183,7 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   size="lg"
-                  disabled={loading}
+                  disabled={loading || initializing || !supabase}
                   className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
                 >
                   {loading ? (

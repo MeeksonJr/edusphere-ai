@@ -37,14 +37,19 @@ export function DashboardSidebar() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", data.user.id)
-          .single();
-        setUser({ ...data.user, profile });
+      if (!supabase) return;
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (data.user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", data.user.id)
+            .single();
+          setUser({ ...data.user, profile });
+        }
+      } catch (error) {
+        console.error("Error loading user:", error);
       }
     };
     getUser();
@@ -67,9 +72,18 @@ export function DashboardSidebar() {
   }, [collapsed, isMobile]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-    router.refresh();
+    if (!supabase) {
+      router.push("/");
+      return;
+    }
+    try {
+      await supabase.auth.signOut();
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Error signing out:", error);
+      router.push("/");
+    }
   };
 
   const navItems = [

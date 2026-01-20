@@ -29,9 +29,14 @@ export default function SignupPage() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        router.push("/dashboard");
+      if (!supabase) return;
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (data.user) {
+          router.push("/dashboard");
+        }
+      } catch (error) {
+        // Ignore errors during initial check
       }
     };
     checkUser();
@@ -67,6 +72,12 @@ export default function SignupPage() {
     }
 
     setLoading(true);
+
+    if (!supabase) {
+      setError("Authentication service is not available. Please refresh the page.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase.auth.signUp({
