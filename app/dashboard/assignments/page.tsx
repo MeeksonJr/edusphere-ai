@@ -1,9 +1,7 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createClient } from "@/utils/supabase/server"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { CheckSquare, Clock, Plus, Search, Filter, SortAsc, SortDesc, CheckCircle2, Circle, Calendar } from "lucide-react"
-import type { Database } from "@/types/supabase"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
@@ -15,7 +13,7 @@ export default async function AssignmentsPage({
 }: {
   searchParams: { status?: string; subject?: string; sort?: string }
 }) {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const supabase = createClient()
 
   const {
     data: { user },

@@ -1,15 +1,13 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createClient } from "@/utils/supabase/server"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { CheckSquare, Clock, Calendar, Beaker, ArrowRight, BookOpen, BrainCircuit, TrendingUp, Award, Zap } from "lucide-react"
-import type { Database } from "@/types/supabase"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 
 export default async function Dashboard() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const supabase = createClient()
 
   const {
     data: { user },

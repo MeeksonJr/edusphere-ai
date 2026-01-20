@@ -4,14 +4,19 @@
 let hf: any = null
 let geminiModel: any = null
 
+// Helper to check if we're in a build context
+function isBuildContext(): boolean {
+  return (
+    typeof process !== "undefined" &&
+    (process.env.NEXT_PHASE === "phase-production-build" ||
+      process.env.NODE_ENV === "production" && !process.env.VERCEL)
+  )
+}
+
 async function getHfClient() {
-  if (typeof window !== "undefined") {
-    throw new Error("AI service can only be used on the server side")
-  }
-  
-  // Check if we're in a build context
-  if (process.env.NEXT_PHASE === "phase-production-build") {
-    throw new Error("AI service cannot be used during build")
+  // Only execute on server, never during build
+  if (typeof window !== "undefined" || isBuildContext()) {
+    throw new Error("AI service can only be used on the server side at runtime")
   }
   
   if (!hf) {
@@ -31,13 +36,9 @@ async function getHfClient() {
 }
 
 async function getGeminiModel() {
-  if (typeof window !== "undefined") {
-    throw new Error("AI service can only be used on the server side")
-  }
-  
-  // Check if we're in a build context
-  if (process.env.NEXT_PHASE === "phase-production-build") {
-    throw new Error("AI service cannot be used during build")
+  // Only execute on server, never during build
+  if (typeof window !== "undefined" || isBuildContext()) {
+    throw new Error("AI service can only be used on the server side at runtime")
   }
   
   if (!geminiModel) {
