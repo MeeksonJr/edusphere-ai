@@ -96,6 +96,7 @@ Return the JSON in this exact format:
 
     // Create course record immediately with pending status to avoid timeout
     // AI generation will happen in background processing
+    // Use empty layout object to satisfy NOT NULL constraint
     const { data: course, error: courseError } = await supabase
       .from("courses")
       .insert([
@@ -105,7 +106,7 @@ Return the JSON in this exact format:
           type: courseType,
           style: style,
           status: "pending",
-          layout: null, // Will be generated in background
+          layout: {}, // Empty object - will be replaced in background processing
           estimated_duration: 0, // Will be calculated in background
         },
       ])
