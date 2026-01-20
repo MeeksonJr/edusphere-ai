@@ -31,7 +31,6 @@ import Link from "next/link"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 import dynamic from "next/dynamic"
 import { CourseSidePanel } from "@/components/courses/CourseSidePanel"
-import { CourseSidePanel } from "@/components/courses/CourseSidePanel"
 
 // Dynamically import Remotion Player to avoid SSR issues
 const RemotionPlayer = dynamic(
@@ -66,6 +65,10 @@ function CourseDetailContent() {
   const [resources, setResources] = useState<any[]>([])
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({})
   const [generatingQuestions, setGeneratingQuestions] = useState<string | null>(null)
+  const [enhancing, setEnhancing] = useState(false)
+  const [sidePanelOpen, setSidePanelOpen] = useState(false)
+  const [selectedChapter, setSelectedChapter] = useState<any>(null)
+  const [selectedSlide, setSelectedSlide] = useState<any>(null)
 
   useEffect(() => {
     const fetchCourse = async () => {
