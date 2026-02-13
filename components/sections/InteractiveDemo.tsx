@@ -1,207 +1,220 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Input } from "@/components/ui/input";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, Play } from "lucide-react";
-import { ScrollReveal } from "@/components/shared/ScrollReveal";
-import { GlassSurface } from "@/components/shared/GlassSurface";
+import { Play, Sparkles, BookOpen, Code, Palette } from "lucide-react";
+import { SectionContainer } from "@/components/shared/SectionContainer";
+import { SectionHeader } from "@/components/shared/SectionHeader";
 
-// Dynamic import for Remotion Player to avoid SSR issues
-// Note: @remotion/player needs to be installed first
-// Run: pnpm add @remotion/player remotion
-let Player: any = null;
+const presets = [
+  { label: "Machine Learning", icon: Sparkles, topic: "Introduction to Machine Learning" },
+  { label: "Web Dev 101", icon: Code, topic: "Web Development Fundamentals" },
+  { label: "Creative Writing", icon: Palette, topic: "Creative Writing Workshop" },
+  { label: "Biology", icon: BookOpen, topic: "Cell Biology for Beginners" },
+];
 
-if (typeof window !== "undefined") {
-  try {
-    const remotionPlayer = require("@remotion/player");
-    Player = remotionPlayer.Player;
-  } catch (e) {
-    // Player not installed yet - will use placeholder
-    console.log("Remotion Player not installed. Install with: pnpm add @remotion/player remotion");
-  }
-}
-
-function DemoPlaceholder() {
-  return (
-    <div className="aspect-video w-full glass-surface rounded-xl flex items-center justify-center">
-      <div className="text-center">
-        <Sparkles className="h-12 w-12 text-purple-400 mx-auto mb-4 animate-pulse" />
-        <p className="text-white/60">Loading demo...</p>
-      </div>
-    </div>
-  );
-}
+const sampleOutputs: Record<string, string[]> = {
+  "Introduction to Machine Learning": [
+    "📋 Generating course outline...",
+    "",
+    "Module 1: What is Machine Learning?",
+    "  → Types of ML: Supervised, Unsupervised, Reinforcement",
+    "  → Real-world applications and use cases",
+    "",
+    "Module 2: Data Preprocessing",
+    "  → Cleaning and normalizing datasets",
+    "  → Feature engineering techniques",
+    "",
+    "Module 3: Building Your First Model",
+    "  → Linear regression step-by-step",
+    "  → Training, testing, and validation",
+    "",
+    "Module 4: Neural Networks",
+    "  → Architecture and layers",
+    "  → Activation functions explained",
+    "",
+    "✅ 4 modules • 12 lessons • ~2h 30m estimated",
+    "🎙️ Narration: English (Natural)",
+    "📹 Format: 16:9 HD Video",
+  ],
+  default: [
+    "📋 Generating course outline...",
+    "",
+    "Module 1: Introduction & Overview",
+    "  → Core concepts and terminology",
+    "  → Why this topic matters",
+    "",
+    "Module 2: Fundamentals",
+    "  → Key principles and theories",
+    "  → Hands-on examples",
+    "",
+    "Module 3: Advanced Topics",
+    "  → Deep-dive analysis",
+    "  → Best practices & patterns",
+    "",
+    "Module 4: Practical Projects",
+    "  → Real-world applications",
+    "  → Assessment & certification",
+    "",
+    "✅ 4 modules • 10 lessons • ~2h estimated",
+    "🎙️ Narration: English (Natural)",
+    "📹 Format: 16:9 HD Video",
+  ],
+};
 
 export function InteractiveDemo() {
   const [topic, setTopic] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [hasGenerated, setHasGenerated] = useState(false);
+  const [output, setOutput] = useState<string[]>([]);
+  const [currentLine, setCurrentLine] = useState(0);
+  const outputRef = useRef<HTMLDivElement>(null);
 
-  const handleGenerate = async () => {
-    if (!topic.trim()) return;
-    
-    setIsGenerating(true);
-    // Simulate generation delay (in real app, this would call an API)
-    setTimeout(() => {
-      setIsGenerating(false);
-      setHasGenerated(true);
-    }, 2000);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !isGenerating) {
-      handleGenerate();
+  useEffect(() => {
+    if (!isGenerating || currentLine >= output.length) {
+      if (currentLine >= output.length && output.length > 0) {
+        setIsGenerating(false);
+      }
+      return;
     }
+
+    const timer = setTimeout(
+      () => setCurrentLine((prev) => prev + 1),
+      output[currentLine] === "" ? 200 : Math.random() * 80 + 40
+    );
+
+    return () => clearTimeout(timer);
+  }, [isGenerating, currentLine, output]);
+
+  useEffect(() => {
+    if (outputRef.current) {
+      outputRef.current.scrollTop = outputRef.current.scrollHeight;
+    }
+  }, [currentLine]);
+
+  const handleGenerate = (selectedTopic?: string) => {
+    const t = selectedTopic || topic;
+    if (!t.trim()) return;
+
+    setTopic(t);
+    const lines = sampleOutputs[t] || sampleOutputs.default;
+    setOutput(lines);
+    setCurrentLine(0);
+    setIsGenerating(true);
   };
 
   return (
-    <section id="demo" className="py-20 lg:py-32 relative">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Section Header */}
-          <ScrollReveal direction="up">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  Try It Now
-                </span>
-              </h2>
-              <p className="text-xl text-white/70 max-w-2xl mx-auto">
-                Enter any topic and see a preview video generated instantly
-              </p>
+    <SectionContainer id="demo" background="gradient">
+      <SectionHeader
+        badge="Try It Now"
+        title="See AI Course Creation"
+        titleGradient="In Action"
+        subtitle="Enter any topic and watch as AI generates a full course structure in real-time"
+      />
+
+      <div className="max-w-3xl mx-auto">
+        {/* Preset Topic Buttons */}
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
+          {presets.map((preset) => {
+            const Icon = preset.icon;
+            return (
+              <button
+                key={preset.label}
+                onClick={() => handleGenerate(preset.topic)}
+                disabled={isGenerating}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-sm text-white/60 hover:text-white/90 hover:border-purple-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {preset.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Input */}
+        <div className="flex gap-3 mb-4">
+          <input
+            type="text"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
+            placeholder="Or type any topic... (e.g., 'Introduction to Quantum Computing')"
+            className="flex-1 h-12 px-4 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/25 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/30 transition-all text-sm"
+            disabled={isGenerating}
+          />
+          <Button
+            onClick={() => handleGenerate()}
+            disabled={isGenerating || !topic.trim()}
+            className="h-12 px-6 rounded-xl bg-purple-600 hover:bg-purple-500 text-white border-0 disabled:opacity-40 group"
+          >
+            <Play className="h-4 w-4 mr-2" />
+            Generate
+          </Button>
+        </div>
+
+        {/* Output Terminal */}
+        <div className="glass-surface rounded-xl overflow-hidden">
+          {/* Terminal header */}
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-white/[0.02]">
+            <div className="flex gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/40" />
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500/40" />
             </div>
-          </ScrollReveal>
-
-          {/* Demo Container */}
-          <ScrollReveal direction="up" delay={0.2}>
-            <GlassSurface className="p-6 md:p-8 lg:p-12">
-              {/* Input Section */}
-              <div className="mb-8">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Input
-                    type="text"
-                    placeholder="Enter a topic... (e.g., 'Introduction to Quantum Computing')"
-                    value={topic}
-                    onChange={(e) => {
-                      setTopic(e.target.value);
-                      setHasGenerated(false);
-                    }}
-                    onKeyDown={handleKeyDown}
-                    className="flex-1 glass-surface border-white/20 text-white placeholder:text-white/40 h-14 text-lg"
-                    disabled={isGenerating}
-                  />
-                  <Button
-                    onClick={handleGenerate}
-                    disabled={isGenerating || !topic.trim()}
-                    className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-8 h-14"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <Play className="mr-2 h-5 w-5" />
-                        Generate Preview
-                      </>
-                    )}
-                  </Button>
-                </div>
+            <span className="text-xs text-white/20 font-mono ml-2">edusphere-ai — course-generator</span>
+            {isGenerating && (
+              <div className="ml-auto flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs text-emerald-400/80 font-mono">Generating...</span>
               </div>
+            )}
+          </div>
 
-              {/* Video Player Section */}
-              <div className="relative">
-                {hasGenerated ? (
+          {/* Terminal body */}
+          <div
+            ref={outputRef}
+            className="p-5 h-[300px] overflow-y-auto font-mono text-sm"
+          >
+            {output.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-white/20">
+                <Sparkles className="h-8 w-8 mb-3 text-purple-500/40" />
+                <p>Select a topic or type your own to see the magic</p>
+                <p className="text-xs mt-1 text-white/10">
+                  AI generates a complete course outline in seconds
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-0.5">
+                {output.slice(0, currentLine).map((line, i) => (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
+                    key={i}
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className={`${line.startsWith("Module")
+                        ? "text-purple-300 font-semibold"
+                        : line.startsWith("  →")
+                          ? "text-white/50 pl-2"
+                          : line.startsWith("✅")
+                            ? "text-emerald-400 mt-2 font-semibold"
+                            : line.startsWith("🎙️") || line.startsWith("📹")
+                              ? "text-cyan-300/70"
+                              : line.startsWith("📋")
+                                ? "text-amber-300/80"
+                                : "text-white/40"
+                      }`}
                   >
-                    {Player ? (
-                      <div className="aspect-video w-full glass-surface rounded-xl overflow-hidden border-2 border-purple-500/30">
-                        <Player
-                          component={() => (
-                            <div
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                background:
-                                  "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                color: "white",
-                                fontSize: "2rem",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Demo Video: {topic}
-                            </div>
-                          )}
-                          durationInFrames={300}
-                          compositionWidth={1920}
-                          compositionHeight={1080}
-                          fps={30}
-                          controls
-                          loop={false}
-                          style={{ width: "100%", height: "100%" }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="aspect-video w-full glass-surface rounded-xl overflow-hidden border-2 border-purple-500/30 flex items-center justify-center">
-                        <div className="text-center p-8">
-                          <div className="w-32 h-32 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                            <Sparkles className="h-16 w-16 text-white animate-pulse" />
-                          </div>
-                          <p className="text-white text-lg font-semibold mb-2">
-                            Preview: {topic}
-                          </p>
-                          <p className="text-white/60 text-sm mb-4">
-                            Video would play here once Remotion Player is installed
-                          </p>
-                          <p className="text-white/40 text-xs">
-                            Install with: pnpm add @remotion/player remotion
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                    {line || "\u00A0"}
                   </motion.div>
-                ) : (
-                  <div className="aspect-video w-full glass-surface rounded-xl flex items-center justify-center border-2 border-dashed border-white/20">
-                    <div className="text-center p-8">
-                      <Sparkles className="h-16 w-16 text-purple-400 mx-auto mb-4 animate-pulse" />
-                      <p className="text-white/60 text-lg mb-2">
-                        Enter a topic above to generate a preview
-                      </p>
-                      <p className="text-white/40 text-sm">
-                        Watch as AI creates a professional course video in seconds
-                      </p>
-                    </div>
-                  </div>
+                ))}
+                {isGenerating && (
+                  <span className="inline-block w-2 h-4 bg-purple-400 animate-pulse ml-1" />
                 )}
               </div>
-
-              {/* Info Banner */}
-              {hasGenerated && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 glass-surface p-4 rounded-lg border border-purple-500/30"
-                >
-                  <p className="text-sm text-white/70 text-center">
-                    <span className="text-purple-400 font-semibold">✨ Preview Generated!</span>{" "}
-                    This is a browser-based demo. In the full version, you can edit, add narration, and export as MP4.
-                  </p>
-                </motion.div>
-              )}
-            </GlassSurface>
-          </ScrollReveal>
+            )}
+          </div>
         </div>
       </div>
-    </section>
+    </SectionContainer>
   );
 }
-

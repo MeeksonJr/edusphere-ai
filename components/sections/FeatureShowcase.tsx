@@ -2,138 +2,152 @@
 
 import { motion } from "framer-motion";
 import {
-  BrainCircuit,
-  Video,
-  Sparkles,
-  Zap,
-  Layers,
-  Shield,
-  Palette,
-  Clock,
-} from "lucide-react";
-import { AnimatedCard } from "@/components/shared/AnimatedCard";
+  RiMagicFill,
+  RiVideoFill,
+  RiFileTransferFill,
+  RiEyeFill,
+  RiVoiceprintFill,
+  RiBrushFill,
+  RiShieldCheckFill,
+  RiFlashlightFill,
+} from "react-icons/ri";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
+import { SectionContainer } from "@/components/shared/SectionContainer";
+import { SectionHeader } from "@/components/shared/SectionHeader";
 
 const features = [
   {
-    icon: BrainCircuit,
-    title: "AI-Powered Generation",
+    icon: RiMagicFill,
+    title: "AI Course Generation",
     description:
-      "Transform any topic into a comprehensive course structure with AI. Our system understands context and creates engaging content automatically.",
-    gradient: "from-purple-500 to-purple-600",
+      "Transform any topic into a structured, multi-module course with outlines, scripts, slides, and quizzes — all generated in seconds.",
+    gradient: "from-purple-500/20 to-purple-600/5",
+    border: "hover:border-purple-500/30",
+    iconColor: "text-purple-400",
+    size: "bento-large",
   },
   {
-    icon: Video,
-    title: "Video Course Creation",
+    icon: RiVideoFill,
+    title: "Video Creation",
     description:
-      "Create professional video courses with animated slides, voiceovers, and captions. All generated automatically from your topic.",
-    gradient: "from-blue-500 to-blue-600",
+      "Automatically produce narrated video lessons with smooth animations, transitions, and professional editing. Export in any format.",
+    gradient: "from-cyan-500/20 to-blue-600/5",
+    border: "hover:border-cyan-500/30",
+    iconColor: "text-cyan-400",
+    size: "bento-large",
   },
   {
-    icon: Sparkles,
-    title: "Instant Narration",
-    description:
-      "High-quality text-to-speech narration in multiple voices. Choose from professional, friendly, or authoritative tones.",
-    gradient: "from-pink-500 to-pink-600",
+    icon: RiFileTransferFill,
+    title: "Multi-Format Export",
+    description: "MP4, PDF, SCORM, and more. Publish anywhere.",
+    gradient: "from-amber-500/15 to-amber-600/5",
+    border: "hover:border-amber-500/30",
+    iconColor: "text-amber-400",
+    size: "",
   },
   {
-    icon: Zap,
+    icon: RiEyeFill,
+    title: "Real-time Preview",
+    description: "See your course take shape as AI generates each section live.",
+    gradient: "from-emerald-500/15 to-emerald-600/5",
+    border: "hover:border-emerald-500/30",
+    iconColor: "text-emerald-400",
+    size: "",
+  },
+  {
+    icon: RiVoiceprintFill,
+    title: "AI Narration",
+    description: "Natural-sounding voiceovers in 20+ languages and accents.",
+    gradient: "from-pink-500/15 to-pink-600/5",
+    border: "hover:border-pink-500/30",
+    iconColor: "text-pink-400",
+    size: "",
+  },
+  {
+    icon: RiBrushFill,
+    title: "Custom Styles",
+    description: "Brand colors, fonts, logos — make every course uniquely yours.",
+    gradient: "from-violet-500/15 to-violet-600/5",
+    border: "hover:border-violet-500/30",
+    iconColor: "text-violet-400",
+    size: "",
+  },
+  {
+    icon: RiShieldCheckFill,
+    title: "Enterprise Security",
+    description: "SOC 2 ready. GDPR compliant. Your data stays yours.",
+    gradient: "from-blue-500/15 to-blue-600/5",
+    border: "hover:border-blue-500/30",
+    iconColor: "text-blue-400",
+    size: "",
+  },
+  {
+    icon: RiFlashlightFill,
     title: "Lightning Fast",
-    description:
-      "Generate complete courses in minutes, not days. Our optimized pipeline delivers results faster than traditional methods.",
-    gradient: "from-yellow-500 to-orange-500",
-  },
-  {
-    icon: Layers,
-    title: "Multiple Formats",
-    description:
-      "Export to YouTube (16:9), TikTok (9:16), or Instagram (1:1). Automatic reformatting ensures perfect sizing for every platform.",
-    gradient: "from-green-500 to-emerald-500",
-  },
-  {
-    icon: Shield,
-    title: "Secure & Private",
-    description:
-      "Your content is encrypted and stored securely. Full control over sharing and privacy settings for all your courses.",
-    gradient: "from-indigo-500 to-indigo-600",
-  },
-  {
-    icon: Palette,
-    title: "Customizable Styles",
-    description:
-      "Choose from professional, creative, cinematic, or minimalist styles. Match your brand with custom colors and fonts.",
-    gradient: "from-rose-500 to-rose-600",
-  },
-  {
-    icon: Clock,
-    title: "Real-Time Preview",
-    description:
-      "Edit and preview your course in real-time with our browser-based player. See changes instantly without waiting for rendering.",
-    gradient: "from-cyan-500 to-teal-500",
+    description: "Generate a full course in under 60 seconds, not weeks.",
+    gradient: "from-yellow-500/15 to-yellow-600/5",
+    border: "hover:border-yellow-500/30",
+    iconColor: "text-yellow-400",
+    size: "",
   },
 ];
 
 export function FeatureShowcase() {
   return (
-    <section id="features" className="py-20 lg:py-32 relative">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <ScrollReveal direction="up">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="text-white">Everything You Need to</span>
-              <br />
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Create Amazing Courses
-              </span>
-            </h2>
-            <p className="text-xl text-white/70 max-w-3xl mx-auto">
-              Powerful features designed to make course creation effortless and enjoyable
-            </p>
-          </div>
-        </ScrollReveal>
+    <SectionContainer background="pattern">
+      <SectionHeader
+        badge="Powerful Features"
+        title="Everything You Need to"
+        titleGradient="Create Amazing Courses"
+        subtitle="A complete toolkit for educators, creators, and teams who want to build professional courses without the complexity"
+      />
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
-            return (
-              <ScrollReveal
-                key={feature.title}
-                direction="up"
-                delay={index * 0.1}
+      <div className="bento-grid max-w-6xl mx-auto">
+        {features.map((feature, index) => {
+          const Icon = feature.icon;
+          return (
+            <ScrollReveal
+              key={feature.title}
+              direction="up"
+              delay={index * 0.08}
+            >
+              <motion.div
+                className={`h-full glass-card border-gradient card-hover-glow ${feature.size} ${feature.border} p-6 flex flex-col group cursor-default`}
+                whileHover={{ y: -4 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
               >
-                <AnimatedCard
-                  variant="3d"
-                  delay={index * 0.1}
-                  className="h-full cursor-pointer group"
-                >
-                  <div className="p-6 h-full flex flex-col">
-                    {/* Icon */}
-                    <div
-                      className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} p-3 mb-4 group-hover:scale-110 transition-transform`}
-                    >
-                      <Icon className="h-full w-full text-white" />
-                    </div>
+                {/* Gradient background glow */}
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl`}
+                />
 
-                    {/* Content */}
-                    <h3 className="text-xl font-bold text-white mb-3">
-                      {feature.title}
-                    </h3>
-                    <p className="text-white/60 text-sm leading-relaxed flex-grow">
-                      {feature.description}
-                    </p>
-
-                    {/* Hover Indicator */}
-                    <div className="mt-4 h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className={`w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-4 group-hover:border-white/15 transition-colors`}>
+                    <Icon className={`h-6 w-6 ${feature.iconColor}`} />
                   </div>
-                </AnimatedCard>
-              </ScrollReveal>
-            );
-          })}
-        </div>
+
+                  <h3 className="text-lg font-bold font-display text-white mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-white/50 leading-relaxed flex-1">
+                    {feature.description}
+                  </p>
+
+                  {/* Large cards get extra visual */}
+                  {feature.size === "bento-large" && (
+                    <div className="mt-4 pt-4 border-t border-white/5">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                        <span className="text-xs text-white/30">Included in all plans</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </ScrollReveal>
+          );
+        })}
       </div>
-    </section>
+    </SectionContainer>
   );
 }
-

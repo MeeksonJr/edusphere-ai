@@ -11,6 +11,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -18,25 +22,15 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary-hue), var(--primary-saturation), var(--primary-lightness))",
-          50: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 25%))",
-          100: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 20%))",
-          200: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 15%))",
-          300: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 10%))",
-          400: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) + 5%))",
-          500: "hsl(var(--primary-hue), var(--primary-saturation), var(--primary-lightness))",
-          600: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) - 5%))",
-          700: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) - 10%))",
-          800: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) - 15%))",
-          900: "hsl(var(--primary-hue), var(--primary-saturation), calc(var(--primary-lightness) - 20%))",
+          DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "#39ff14", // Neon green
+          DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
         accent: {
-          DEFAULT: "#ff00ff", // Neon pink
+          DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
         destructive: {
@@ -54,6 +48,21 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        surface: {
+          0: "hsl(var(--surface-0))",
+          1: "hsl(var(--surface-1))",
+          2: "hsl(var(--surface-2))",
+          3: "hsl(var(--surface-3))",
+        },
+        cyan: {
+          DEFAULT: "hsl(var(--cyan))",
+        },
+        amber: {
+          DEFAULT: "hsl(var(--amber))",
+        },
+        emerald: {
+          DEFAULT: "hsl(var(--emerald))",
         },
         glass: {
           bg: "var(--glass-bg)",
@@ -76,10 +85,10 @@ const config: Config = {
         },
         glow: {
           "0%, 100%": {
-            boxShadow: "0 0 5px var(--neon-purple), 0 0 10px var(--neon-purple)",
+            boxShadow: "0 0 5px rgba(168, 85, 247, 0.3), 0 0 10px rgba(168, 85, 247, 0.2)",
           },
           "50%": {
-            boxShadow: "0 0 15px var(--neon-purple), 0 0 20px var(--neon-purple)",
+            boxShadow: "0 0 15px rgba(168, 85, 247, 0.4), 0 0 25px rgba(168, 85, 247, 0.3)",
           },
         },
         slideIn: {

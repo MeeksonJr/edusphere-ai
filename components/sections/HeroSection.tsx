@@ -2,144 +2,181 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Zap, TrendingUp } from "lucide-react";
+import { ArrowRight, Play, Shield, CreditCard, Clock } from "lucide-react";
 import Link from "next/link";
-import { ScrollReveal } from "@/components/shared/ScrollReveal";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 lg:pt-32 pb-20">
-      {/* Animated Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black" />
-      
-      {/* Animated Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-      
-      {/* Floating Particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        {Array.from({ length: 15 }).map((_, i) => {
-          const randomX = typeof window !== "undefined" ? Math.random() * window.innerWidth : Math.random() * 1920;
-          const randomY = typeof window !== "undefined" ? Math.random() * window.innerHeight : Math.random() * 1080;
-          return (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-purple-500/30 rounded-full blur-sm"
-              initial={{
-                x: randomX,
-                y: randomY,
-                opacity: 0,
-              }}
-              animate={{
-                y: [null, -100, -200],
-                opacity: [0, 0.5, 0],
-              }}
-              transition={{
-                duration: 5 + Math.random() * 3,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
-          );
-        })}
+    <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden pt-20 lg:pt-24 pb-16">
+      {/* Mesh Gradient Background */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black" />
+        <div className="absolute inset-0 mesh-gradient-bg" />
+        <div className="absolute inset-0 grid-pattern-dense opacity-40" />
       </div>
 
+      {/* Animated Gradient Orbs */}
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-purple-600/10 blur-[120px] animate-float-slow" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-cyan-500/8 blur-[100px] animate-float-gentle" />
+      <div className="absolute top-1/2 right-1/3 w-[300px] h-[300px] rounded-full bg-pink-500/6 blur-[80px] animate-float-slow" style={{ animationDelay: "3s" }} />
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center">
           {/* Badge */}
-          <ScrollReveal direction="down" delay={0.1}>
-            <motion.div
-              className="inline-flex items-center space-x-2 glass-surface px-4 py-2 rounded-full mb-8"
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Sparkles className="h-4 w-4 text-purple-400" />
-              <span className="text-sm text-white/80">
-                AI-Powered Course Generation
-              </span>
-              <Zap className="h-4 w-4 text-yellow-400" />
-            </motion.div>
-          </ScrollReveal>
+          <motion.div
+            className="inline-flex items-center gap-2 glass-surface px-5 py-2 rounded-full mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-sm text-white/70 font-medium">
+              Trusted by 5,000+ educators worldwide
+            </span>
+          </motion.div>
 
           {/* Main Heading */}
-          <ScrollReveal direction="up" delay={0.2}>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent animate-pulse">
-                Create Stunning
-              </span>
-              <br />
-              <span className="text-white">Educational Courses</span>
-              <br />
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                With AI Magic
-              </span>
-            </h1>
-          </ScrollReveal>
+          <motion.h1
+            className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-[0.9] tracking-tight"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+          >
+            <span className="text-white block">Create Courses</span>
+            <span className="text-gradient-purple block mt-2">
+              10x Faster with AI
+            </span>
+          </motion.h1>
 
           {/* Subheading */}
-          <ScrollReveal direction="up" delay={0.3}>
-            <p className="text-xl md:text-2xl text-white/70 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Transform any topic into a professional, narrated video course in minutes. 
-              Powered by AI, perfected by design. 
-              <span className="text-purple-400 font-semibold"> Zero coding required.</span>
-            </p>
-          </ScrollReveal>
+          <motion.p
+            className="text-lg md:text-xl text-white/55 mb-10 max-w-2xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
+          >
+            Transform any topic into a professional, narrated video course in minutes.
+            Powered by AI, perfected by design.
+          </motion.p>
 
           {/* CTA Buttons */}
-          <ScrollReveal direction="up" delay={0.4}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-              <Link href="/signup">
-                <Button
-                  size="lg"
-                  className="group bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white border-0 shadow-lg shadow-purple-500/25 px-8 py-6 text-lg"
-                >
-                  Start Creating Free
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link href="#demo">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="glass-surface border-white/20 hover:border-white/40 text-white px-8 py-6 text-lg backdrop-blur-md"
-                >
-                  Watch Demo
-                </Button>
-              </Link>
-            </div>
-          </ScrollReveal>
+          <motion.div
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+          >
+            <Link href="/signup">
+              <Button
+                size="lg"
+                className="glow-button group bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white border-0 shadow-lg shadow-purple-500/20 px-8 py-7 text-lg rounded-xl"
+              >
+                Start Creating Free
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            <Link href="#demo">
+              <Button
+                size="lg"
+                variant="outline"
+                className="glass-surface border-white/15 hover:border-white/30 text-white px-8 py-7 text-lg rounded-xl backdrop-blur-md group"
+              >
+                <Play className="mr-2 h-5 w-5 text-purple-400 group-hover:text-purple-300 transition-colors" />
+                Watch Demo
+              </Button>
+            </Link>
+          </motion.div>
 
-          {/* Stats */}
-          <ScrollReveal direction="up" delay={0.5}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-              {[
-                { label: "Courses Created", value: "10K+", icon: TrendingUp },
-                { label: "Active Users", value: "5K+", icon: Sparkles },
-                { label: "Success Rate", value: "99%", icon: Zap },
-              ].map((stat, index) => {
-                const Icon = stat.icon;
-                return (
-                  <motion.div
-                    key={stat.label}
-                    className="glass-surface p-6 rounded-xl"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                  >
-                    <Icon className="h-8 w-8 text-purple-400 mb-3 mx-auto" />
-                    <div className="text-3xl font-bold text-white mb-1">
-                      {stat.value}
+          {/* Trust Indicators */}
+          <motion.div
+            className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/40"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <span className="flex items-center gap-1.5">
+              <Shield className="h-4 w-4 text-emerald-400/70" />
+              Secure & private
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CreditCard className="h-4 w-4 text-emerald-400/70" />
+              No credit card required
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Clock className="h-4 w-4 text-emerald-400/70" />
+              2-minute setup
+            </span>
+          </motion.div>
+
+          {/* Hero Product Mockup */}
+          <motion.div
+            className="mt-16 mx-auto max-w-4xl"
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-purple-500/10">
+              {/* Browser Chrome */}
+              <div className="bg-white/[0.03] border-b border-white/10 px-4 py-3 flex items-center gap-2">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-white/10" />
+                  <div className="w-3 h-3 rounded-full bg-white/10" />
+                  <div className="w-3 h-3 rounded-full bg-white/10" />
+                </div>
+                <div className="flex-1 mx-4">
+                  <div className="glass-surface rounded-md h-7 max-w-md mx-auto flex items-center px-3">
+                    <span className="text-xs text-white/30">app.edusphere.ai/courses/create</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mockup Content */}
+              <div className="bg-black/80 p-6 md:p-8 min-h-[300px] md:min-h-[400px]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                  {/* Left panel - Course outline */}
+                  <div className="glass-surface p-4 rounded-lg">
+                    <div className="text-xs text-white/40 mb-3 font-medium uppercase tracking-wider">Course Outline</div>
+                    {["Introduction to AI", "Neural Networks Basics", "Deep Learning", "Practical Applications"].map((item, i) => (
+                      <div key={item} className="flex items-center gap-2 py-2 border-b border-white/5 last:border-0">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/40'}`}>
+                          {i + 1}
+                        </div>
+                        <span className={`text-sm ${i === 0 ? 'text-white' : 'text-white/50'}`}>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Center panel - Preview */}
+                  <div className="md:col-span-2 glass-surface p-4 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-xs text-white/40 font-medium uppercase tracking-wider">Slide Preview</div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="text-xs text-emerald-400/80">Generating...</span>
+                      </div>
                     </div>
-                    <div className="text-sm text-white/60">{stat.label}</div>
-                  </motion.div>
-                );
-              })}
+                    <div className="aspect-video rounded-lg bg-gradient-to-br from-purple-600/20 via-black to-cyan-600/10 flex items-center justify-center border border-white/5">
+                      <div className="text-center">
+                        <div className="text-2xl md:text-3xl font-display font-bold text-white mb-2">Introduction to AI</div>
+                        <div className="text-sm text-white/50">Module 1 of 4</div>
+                        <div className="mt-4 flex items-center justify-center gap-2">
+                          <div className="h-1 w-16 rounded-full bg-purple-500" />
+                          <div className="h-1 w-16 rounded-full bg-white/10" />
+                          <div className="h-1 w-16 rounded-full bg-white/10" />
+                          <div className="h-1 w-16 rounded-full bg-white/10" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </ScrollReveal>
+
+            {/* Glow effect under mockup */}
+            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-20 bg-purple-500/20 blur-[60px] rounded-full" />
+          </motion.div>
         </div>
       </div>
     </section>
   );
 }
-

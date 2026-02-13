@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Space_Grotesk } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SupabaseProvider } from "@/components/supabase-provider"
@@ -8,10 +8,18 @@ import { SettingsProvider } from "@/contexts/settings-context"
 import { Toaster } from "@/components/ui/toaster"
 import { SkipLink } from "@/components/shared/SkipLink"
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   preload: true,
+  variable: "--font-inter",
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  variable: "--font-space-grotesk",
 })
 
 export const metadata: Metadata = {
@@ -76,7 +84,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </head>
-      <body className={`${inter.className} bg-black text-white antialiased`}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans bg-black text-white antialiased`}>
         <SkipLink />
         <SupabaseProvider>
           <SettingsProvider>
