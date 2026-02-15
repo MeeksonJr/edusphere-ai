@@ -84,7 +84,7 @@ export function SocialProof() {
               key={stat.label}
               className="glass-card p-6 text-center group hover:border-cyan-500/20 transition-all"
             >
-              <div className="text-3xl md:text-4xl font-bold font-display text-white mb-1">
+              <div className="text-3xl md:text-4xl font-bold font-display text-foreground mb-1">
                 {stat.isDecimal ? (
                   <span>{stat.value}<span className="text-cyan-400">/5</span></span>
                 ) : (
@@ -95,7 +95,7 @@ export function SocialProof() {
                   />
                 )}
               </div>
-              <div className="text-sm text-white/40">{stat.label}</div>
+              <div className="text-sm text-foreground/40">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -106,7 +106,7 @@ export function SocialProof() {
         {testimonials.map((t) => (
           <div
             key={t.name}
-            className="glass-card p-6 w-[350px] shrink-0 group hover:border-white/10 transition-all"
+            className="glass-card p-6 w-[350px] shrink-0 group hover:border-foreground/10 transition-all"
           >
             {/* Stars */}
             <div className="flex gap-0.5 mb-4">
@@ -119,7 +119,7 @@ export function SocialProof() {
             </div>
 
             {/* Quote */}
-            <p className="text-sm text-white/60 leading-relaxed mb-4 line-clamp-4">
+            <p className="text-sm text-foreground/60 leading-relaxed mb-4 line-clamp-4">
               &ldquo;{t.quote}&rdquo;
             </p>
 
@@ -133,10 +133,10 @@ export function SocialProof() {
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div>
-                <div className="text-sm font-semibold text-white">
+                <div className="text-sm font-semibold text-foreground">
                   {t.name}
                 </div>
-                <div className="text-xs text-white/40">{t.role}</div>
+                <div className="text-xs text-foreground/40">{t.role}</div>
               </div>
             </div>
           </div>

@@ -131,7 +131,7 @@ export function DashboardSidebar() {
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="fixed top-4 left-4 z-50 p-2 rounded-lg glass-surface border-white/20 text-white hover:border-cyan-500/50 transition-all"
+          className="fixed top-4 left-4 z-50 p-2 rounded-lg glass-surface border-foreground/20 text-white hover:border-cyan-500/50 transition-all"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
         >
@@ -155,16 +155,16 @@ export function DashboardSidebar() {
             role="navigation"
             aria-label="Dashboard navigation"
           >
-            <GlassSurface className="h-full w-full rounded-none border-r border-white/10 flex flex-col">
+            <GlassSurface className="h-full w-full rounded-none border-r border-foreground/10 flex flex-col">
               {/* Logo */}
-              <div className="p-4 border-b border-white/10">
+              <div className="p-4 border-b border-foreground/10">
                 <Link
                   href="/dashboard"
                   className="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black rounded-lg"
                   aria-label="Dashboard home"
                 >
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-pink-500 p-2 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-6 w-6 text-white" aria-hidden="true" />
+                    <Sparkles className="h-6 w-6 text-foreground" aria-hidden="true" />
                   </div>
                   {!collapsed && (
                     <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
@@ -187,15 +187,15 @@ export function DashboardSidebar() {
                         "flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
                         "focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black",
                         active
-                          ? "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 border border-cyan-500/30 text-white"
-                          : "text-white/70 hover:text-white hover:bg-white/5"
+                          ? "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 border border-cyan-500/30 text-foreground"
+                          : "text-foreground/70 hover:text-foreground hover:bg-foreground/5"
                       )}
                       aria-current={active ? "page" : undefined}
                     >
                       <Icon
                         className={cn(
                           "h-5 w-5 flex-shrink-0",
-                          active ? "text-cyan-400" : "text-white/60 group-hover:text-white"
+                          active ? "text-cyan-400" : "text-foreground/60 group-hover:text-foreground"
                         )}
                         aria-hidden="true"
                       />
@@ -208,12 +208,12 @@ export function DashboardSidebar() {
               </nav>
 
               {/* User Section */}
-              <div className="p-4 border-t border-white/10">
+              <div className="p-4 border-t border-foreground/10">
                 {user && !collapsed && (
                   <div className="flex items-center space-x-3 mb-4">
                     <Avatar className="h-10 w-10 border-2 border-cyan-500/30">
                       <AvatarImage src={user.profile?.avatar_url} alt={user.email || "User"} />
-                      <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-pink-500 text-white">
+                      <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-pink-500 text-foreground">
                         {user.email?.charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
@@ -221,7 +221,7 @@ export function DashboardSidebar() {
                       <p className="text-sm font-medium text-white truncate">
                         {user.profile?.full_name || user.email?.split("@")[0] || "User"}
                       </p>
-                      <p className="text-xs text-white/60 truncate">{user.email}</p>
+                      <p className="text-xs text-foreground/60 truncate">{user.email}</p>
                     </div>
                   </div>
                 )}
@@ -229,7 +229,7 @@ export function DashboardSidebar() {
                   <div className="flex justify-center mb-4">
                     <Avatar className="h-10 w-10 border-2 border-cyan-500/30">
                       <AvatarImage src={user.profile?.avatar_url} alt={user.email || "User"} />
-                      <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-pink-500 text-white">
+                      <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-pink-500 text-foreground">
                         {user.email?.charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
@@ -242,7 +242,7 @@ export function DashboardSidebar() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setCollapsed(!collapsed)}
-                    className="w-full justify-start text-white/70 hover:text-white mb-2"
+                    className="w-full justify-start text-foreground/70 hover:text-foreground mb-2"
                     aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
                   >
                     <ChevronLeft

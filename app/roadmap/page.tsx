@@ -101,21 +101,21 @@ export default function RoadmapPage() {
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-background to-background" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
               <div className="max-w-3xl mx-auto text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-6">
-                  <Sparkles className="h-8 w-8 text-white" />
+                  <Sparkles className="h-8 w-8 text-foreground" />
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                  <span className="text-white">Product</span>{" "}
+                  <span className="text-foreground">Product</span>{" "}
                   <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Roadmap
                   </span>
                 </h1>
-                <p className="text-xl text-white/70">
+                <p className="text-xl text-foreground/70">
                   Explore our vision for the future of EduSphere AI and see what
                   exciting features are coming next
                 </p>
@@ -140,10 +140,10 @@ export default function RoadmapPage() {
                       <Badge
                         className={`${
                           quarter.status === "completed"
-                            ? "bg-green-500 text-white"
+                            ? "bg-green-500 text-foreground"
                             : quarter.status === "in-progress"
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-500 text-white"
+                            ? "bg-blue-500 text-foreground"
+                            : "bg-gray-500 text-foreground"
                         }`}
                       >
                         {quarter.status === "completed" && (
@@ -166,7 +166,7 @@ export default function RoadmapPage() {
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center space-x-3 mb-2">
-                                <h3 className="text-xl font-bold text-white">
+                                <h3 className="text-xl font-bold text-foreground">
                                   {item.title}
                                 </h3>
                                 {item.status === "completed" && (
@@ -176,7 +176,7 @@ export default function RoadmapPage() {
                                   <Clock className="h-5 w-5 text-blue-400" />
                                 )}
                               </div>
-                              <p className="text-white/70">{item.description}</p>
+                              <p className="text-foreground/70">{item.description}</p>
                             </div>
                           </div>
                         </GlassSurface>
@@ -194,10 +194,10 @@ export default function RoadmapPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollReveal direction="up">
               <GlassSurface className="p-8 md:p-12 text-center max-w-3xl mx-auto">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                   Have Suggestions?
                 </h2>
-                <p className="text-xl text-white/70 mb-8">
+                <p className="text-xl text-foreground/70 mb-8">
                   We'd love to hear your ideas! Your feedback helps shape the future of EduSphere AI.
                 </p>
                 <Link href="/contact">

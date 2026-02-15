@@ -123,13 +123,13 @@ function VerifyEmailContent() {
             <ScrollReveal direction="up">
               <GlassSurface className="p-8 text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 mb-4">
-                  <CheckCircle className="h-8 w-8 text-white" />
+                  <CheckCircle className="h-8 w-8 text-foreground" />
                 </div>
-                <h1 className="text-3xl font-bold mb-2 text-white">Email Verified!</h1>
-                <p className="text-white/70 mb-6">Your email has been successfully verified.</p>
-                <p className="text-white/60 text-sm mb-6">Redirecting to your dashboard...</p>
+                <h1 className="text-3xl font-bold mb-2 text-foreground">Email Verified!</h1>
+                <p className="text-foreground/70 mb-6">Your email has been successfully verified.</p>
+                <p className="text-foreground/60 text-sm mb-6">Redirecting to your dashboard...</p>
                 <Link href="/dashboard">
-                  <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
+                  <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground">
                     Go to Dashboard
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -150,15 +150,15 @@ function VerifyEmailContent() {
             {/* Header */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-4">
-                <Mail className="h-8 w-8 text-white" />
+                <Mail className="h-8 w-8 text-foreground" />
               </div>
               <h1 className="text-4xl font-bold mb-2">
-                <span className="text-white">Verify Your</span>{" "}
+                <span className="text-foreground">Verify Your</span>{" "}
                 <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                   Email
                 </span>
               </h1>
-              <p className="text-white/70">We've sent a verification link to your email</p>
+              <p className="text-foreground/70">We've sent a verification link to your email</p>
             </div>
 
             {/* Verification Form */}
@@ -177,15 +177,15 @@ function VerifyEmailContent() {
 
               <div className="space-y-6">
                 <div className="text-center">
-                  <p className="text-white/80 mb-2">
+                  <p className="text-foreground/80 mb-2">
                     We've sent a verification email to:
                   </p>
                   <p className="text-cyan-400 font-semibold">{email || "your email"}</p>
                 </div>
 
-                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <p className="text-white/70 text-sm mb-2">📧 Check your inbox</p>
-                  <p className="text-white/60 text-xs">
+                <div className="bg-white/5 rounded-lg p-4 border border-foreground/10">
+                  <p className="text-foreground/70 text-sm mb-2">📧 Check your inbox</p>
+                  <p className="text-foreground/60 text-xs">
                     Click the verification link in the email we sent to activate your account.
                   </p>
                 </div>
@@ -194,7 +194,7 @@ function VerifyEmailContent() {
                   <Button
                     onClick={handleCheckVerification}
                     disabled={loading || !supabase}
-                    className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                    className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                   >
                     {loading ? (
                       <>
@@ -213,7 +213,7 @@ function VerifyEmailContent() {
                     onClick={handleResendEmail}
                     disabled={resending || !email || !supabase}
                     variant="outline"
-                    className="w-full border-white/20 text-white hover:bg-white/10"
+                    className="w-full border-foreground/20 text-white hover:bg-foreground/10"
                   >
                     {resending ? (
                       <>
@@ -229,8 +229,8 @@ function VerifyEmailContent() {
                   </Button>
                 </div>
 
-                <div className="pt-4 border-t border-white/10">
-                  <p className="text-center text-white/60 text-sm">
+                <div className="pt-4 border-t border-foreground/10">
+                  <p className="text-center text-foreground/60 text-sm">
                     Didn't receive the email? Check your spam folder or{" "}
                     <button
                       onClick={handleResendEmail}
@@ -242,8 +242,8 @@ function VerifyEmailContent() {
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-white/10">
-                  <Link href="/login" className="block text-center text-white/70 hover:text-white text-sm">
+                <div className="pt-4 border-t border-foreground/10">
+                  <Link href="/login" className="block text-center text-foreground/70 hover:text-foreground text-sm">
                     Back to Login
                   </Link>
                 </div>

@@ -380,10 +380,10 @@ function CourseDetailContent() {
       <div className="p-6 md:p-8 lg:p-12">
         <GlassSurface className="p-8 text-center">
           <XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Course Not Found</h2>
-          <p className="text-white/70 mb-6">{error || "The course you're looking for doesn't exist."}</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Course Not Found</h2>
+          <p className="text-foreground/70 mb-6">{error || "The course you're looking for doesn't exist."}</p>
           <Link href="/dashboard/courses">
-            <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+            <Button variant="outline" className="border-foreground/20 text-white hover:bg-foreground/10">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Courses
             </Button>
@@ -404,7 +404,7 @@ function CourseDetailContent() {
           <Link href="/dashboard/courses">
             <Button
               variant="ghost"
-              className="text-white/70 hover:text-white mb-4"
+              className="text-foreground/70 hover:text-foreground mb-4"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Courses
@@ -414,19 +414,19 @@ function CourseDetailContent() {
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 {getStatusBadge(course.status)}
-                <Badge variant="outline" className="border-white/20 text-white/70">
+                <Badge variant="outline" className="border-foreground/20 text-foreground/70">
                   {course.type?.replace("-", " ")}
                 </Badge>
                 {course.style && (
-                  <Badge variant="outline" className="border-white/20 text-white/70">
+                  <Badge variant="outline" className="border-foreground/20 text-foreground/70">
                     {course.style}
                   </Badge>
                 )}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-white">
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground">
                 {course.title}
               </h1>
-              <div className="flex items-center gap-4 text-white/60 text-sm">
+              <div className="flex items-center gap-4 text-foreground/60 text-sm">
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   <span>{formatDuration(course.estimated_duration)}</span>
@@ -443,7 +443,7 @@ function CourseDetailContent() {
               <Link href={`/dashboard/courses/${course.id}/edit`}>
                 <Button
                   variant="outline"
-                  className="border-white/20 text-white hover:bg-white/10"
+                  className="border-foreground/20 text-white hover:bg-foreground/10"
                 >
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
@@ -458,7 +458,7 @@ function CourseDetailContent() {
       {course.status === "completed" || course.status === "processing" ? (
         <ScrollReveal direction="up" delay={0.1}>
           <GlassSurface className="p-6 mb-6">
-            <h2 className="text-xl font-bold text-white mb-4">Course Preview</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Course Preview</h2>
             <div className="w-full aspect-video bg-black rounded-lg overflow-hidden">
               <RemotionPlayer
                 durationInFrames={totalFrames}
@@ -487,7 +487,7 @@ function CourseDetailContent() {
         <ScrollReveal direction="up" delay={0.2}>
           <GlassSurface className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white">Course Structure</h2>
+              <h2 className="text-xl font-bold text-foreground">Course Structure</h2>
               <Button
                 onClick={async () => {
                   if (!supabase || !params.id) return
@@ -540,7 +540,7 @@ function CourseDetailContent() {
                 }}
                 variant="outline"
                 size="sm"
-                className="border-white/20 text-white hover:bg-white/10"
+                className="border-foreground/20 text-white hover:bg-foreground/10"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Chapter
@@ -554,7 +554,7 @@ function CourseDetailContent() {
                 return (
                   <div
                     key={chapterKey}
-                    className="p-4 rounded-lg glass-surface border border-white/10"
+                    className="p-4 rounded-lg glass-surface border border-foreground/10"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
@@ -563,7 +563,7 @@ function CourseDetailContent() {
                             onClick={() => toggleSection(chapterKey)}
                             variant="ghost"
                             size="sm"
-                            className="p-1 h-6 w-6 text-white/70 hover:text-white hover:bg-white/10"
+                            className="p-1 h-6 w-6 text-foreground/70 hover:text-foreground hover:bg-foreground/10"
                           >
                             {isExpanded ? (
                               <ChevronUp className="h-4 w-4" />
@@ -571,11 +571,11 @@ function CourseDetailContent() {
                               <ChevronDown className="h-4 w-4" />
                             )}
                           </Button>
-                          <h3 className="text-lg font-semibold text-white">
+                          <h3 className="text-lg font-semibold text-foreground">
                             Chapter {chapter.order || chapterIndex + 1}: {chapter.title}
                           </h3>
                         </div>
-                        <p className="text-white/60 text-sm mt-1 ml-8">
+                        <p className="text-foreground/60 text-sm mt-1 ml-8">
                           {chapter.slides?.length || 0} slides
                         </p>
                       </div>
@@ -591,7 +591,7 @@ function CourseDetailContent() {
                           }}
                           variant="ghost"
                           size="sm"
-                          className="text-white/70 hover:text-white hover:bg-white/10"
+                          className="text-foreground/70 hover:text-foreground hover:bg-foreground/10"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -604,12 +604,12 @@ function CourseDetailContent() {
                             {chapter.slides.map((slide: any, slideIndex: number) => (
                               <div
                                 key={slide.slideId || slideIndex}
-                                className="p-3 rounded bg-white/5 border border-white/5 hover:border-cyan-500/30 transition-colors group"
+                                className="p-3 rounded bg-white/5 border border-foreground/5 hover:border-cyan-500/30 transition-colors group"
                               >
                                 <div className="flex items-center justify-between">
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
-                                      <Badge variant="outline" className="border-white/20 text-white/70 text-xs">
+                                      <Badge variant="outline" className="border-foreground/20 text-foreground/70 text-xs">
                                         {slide.type?.replace("-", " ") || "slide"}
                                       </Badge>
                                       <span className="text-white/90 font-medium text-sm">
@@ -617,13 +617,13 @@ function CourseDetailContent() {
                                       </span>
                                     </div>
                                     {slide.content?.body && (
-                                      <p className="text-white/60 text-xs line-clamp-2 mt-1">
+                                      <p className="text-foreground/60 text-xs line-clamp-2 mt-1">
                                         {slide.content.body.replace(/[#*`]/g, "").substring(0, 100)}...
                                       </p>
                                     )}
                                   </div>
                                   <div className="flex items-center gap-2 ml-4">
-                                    <div className="text-white/50 text-xs">
+                                    <div className="text-foreground/50 text-xs">
                                       {slide.estimatedDuration || 30}s
                                     </div>
                                     <Button
@@ -634,7 +634,7 @@ function CourseDetailContent() {
                                       }}
                                       variant="ghost"
                                       size="sm"
-                                      className="opacity-0 group-hover:opacity-100 transition-opacity text-white/70 hover:text-white hover:bg-white/10 h-7 px-2"
+                                      className="opacity-0 group-hover:opacity-100 transition-opacity text-foreground/70 hover:text-foreground hover:bg-foreground/10 h-7 px-2"
                                     >
                                       <Sparkles className="h-3 w-3" />
                                     </Button>
@@ -644,7 +644,7 @@ function CourseDetailContent() {
                             ))}
                           </div>
                         )}
-                        <div className="mt-3 pt-3 border-t border-white/10">
+                        <div className="mt-3 pt-3 border-t border-foreground/10">
                           <Button
                             onClick={() => {
                               setSelectedChapter(chapter)
@@ -652,7 +652,7 @@ function CourseDetailContent() {
                               setSidePanelOpen(true)
                             }}
                             variant="outline"
-                            className="w-full border-white/20 text-white hover:bg-white/10 text-sm"
+                            className="w-full border-foreground/20 text-white hover:bg-foreground/10 text-sm"
                           >
                             <Sparkles className="mr-2 h-4 w-4" />
                             Learn More About This Chapter
@@ -676,7 +676,7 @@ function CourseDetailContent() {
               <Loader2 className="h-5 w-5 text-blue-400 animate-spin" />
               <div>
                 <p className="text-blue-400 font-semibold">Course is being generated</p>
-                <p className="text-white/70 text-sm mt-1">
+                <p className="text-foreground/70 text-sm mt-1">
                   This may take a few minutes. The course will be ready for preview shortly.
                 </p>
               </div>

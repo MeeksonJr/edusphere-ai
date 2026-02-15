@@ -46,10 +46,10 @@ export function ComparisonSection() {
                 <ScrollReveal direction="up" delay={0.1}>
                     <div className="glass-surface rounded-xl overflow-hidden">
                         {/* Table Header */}
-                        <div className="grid grid-cols-3 gap-4 px-6 py-4 border-b border-white/5 bg-white/[0.02]">
-                            <div className="text-sm text-white/40 font-medium" />
+                        <div className="grid grid-cols-3 gap-4 px-6 py-4 border-b border-foreground/5 bg-foreground/[0.02]">
+                            <div className="text-sm text-foreground/40 font-medium" />
                             <div className="text-center">
-                                <span className="text-sm font-semibold text-white/40">Traditional</span>
+                                <span className="text-sm font-semibold text-foreground/40">Traditional</span>
                             </div>
                             <div className="text-center">
                                 <span className="text-sm font-semibold text-gradient-brand">EduSphere AI</span>
@@ -62,7 +62,7 @@ export function ComparisonSection() {
                             return (
                                 <motion.div
                                     key={item.label}
-                                    className="grid grid-cols-3 gap-4 px-6 py-5 border-b border-white/5 last:border-0 group hover:bg-white/[0.02] transition-colors"
+                                    className="grid grid-cols-3 gap-4 px-6 py-5 border-b border-foreground/5 last:border-0 group hover:bg-foreground/[0.02] transition-colors"
                                     initial={{ opacity: 0, y: 10 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
@@ -70,14 +70,14 @@ export function ComparisonSection() {
                                 >
                                     {/* Label */}
                                     <div className="flex items-center gap-3">
-                                        <Icon className="h-4 w-4 text-white/30 shrink-0" />
-                                        <span className="text-sm text-white/70 font-medium">{item.label}</span>
+                                        <Icon className="h-4 w-4 text-foreground/30 shrink-0" />
+                                        <span className="text-sm text-foreground/70 font-medium">{item.label}</span>
                                     </div>
 
                                     {/* Traditional */}
                                     <div className="flex items-center justify-center gap-2">
                                         <X className="h-4 w-4 text-red-400/60 shrink-0" />
-                                        <span className="text-sm text-white/40 text-center">{item.traditional}</span>
+                                        <span className="text-sm text-foreground/40 text-center">{item.traditional}</span>
                                     </div>
 
                                     {/* AI */}

@@ -112,15 +112,15 @@ export default function NewCoursePage() {
       <ScrollReveal direction="up">
         <div className="mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-4">
-            <Sparkles className="h-8 w-8 text-white" />
+            <Sparkles className="h-8 w-8 text-foreground" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">Create New </span>
+            <span className="text-foreground">Create New </span>
             <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
               Course
             </span>
           </h1>
-          <p className="text-white/70">
+          <p className="text-foreground/70">
             Enter a topic and let AI generate a complete course with slides, narration, and captions
           </p>
         </div>
@@ -132,7 +132,7 @@ export default function NewCoursePage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Topic Input */}
             <div>
-              <Label htmlFor="topic" className="text-white mb-2 block">
+              <Label htmlFor="topic" className="text-foreground mb-2 block">
                 Course Topic <span className="text-red-400">*</span>
               </Label>
               <Textarea
@@ -142,24 +142,24 @@ export default function NewCoursePage() {
                 value={formData.topic}
                 onChange={handleChange}
                 placeholder="e.g., Introduction to Quantum Computing, How to Build a React App, The History of Ancient Rome..."
-                className="min-h-[120px] glass-surface border-white/20 text-white placeholder:text-white/40"
+                className="min-h-[120px] glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                 rows={4}
               />
-              <p className="text-white/60 text-sm mt-2">
+              <p className="text-foreground/60 text-sm mt-2">
                 Be specific! The more details you provide, the better the course will be.
               </p>
             </div>
 
             {/* Course Type */}
             <div>
-              <Label htmlFor="courseType" className="text-white mb-2 block">
+              <Label htmlFor="courseType" className="text-foreground mb-2 block">
                 Course Type <span className="text-red-400">*</span>
               </Label>
               <Select
                 value={formData.courseType}
                 onValueChange={(value) => handleSelectChange("courseType", value)}
               >
-                <SelectTrigger className="glass-surface border-white/20 text-white">
+                <SelectTrigger className="glass-surface border-foreground/20 text-foreground">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -171,7 +171,7 @@ export default function NewCoursePage() {
                           <Icon className="h-4 w-4" />
                           <div>
                             <div className="font-medium">{type.label}</div>
-                            <div className="text-xs text-white/60">{type.description}</div>
+                            <div className="text-xs text-foreground/60">{type.description}</div>
                           </div>
                         </div>
                       </SelectItem>
@@ -183,14 +183,14 @@ export default function NewCoursePage() {
 
             {/* Style */}
             <div>
-              <Label htmlFor="style" className="text-white mb-2 block">
+              <Label htmlFor="style" className="text-foreground mb-2 block">
                 Style Preset
               </Label>
               <Select
                 value={formData.style}
                 onValueChange={(value) => handleSelectChange("style", value)}
               >
-                <SelectTrigger className="glass-surface border-white/20 text-white">
+                <SelectTrigger className="glass-surface border-foreground/20 text-foreground">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -198,7 +198,7 @@ export default function NewCoursePage() {
                     <SelectItem key={style.value} value={style.value}>
                       <div>
                         <div className="font-medium">{style.label}</div>
-                        <div className="text-xs text-white/60">{style.description}</div>
+                        <div className="text-xs text-foreground/60">{style.description}</div>
                       </div>
                     </SelectItem>
                   ))}
@@ -212,7 +212,7 @@ export default function NewCoursePage() {
                 <Film className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-blue-400 font-semibold text-sm mb-1">What happens next?</p>
-                  <ul className="text-white/70 text-sm space-y-1 list-disc list-inside">
+                  <ul className="text-foreground/70 text-sm space-y-1 list-disc list-inside">
                     <li>AI generates a comprehensive course layout with chapters and slides</li>
                     <li>Content and narration scripts are created for each slide</li>
                     <li>Text-to-speech generates voiceovers</li>
@@ -228,7 +228,7 @@ export default function NewCoursePage() {
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1 border-white/20 text-white hover:bg-white/10"
+                className="flex-1 border-foreground/20 text-white hover:bg-foreground/10"
                 onClick={() => router.back()}
                 disabled={loading}
               >
@@ -237,7 +237,7 @@ export default function NewCoursePage() {
               <Button
                 type="submit"
                 disabled={loading || !formData.topic.trim()}
-                className="flex-1 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                className="flex-1 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
               >
                 {loading ? (
                   <>

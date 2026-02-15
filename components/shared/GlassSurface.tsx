@@ -19,7 +19,7 @@ export function GlassSurface({
   const variants = {
     default: "glass-surface",
     elevated: "glass-surface shadow-lg shadow-cyan-500/10",
-    subtle: "glass-surface bg-black/20 backdrop-blur-sm",
+    subtle: "glass-surface bg-background/20 backdrop-blur-sm",
   };
 
   if (onClick) {

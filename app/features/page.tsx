@@ -38,19 +38,19 @@ export default function FeaturesPage() {
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-background to-background" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
               <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                  <span className="text-white">Powerful Features for</span>
+                  <span className="text-foreground">Powerful Features for</span>
                   <br />
                   <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Modern Learning
                   </span>
                 </h1>
-                <p className="text-xl md:text-2xl text-white/70 mb-8">
+                <p className="text-xl md:text-2xl text-foreground/70 mb-8">
                   Discover how EduSphere AI transforms your course creation process 
                   with cutting-edge AI technology and intuitive design.
                 </p>
@@ -68,7 +68,7 @@ export default function FeaturesPage() {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="glass-surface border-white/20 hover:border-cyan-500/50 text-white px-8"
+                      className="glass-surface border-foreground/20 hover:border-cyan-500/50 text-white px-8"
                     >
                       Watch Demo
                     </Button>
@@ -88,12 +88,12 @@ export default function FeaturesPage() {
             <ScrollReveal direction="up">
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  <span className="text-white">Perfect for</span>{" "}
+                  <span className="text-foreground">Perfect for</span>{" "}
                   <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Every Use Case
                   </span>
                 </h2>
-                <p className="text-xl text-white/70 max-w-2xl mx-auto">
+                <p className="text-xl text-foreground/70 max-w-2xl mx-auto">
                   Whether you're teaching, training, or creating content, we've got you covered
                 </p>
               </div>
@@ -112,12 +112,12 @@ export default function FeaturesPage() {
                       <div
                         className={`w-16 h-16 rounded-xl bg-gradient-to-br ${useCase.gradient} p-4 mx-auto mb-6`}
                       >
-                        <Icon className="h-full w-full text-white" />
+                        <Icon className="h-full w-full text-foreground" />
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-4">
+                      <h3 className="text-2xl font-bold text-foreground mb-4">
                         {useCase.title}
                       </h3>
-                      <p className="text-white/70 leading-relaxed">
+                      <p className="text-foreground/70 leading-relaxed">
                         {useCase.description}
                       </p>
                     </GlassSurface>
@@ -133,10 +133,10 @@ export default function FeaturesPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollReveal direction="up">
               <GlassSurface className="p-8 md:p-12 text-center max-w-3xl mx-auto">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                   Ready to Get Started?
                 </h2>
-                <p className="text-xl text-white/70 mb-8">
+                <p className="text-xl text-foreground/70 mb-8">
                   Join thousands of creators already using EduSphere AI to create amazing courses.
                 </p>
                 <Link href="/signup">

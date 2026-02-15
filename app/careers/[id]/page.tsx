@@ -120,7 +120,7 @@ export default function CareerDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-foreground">
       {/* Header */}
       <header className="bg-black/50 backdrop-blur-sm border-b border-cyan-900/50 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">

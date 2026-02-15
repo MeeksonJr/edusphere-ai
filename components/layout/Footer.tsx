@@ -34,8 +34,8 @@ const footerLinks = {
 }
 
 const socials = [
-  { icon: FaXTwitter, href: "https://twitter.com/edusphereai", label: "Twitter/X", hoverColor: "hover:text-white" },
-  { icon: FaGithub, href: "https://github.com/edusphereai", label: "GitHub", hoverColor: "hover:text-white" },
+  { icon: FaXTwitter, href: "https://twitter.com/edusphereai", label: "Twitter/X", hoverColor: "hover:text-foreground" },
+  { icon: FaGithub, href: "https://github.com/edusphereai", label: "GitHub", hoverColor: "hover:text-foreground" },
   { icon: FaLinkedinIn, href: "https://linkedin.com/company/edusphereai", label: "LinkedIn", hoverColor: "hover:text-blue-400" },
   { icon: FaDiscord, href: "https://discord.gg/edusphereai", label: "Discord", hoverColor: "hover:text-indigo-400" },
 ]
@@ -46,7 +46,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative border-t border-white/5">
+    <footer className="relative border-t border-foreground/5">
       {/* Main Footer */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
@@ -56,11 +56,11 @@ export function Footer() {
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
-              <span className="text-lg font-bold font-display text-white">
+              <span className="text-lg font-bold font-display text-foreground">
                 EduSphere<span className="text-cyan-400"> AI</span>
               </span>
             </Link>
-            <p className="text-sm text-white/40 leading-relaxed mb-6 max-w-xs">
+            <p className="text-sm text-foreground/40 leading-relaxed mb-6 max-w-xs">
               AI-powered course creation platform. Transform your expertise into professional video courses in minutes.
             </p>
 
@@ -74,7 +74,7 @@ export function Footer() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-white/30 ${social.hoverColor} hover:border-white/15 hover:bg-white/[0.08] transition-all duration-300`}
+                    className={`w-9 h-9 rounded-lg bg-foreground/[0.04] border border-foreground/[0.06] flex items-center justify-center text-foreground/30 ${social.hoverColor} hover:border-foreground/15 hover:bg-foreground/[0.08] transition-all duration-300`}
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     aria-label={social.label}
@@ -89,13 +89,13 @@ export function Footer() {
           {/* Link Columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h4 className="text-sm font-semibold text-white mb-4">{category}</h4>
+              <h4 className="text-sm font-semibold text-foreground mb-4">{category}</h4>
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-sm text-white/35 hover:text-white/70 transition-colors duration-200"
+                      className="text-sm text-foreground/35 hover:text-foreground/70 transition-colors duration-200"
                     >
                       {link.name}
                     </Link>
@@ -108,21 +108,21 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-white/5">
+      <div className="border-t border-foreground/5">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <span className="text-xs text-white/25">
+            <span className="text-xs text-foreground/25">
               © {new Date().getFullYear()} EduSphere AI. All rights reserved.
             </span>
             <div className="hidden sm:flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span className="text-xs text-white/25">All systems operational</span>
+              <span className="text-xs text-foreground/25">All systems operational</span>
             </div>
           </div>
 
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-2 text-xs text-white/25 hover:text-white/50 transition-colors group"
+            className="flex items-center gap-2 text-xs text-foreground/25 hover:text-foreground/50 transition-colors group"
           >
             <ArrowUp className="h-3.5 w-3.5 group-hover:-translate-y-0.5 transition-transform" />
             Back to top

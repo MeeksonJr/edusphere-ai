@@ -71,10 +71,10 @@ function ThankYouContent() {
               }}
             >
               <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 mb-6">
-                <CheckCircle className="h-12 w-12 text-white" />
+                <CheckCircle className="h-12 w-12 text-foreground" />
               </div>
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-4 -mt-12 ml-8">
-                <Icon className="h-8 w-8 text-white" />
+                <Icon className="h-8 w-8 text-foreground" />
               </div>
             </motion.div>
 
@@ -87,13 +87,13 @@ function ThankYouContent() {
 
             {/* Message */}
             <GlassSurface className="p-8 mb-8">
-              <p className="text-xl text-white/80 text-center mb-6">
+              <p className="text-xl text-foreground/80 text-center mb-6">
                 {currentMessage.message}
               </p>
 
               {/* Next Steps */}
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-white mb-4">
+                <h3 className="text-lg font-semibold text-foreground mb-4">
                   What's Next?
                 </h3>
                 {currentMessage.nextSteps.map((step, index) => (
@@ -109,7 +109,7 @@ function ThankYouContent() {
                         {index + 1}
                       </span>
                     </div>
-                    <p className="text-white/70 flex-1">{step}</p>
+                    <p className="text-foreground/70 flex-1">{step}</p>
                   </motion.div>
                 ))}
               </div>
@@ -132,7 +132,7 @@ function ThankYouContent() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto glass-surface border-white/20 hover:border-cyan-500/50 text-white px-8"
+                  className="w-full sm:w-auto glass-surface border-foreground/20 hover:border-cyan-500/50 text-white px-8"
                 >
                   <Home className="mr-2 h-5 w-5" />
                   Back to Home
@@ -147,7 +147,7 @@ function ThankYouContent() {
               transition={{ delay: 0.8 }}
               className="mt-12 text-center"
             >
-              <p className="text-white/50 text-sm">
+              <p className="text-foreground/50 text-sm">
                 Need help?{" "}
                 <Link
                   href="/contact"
@@ -169,7 +169,7 @@ export default function ThankYouPage() {
     <Suspense fallback={
       <PublicLayout>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-white">Loading...</div>
+          <div className="text-foreground">Loading...</div>
         </div>
       </PublicLayout>
     }>

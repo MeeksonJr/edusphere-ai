@@ -136,14 +136,14 @@ export default function SettingsPage() {
       <ScrollReveal direction="up">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">Settings</span>
+            <span className="text-foreground">Settings</span>
           </h1>
-          <p className="text-white/70">Customize your EduSphere experience</p>
+          <p className="text-foreground/70">Customize your EduSphere experience</p>
         </div>
       </ScrollReveal>
 
       <Tabs defaultValue="appearance" className="space-y-6">
-        <TabsList className="glass-surface border-white/20 p-1">
+        <TabsList className="glass-surface border-foreground/20 p-1">
           <TabsTrigger
             value="appearance"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
@@ -185,10 +185,10 @@ export default function SettingsPage() {
         <TabsContent value="appearance">
           <ScrollReveal direction="up">
             <GlassSurface className="p-6 lg:p-8">
-              <h2 className="text-xl font-bold text-white mb-6">Appearance</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Appearance</h2>
               <div className="space-y-8">
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Theme</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Theme</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <AnimatedCard
                       variant="3d"
@@ -200,14 +200,14 @@ export default function SettingsPage() {
                       <div className="p-4">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center">
-                            <Moon className="h-5 w-5 mr-2 text-white" aria-hidden="true" />
+                            <Moon className="h-5 w-5 mr-2 text-foreground" aria-hidden="true" />
                             <span className="text-white font-medium">Dark</span>
                           </div>
                           {localSettings.theme === "dark" && (
                             <CheckCircle className="h-5 w-5 text-cyan-400" aria-hidden="true" />
                           )}
                         </div>
-                        <div className="h-24 bg-gradient-to-br from-gray-900 to-black rounded-md border border-white/10"></div>
+                        <div className="h-24 bg-gradient-to-br from-gray-900 to-background rounded-md border border-foreground/10"></div>
                       </div>
                     </AnimatedCard>
 
@@ -222,7 +222,7 @@ export default function SettingsPage() {
                       <div className="p-4">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center">
-                            <Sun className="h-5 w-5 mr-2 text-white" aria-hidden="true" />
+                            <Sun className="h-5 w-5 mr-2 text-foreground" aria-hidden="true" />
                             <span className="text-white font-medium">Light</span>
                           </div>
                           {localSettings.theme === "light" && (
@@ -236,7 +236,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Accent Color</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Accent Color</h3>
                   <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
                     {[
                       { value: "purple", color: "from-cyan-500 to-cyan-600" },
@@ -267,31 +267,31 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Language</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Language</h3>
                   <Select value={localSettings.language} onValueChange={handleLanguageChange}>
-                    <SelectTrigger className="w-full md:w-[250px] glass-surface border-white/20 text-white">
+                    <SelectTrigger className="w-full md:w-[250px] glass-surface border-foreground/20 text-foreground">
                       <SelectValue placeholder="Select language" />
                     </SelectTrigger>
-                    <SelectContent className="glass-surface border-white/20">
-                      <SelectItem value="en" className="text-white">English</SelectItem>
-                      <SelectItem value="es" className="text-white">Español</SelectItem>
-                      <SelectItem value="fr" className="text-white">Français</SelectItem>
-                      <SelectItem value="de" className="text-white">Deutsch</SelectItem>
-                      <SelectItem value="zh" className="text-white">中文</SelectItem>
+                    <SelectContent className="glass-surface border-foreground/20">
+                      <SelectItem value="en" className="text-foreground">English</SelectItem>
+                      <SelectItem value="es" className="text-foreground">Español</SelectItem>
+                      <SelectItem value="fr" className="text-foreground">Français</SelectItem>
+                      <SelectItem value="de" className="text-foreground">Deutsch</SelectItem>
+                      <SelectItem value="zh" className="text-foreground">中文</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-white/50 mt-2">Note: Language support is limited in the current version.</p>
+                  <p className="text-xs text-foreground/50 mt-2">Note: Language support is limited in the current version.</p>
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Keyboard Shortcuts</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Keyboard Shortcuts</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <Label htmlFor="sidebar-toggle" className="text-white">
+                        <Label htmlFor="sidebar-toggle" className="text-foreground">
                           Toggle Sidebar (Ctrl+B / Cmd+B)
                         </Label>
-                        <p className="text-xs text-white/50 mt-1">
+                        <p className="text-xs text-foreground/50 mt-1">
                           Press Ctrl+B (or Cmd+B on Mac) to quickly toggle the sidebar
                         </p>
                       </div>
@@ -322,14 +322,14 @@ export default function SettingsPage() {
         <TabsContent value="notifications">
           <ScrollReveal direction="up">
             <GlassSurface className="p-6 lg:p-8">
-              <h2 className="text-xl font-bold text-white mb-6">Notifications</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Notifications</h2>
               <div className="space-y-6">
-                <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-white/10">
+                <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-foreground/10">
                   <div className="space-y-0.5">
                     <Label htmlFor="email-notifications" className="text-white font-medium">
                       Email Notifications
                     </Label>
-                    <p className="text-sm text-white/60">Receive email notifications about assignments and updates</p>
+                    <p className="text-sm text-foreground/60">Receive email notifications about assignments and updates</p>
                   </div>
                   <Switch
                     id="email-notifications"
@@ -338,12 +338,12 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-white/10">
+                <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-foreground/10">
                   <div className="space-y-0.5">
                     <Label htmlFor="assignment-notifications" className="text-white font-medium">
                       Assignment Reminders
                     </Label>
-                    <p className="text-sm text-white/60">Get notified about upcoming assignment deadlines</p>
+                    <p className="text-sm text-foreground/60">Get notified about upcoming assignment deadlines</p>
                   </div>
                   <Switch
                     id="assignment-notifications"
@@ -352,12 +352,12 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-white/10">
+                <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-foreground/10">
                   <div className="space-y-0.5">
                     <Label htmlFor="ai-notifications" className="text-white font-medium">
                       AI Assistant Updates
                     </Label>
-                    <p className="text-sm text-white/60">
+                    <p className="text-sm text-foreground/60">
                       Receive notifications about AI-generated content and suggestions
                     </p>
                   </div>
@@ -376,10 +376,10 @@ export default function SettingsPage() {
         <TabsContent value="calendar">
           <ScrollReveal direction="up">
             <GlassSurface className="p-6 lg:p-8">
-              <h2 className="text-xl font-bold text-white mb-6">Calendar Settings</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Calendar Settings</h2>
               <div className="space-y-6">
                 <div>
-                  <Label htmlFor="default-view" className="text-white mb-2 block">
+                  <Label htmlFor="default-view" className="text-foreground mb-2 block">
                     Default View
                   </Label>
                   <Select
@@ -388,20 +388,20 @@ export default function SettingsPage() {
                   >
                     <SelectTrigger
                       id="default-view"
-                      className="w-full md:w-[250px] glass-surface border-white/20 text-white"
+                      className="w-full md:w-[250px] glass-surface border-foreground/20 text-foreground"
                     >
                       <SelectValue placeholder="Select default view" />
                     </SelectTrigger>
-                    <SelectContent className="glass-surface border-white/20">
-                      <SelectItem value="month" className="text-white">Month</SelectItem>
-                      <SelectItem value="week" className="text-white">Week</SelectItem>
-                      <SelectItem value="day" className="text-white">Day</SelectItem>
+                    <SelectContent className="glass-surface border-foreground/20">
+                      <SelectItem value="month" className="text-foreground">Month</SelectItem>
+                      <SelectItem value="week" className="text-foreground">Week</SelectItem>
+                      <SelectItem value="day" className="text-foreground">Day</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <Label htmlFor="first-day" className="text-white mb-2 block">
+                  <Label htmlFor="first-day" className="text-foreground mb-2 block">
                     First Day of Week
                   </Label>
                   <Select
@@ -410,23 +410,23 @@ export default function SettingsPage() {
                   >
                     <SelectTrigger
                       id="first-day"
-                      className="w-full md:w-[250px] glass-surface border-white/20 text-white"
+                      className="w-full md:w-[250px] glass-surface border-foreground/20 text-foreground"
                     >
                       <SelectValue placeholder="Select first day" />
                     </SelectTrigger>
-                    <SelectContent className="glass-surface border-white/20">
-                      <SelectItem value="sunday" className="text-white">Sunday</SelectItem>
-                      <SelectItem value="monday" className="text-white">Monday</SelectItem>
+                    <SelectContent className="glass-surface border-foreground/20">
+                      <SelectItem value="sunday" className="text-foreground">Sunday</SelectItem>
+                      <SelectItem value="monday" className="text-foreground">Monday</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-white/10">
+                <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-foreground/10">
                   <div className="space-y-0.5">
                     <Label htmlFor="show-weekends" className="text-white font-medium">
                       Show Weekends
                     </Label>
-                    <p className="text-sm text-white/60">Display weekend days in your calendar view</p>
+                    <p className="text-sm text-foreground/60">Display weekend days in your calendar view</p>
                   </div>
                   <Switch
                     id="show-weekends"
@@ -443,11 +443,11 @@ export default function SettingsPage() {
         <TabsContent value="billing">
           <ScrollReveal direction="up">
             <GlassSurface className="p-6 lg:p-8">
-              <h2 className="text-xl font-bold text-white mb-6">Billing Information</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Billing Information</h2>
               <div className="space-y-6">
                 <div className="glass-surface border-cyan-500/30 p-6 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-white">Current Plan</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Current Plan</h3>
                     <Badge
                       className={
                         user?.profile?.subscription_tier === "free"
@@ -464,7 +464,7 @@ export default function SettingsPage() {
                           : "Free"}
                     </Badge>
                   </div>
-                  <p className="text-white/70 mb-4">
+                  <p className="text-foreground/70 mb-4">
                     {user?.profile?.subscription_tier === "ultimate"
                       ? "You are currently on the Ultimate plan ($12.99/month)."
                       : user?.profile?.subscription_tier === "pro"
@@ -473,13 +473,13 @@ export default function SettingsPage() {
                   </p>
                   {user?.profile?.subscription_tier === "free" ? (
                     <Button
-                      className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-foreground"
                       onClick={() => router.push("/dashboard/profile?tab=subscription")}
                     >
                       Upgrade Plan
                     </Button>
                   ) : (
-                    <Button variant="outline" className="glass-surface border-white/20 text-white">
+                    <Button variant="outline" className="glass-surface border-foreground/20 text-foreground">
                       Manage Subscription
                     </Button>
                   )}
@@ -493,51 +493,51 @@ export default function SettingsPage() {
         <TabsContent value="privacy">
           <ScrollReveal direction="up">
             <GlassSurface className="p-6 lg:p-8">
-              <h2 className="text-xl font-bold text-white mb-6">Privacy & Security</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Privacy & Security</h2>
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-white/10">
+                  <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-foreground/10">
                     <div className="space-y-0.5">
                       <Label htmlFor="data-collection" className="text-white font-medium">
                         Data Collection
                       </Label>
-                      <p className="text-sm text-white/60">
+                      <p className="text-sm text-foreground/60">
                         Allow EduSphere to collect usage data to improve the service
                       </p>
                     </div>
                     <Switch id="data-collection" defaultChecked />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-white/10">
+                  <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-foreground/10">
                     <div className="space-y-0.5">
                       <Label htmlFor="ai-personalization" className="text-white font-medium">
                         AI Personalization
                       </Label>
-                      <p className="text-sm text-white/60">
+                      <p className="text-sm text-foreground/60">
                         Allow AI to learn from your usage patterns to provide better recommendations
                       </p>
                     </div>
                     <Switch id="ai-personalization" defaultChecked />
                   </div>
 
-                  <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-white/10">
+                  <div className="flex items-center justify-between p-4 rounded-lg glass-surface border-foreground/10">
                     <div className="space-y-0.5">
                       <Label htmlFor="third-party" className="text-white font-medium">
                         Third-Party Integrations
                       </Label>
-                      <p className="text-sm text-white/60">Allow EduSphere to connect with third-party services</p>
+                      <p className="text-sm text-foreground/60">Allow EduSphere to connect with third-party services</p>
                     </div>
                     <Switch id="third-party" defaultChecked />
                   </div>
                 </div>
 
-                <div className="border-t border-white/10 pt-6">
-                  <h3 className="text-lg font-semibold text-white mb-4">Data Management</h3>
-                  <p className="text-sm text-white/60 mb-4">
+                <div className="border-t border-foreground/10 pt-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Data Management</h3>
+                  <p className="text-sm text-foreground/60 mb-4">
                     You can request a copy of your data or delete all your data from EduSphere.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <Button variant="outline" className="glass-surface border-white/20 text-white">
+                    <Button variant="outline" className="glass-surface border-foreground/20 text-foreground">
                       Request Data Export
                     </Button>
                     <Button
@@ -560,7 +560,7 @@ export default function SettingsPage() {
           <Button
             onClick={handleSaveSettings}
             disabled={saving}
-            className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+            className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
           >
             {saving ? (
               <>

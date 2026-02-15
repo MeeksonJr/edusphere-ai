@@ -10,7 +10,7 @@ export function CTASection() {
         <section className="relative py-24 lg:py-32 overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-gradient-to-b from-black via-cyan-950/20 to-black" />
+                <div className="absolute inset-0 bg-gradient-to-b from-cyan-50 via-background to-background dark:from-black dark:via-cyan-950/20 dark:to-background" />
                 <div className="absolute inset-0 mesh-gradient-bg opacity-60" />
                 <div className="absolute inset-0 grid-pattern opacity-20" />
             </div>
@@ -27,11 +27,11 @@ export function CTASection() {
                     transition={{ duration: 0.7 }}
                 >
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-6 leading-tight">
-                        <span className="text-white">Start Creating</span>
+                        <span className="text-foreground">Start Creating</span>
                         <br />
                         <span className="text-gradient-brand">Today</span>
                     </h2>
-                    <p className="text-lg text-white/50 mb-10 max-w-xl mx-auto leading-relaxed">
+                    <p className="text-lg text-foreground/50 mb-10 max-w-xl mx-auto leading-relaxed">
                         Join thousands of educators and creators already using AI to build
                         professional courses in minutes, not weeks.
                     </p>
@@ -51,7 +51,7 @@ export function CTASection() {
                             <Button
                                 size="lg"
                                 variant="outline"
-                                className="glass-surface border-white/15 hover:border-white/30 text-white px-10 py-7 text-lg rounded-xl"
+                                className="glass-surface border-foreground/15 hover:border-foreground/30 text-foreground px-10 py-7 text-lg rounded-xl"
                             >
                                 View Pricing
                             </Button>
@@ -59,7 +59,7 @@ export function CTASection() {
                     </div>
 
                     {/* Trust Indicators */}
-                    <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/35">
+                    <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-foreground/35">
                         <span className="flex items-center gap-1.5">
                             <Shield className="h-4 w-4 text-emerald-400/60" />
                             Secure & encrypted

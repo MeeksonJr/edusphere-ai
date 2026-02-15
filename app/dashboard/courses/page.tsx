@@ -18,7 +18,7 @@ export default async function CoursesPage() {
     return (
       <div className="p-6 md:p-8 lg:p-12">
         <GlassSurface className="p-8 text-center">
-          <p className="text-white/70">Please log in to view your courses.</p>
+          <p className="text-foreground/70">Please log in to view your courses.</p>
         </GlassSurface>
       </div>
     )
@@ -78,15 +78,15 @@ export default async function CoursesPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              <span className="text-white">My </span>
+              <span className="text-foreground">My </span>
               <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                 Courses
               </span>
             </h1>
-            <p className="text-white/70">Create and manage your AI-generated courses</p>
+            <p className="text-foreground/70">Create and manage your AI-generated courses</p>
           </div>
           <Link href="/dashboard/courses/new">
-            <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
+            <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground">
               <Plus className="mr-2 h-4 w-4" />
               New Course
             </Button>
@@ -111,32 +111,32 @@ export default async function CoursesPage() {
                     </div>
 
                     {/* Course Title */}
-                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">
+                    <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2">
                       {course.title}
                     </h3>
 
                     {/* Course Type & Style */}
                     <div className="flex items-center gap-2 mb-4 flex-wrap">
-                      <Badge variant="outline" className="border-white/20 text-white/70">
+                      <Badge variant="outline" className="border-foreground/20 text-foreground/70">
                         {course.type?.replace("-", " ")}
                       </Badge>
                       {course.style && (
-                        <Badge variant="outline" className="border-white/20 text-white/70">
+                        <Badge variant="outline" className="border-foreground/20 text-foreground/70">
                           {course.style}
                         </Badge>
                       )}
                     </div>
 
                     {/* Duration */}
-                    <div className="flex items-center text-white/60 text-sm mb-4">
+                    <div className="flex items-center text-foreground/60 text-sm mb-4">
                       <Clock className="mr-2 h-4 w-4" />
                       <span>{formatDuration(course.estimated_duration)}</span>
                     </div>
 
                     {/* Progress Info */}
                     {course.status === "processing" && (
-                      <div className="mt-4 pt-4 border-t border-white/10">
-                        <p className="text-xs text-white/50">Generating course content...</p>
+                      <div className="mt-4 pt-4 border-t border-foreground/10">
+                        <p className="text-xs text-foreground/50">Generating course content...</p>
                       </div>
                     )}
 
@@ -144,7 +144,7 @@ export default async function CoursesPage() {
                     <div className="mt-4">
                       <Button
                         variant="outline"
-                        className="w-full border-white/20 text-white hover:bg-white/10"
+                        className="w-full border-foreground/20 text-white hover:bg-foreground/10"
                       >
                         {course.status === "completed" ? "View Course" : "View Progress"}
                       </Button>
@@ -161,12 +161,12 @@ export default async function CoursesPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500/20 to-pink-500/20 mb-4">
               <Video className="h-8 w-8 text-cyan-400" />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">No courses yet</h3>
-            <p className="text-white/70 mb-6">
+            <h3 className="text-xl font-bold text-foreground mb-2">No courses yet</h3>
+            <p className="text-foreground/70 mb-6">
               Create your first AI-generated course to get started
             </p>
             <Link href="/dashboard/courses/new">
-              <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
+              <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Your First Course
               </Button>

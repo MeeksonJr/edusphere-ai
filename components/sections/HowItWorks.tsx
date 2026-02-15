@@ -17,8 +17,8 @@ const steps = [
         visual: (
             <div className="glass-surface p-4 rounded-lg mt-4">
                 <div className="flex items-center gap-3">
-                    <div className="flex-1 h-10 rounded-lg bg-white/[0.04] border border-white/10 px-3 flex items-center">
-                        <span className="text-sm text-white/30">Introduction to Machine Learning...</span>
+                    <div className="flex-1 h-10 rounded-lg bg-foreground/[0.04] border border-foreground/10 px-3 flex items-center">
+                        <span className="text-sm text-foreground/30">Introduction to Machine Learning...</span>
                         <span className="ml-1 w-0.5 h-5 bg-cyan-400 animate-pulse" />
                     </div>
                     <div className="h-10 px-4 rounded-lg bg-cyan-500/20 border border-cyan-500/30 flex items-center">
@@ -47,7 +47,7 @@ const steps = [
                                     <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                                 )}
                             </div>
-                            <span className={`text-xs ${i < 3 ? 'text-white/50' : 'text-cyan-300/80'}`}>{step}</span>
+                            <span className={`text-xs ${i < 3 ? 'text-foreground/50' : 'text-cyan-300/80'}`}>{step}</span>
                         </div>
                     )
                 )}
@@ -69,7 +69,7 @@ const steps = [
                             key={format}
                             className={`flex-1 rounded-lg border flex items-center justify-center py-3 text-xs font-mono transition-all ${i === 0
                                 ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
-                                : "border-white/5 bg-white/[0.02] text-white/30 hover:border-white/10"
+                                : "border-foreground/5 bg-foreground/[0.02] text-foreground/30 hover:border-foreground/10"
                                 }`}
                         >
                             {format}
@@ -78,7 +78,7 @@ const steps = [
                 </div>
                 <div className="mt-3 flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                    <span className="text-xs text-white/40">Ready to export</span>
+                    <span className="text-xs text-foreground/40">Ready to export</span>
                 </div>
             </div>
         ),
@@ -118,21 +118,21 @@ export function HowItWorks() {
                                             whileHover={{ scale: 1.1, rotate: 5 }}
                                             transition={{ type: "spring", stiffness: 300 }}
                                         >
-                                            <div className="w-full h-full rounded-2xl bg-black flex items-center justify-center">
-                                                <Icon className="h-7 w-7 text-white" />
+                                            <div className="w-full h-full rounded-2xl bg-background flex items-center justify-center">
+                                                <Icon className="h-7 w-7 text-foreground" />
                                             </div>
                                         </motion.div>
-                                        <span className="text-xs font-mono text-white/20 uppercase tracking-widest">
+                                        <span className="text-xs font-mono text-foreground/20 uppercase tracking-widest">
                                             Step {step.number}
                                         </span>
                                     </div>
 
                                     {/* Content */}
                                     <div className="text-center">
-                                        <h3 className="text-xl font-bold font-display text-white mb-3">
+                                        <h3 className="text-xl font-bold font-display text-foreground mb-3">
                                             {step.title}
                                         </h3>
-                                        <p className="text-sm text-white/50 leading-relaxed mb-2">
+                                        <p className="text-sm text-foreground/50 leading-relaxed mb-2">
                                             {step.description}
                                         </p>
                                     </div>

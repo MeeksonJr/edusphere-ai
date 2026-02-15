@@ -157,10 +157,10 @@ function CourseEditContent() {
     return (
       <div className="p-6 md:p-8 lg:p-12">
         <GlassSurface className="p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Course Not Found</h2>
-          <p className="text-white/70 mb-6">{error || "The course you're looking for doesn't exist."}</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Course Not Found</h2>
+          <p className="text-foreground/70 mb-6">{error || "The course you're looking for doesn't exist."}</p>
           <Link href="/dashboard/courses">
-            <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
+            <Button variant="outline" className="border-foreground/20 text-white hover:bg-foreground/10">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Courses
             </Button>
@@ -179,20 +179,20 @@ function CourseEditContent() {
       <ScrollReveal direction="up">
         <div className="mb-6">
           <Link href={`/dashboard/courses/${course.id}`}>
-            <Button variant="ghost" className="text-white/70 hover:text-white mb-4">
+            <Button variant="ghost" className="text-foreground/70 hover:text-foreground mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Course
             </Button>
           </Link>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-white">Edit Course</h1>
-              <p className="text-white/70">{course.title}</p>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground">Edit Course</h1>
+              <p className="text-foreground/70">{course.title}</p>
             </div>
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+              className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
             >
               {saving ? (
                 <>
@@ -214,7 +214,7 @@ function CourseEditContent() {
         {/* Preview */}
         <ScrollReveal direction="up" delay={0.1}>
           <GlassSurface className="p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Live Preview</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Live Preview</h2>
             <div className="w-full aspect-video bg-black rounded-lg overflow-hidden mb-4">
               <RemotionPlayer
                 durationInFrames={totalFrames}
@@ -240,27 +240,27 @@ function CourseEditContent() {
         {/* Editor */}
         <ScrollReveal direction="up" delay={0.2}>
           <GlassSurface className="p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Edit Content</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Edit Content</h2>
             <div className="space-y-6 max-h-[600px] overflow-y-auto">
               {layout?.chapters?.map((chapter: any, chapterIndex: number) => (
-                <div key={chapter.chapterId || chapterIndex} className="border-b border-white/10 pb-6 last:border-0">
-                  <h3 className="text-lg font-semibold text-white mb-4">
+                <div key={chapter.chapterId || chapterIndex} className="border-b border-foreground/10 pb-6 last:border-0">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">
                     Chapter {chapter.order || chapterIndex + 1}: {chapter.title}
                   </h3>
                   <div className="space-y-4">
                     {chapter.slides?.map((slide: any, slideIndex: number) => (
                       <div
                         key={slide.slideId || slideIndex}
-                        className="p-4 rounded-lg bg-white/5 border border-white/10"
+                        className="p-4 rounded-lg bg-white/5 border border-foreground/10"
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <Badge variant="outline" className="border-white/20 text-white/70 text-xs">
+                          <Badge variant="outline" className="border-foreground/20 text-foreground/70 text-xs">
                             {slide.type?.replace("-", " ") || "slide"}
                           </Badge>
                         </div>
                         <div className="space-y-3">
                           <div>
-                            <Label htmlFor={`slide-${slideIndex}-title`} className="text-white/70 text-sm">
+                            <Label htmlFor={`slide-${slideIndex}-title`} className="text-foreground/70 text-sm">
                               Title
                             </Label>
                             <Input
@@ -269,11 +269,11 @@ function CourseEditContent() {
                               onChange={(e) =>
                                 handleUpdateSlide(chapterIndex, slideIndex, "title", e.target.value)
                               }
-                              className="mt-1 glass-surface border-white/20 text-white"
+                              className="mt-1 glass-surface border-foreground/20 text-foreground"
                             />
                           </div>
                           <div>
-                            <Label htmlFor={`slide-${slideIndex}-body`} className="text-white/70 text-sm">
+                            <Label htmlFor={`slide-${slideIndex}-body`} className="text-foreground/70 text-sm">
                               Content
                             </Label>
                             <Textarea
@@ -282,12 +282,12 @@ function CourseEditContent() {
                               onChange={(e) =>
                                 handleUpdateSlide(chapterIndex, slideIndex, "body", e.target.value)
                               }
-                              className="mt-1 glass-surface border-white/20 text-white min-h-[100px]"
+                              className="mt-1 glass-surface border-foreground/20 text-white min-h-[100px]"
                               rows={4}
                             />
                           </div>
                           <div>
-                            <Label htmlFor={`slide-${slideIndex}-narration`} className="text-white/70 text-sm">
+                            <Label htmlFor={`slide-${slideIndex}-narration`} className="text-foreground/70 text-sm">
                               Narration Script
                             </Label>
                             <Textarea
@@ -296,7 +296,7 @@ function CourseEditContent() {
                               onChange={(e) =>
                                 handleUpdateSlide(chapterIndex, slideIndex, "narration", e.target.value)
                               }
-                              className="mt-1 glass-surface border-white/20 text-white min-h-[80px]"
+                              className="mt-1 glass-surface border-foreground/20 text-white min-h-[80px]"
                               rows={3}
                             />
                           </div>

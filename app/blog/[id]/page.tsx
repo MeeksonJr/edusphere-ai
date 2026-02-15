@@ -266,7 +266,7 @@ The future of education will likely be a blend of human expertise and AI capabil
 
   return (
     <div className="min-h-screen bg-black">
-      <header className="border-b border-gray-800 py-4 sticky top-0 z-50 bg-black/80 backdrop-blur-md">
+      <header className="border-b border-gray-800 py-4 sticky top-0 z-50 bg-background/80 backdrop-blur-md">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link href="/" className="flex items-center">
             <div className="mr-2 bg-cyan-600 rounded-lg p-1.5">
@@ -278,7 +278,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="h-5 w-5 text-white"
+                className="h-5 w-5 text-foreground"
               >
                 <path d="M15.5 2H8.6c-.4 0-.8.2-1.1.5-.3.3-.5.7-.5 1.1v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8c.4 0 .8-.2 1.1-.5.3-.3.5-.7.5-1.1V6.5L15.5 2z" />
                 <path d="M3 7.6v12.8c0 .4.2.8.5 1.1.3.3.7.5 1.1.5h9.8" />
@@ -346,7 +346,7 @@ The future of education will likely be a blend of human expertise and AI capabil
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <Link
           href="/blog"
-          className="inline-flex items-center text-gray-400 hover:text-white mb-6"
+          className="inline-flex items-center text-gray-400 hover:text-foreground mb-6"
         >
           <ChevronLeft className="mr-1 h-4 w-4" /> Back to Blog
         </Link>
@@ -469,7 +469,7 @@ The future of education will likely be a blend of human expertise and AI capabil
         </section>
       </main>
 
-      <footer className="bg-black/80 border-t border-cyan-900/50 mt-20">
+      <footer className="bg-background/80 border-t border-cyan-900/50 mt-20">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Logo & Description */}

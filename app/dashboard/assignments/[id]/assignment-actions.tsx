@@ -109,7 +109,7 @@ export function AssignmentActions({ assignment }: { assignment: any }) {
           <AlertDialogFooter>
             <AlertDialogCancel className="bg-gray-800 border-gray-700 hover:bg-gray-700">Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-900 hover:bg-red-800 text-white"
+              className="bg-red-900 hover:bg-red-800 text-foreground"
               onClick={handleDelete}
               disabled={loading}
             >

@@ -313,11 +313,11 @@ function ProfileContent() {
   const getSubscriptionBadge = () => {
     const tier = user?.profile?.subscription_tier || "free"
     if (tier === "ultimate") {
-      return <Badge className="bg-gradient-to-r from-pink-500 to-pink-600 text-white">Ultimate</Badge>
+      return <Badge className="bg-gradient-to-r from-pink-500 to-pink-600 text-foreground">Ultimate</Badge>
     } else if (tier === "pro") {
-      return <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">Pro</Badge>
+      return <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-foreground">Pro</Badge>
     } else {
-      return <Badge className="bg-gray-600 text-white">Free</Badge>
+      return <Badge className="bg-gray-600 text-foreground">Free</Badge>
     }
   }
 
@@ -335,17 +335,17 @@ function ProfileContent() {
       <ScrollReveal direction="up">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">Your</span>{" "}
+            <span className="text-foreground">Your</span>{" "}
             <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
               Profile
             </span>
           </h1>
-          <p className="text-white/70">Manage your account and view your stats</p>
+          <p className="text-foreground/70">Manage your account and view your stats</p>
         </div>
       </ScrollReveal>
 
       <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="glass-surface border-white/20 p-1">
+        <TabsList className="glass-surface border-foreground/20 p-1">
           <TabsTrigger
             value="profile"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
@@ -380,7 +380,7 @@ function ProfileContent() {
         <TabsContent value="profile">
           <ScrollReveal direction="up">
             <GlassSurface className="p-6 lg:p-8">
-              <h2 className="text-xl font-bold text-white mb-6">Personal Information</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Personal Information</h2>
               <div className="flex flex-col md:flex-row gap-8">
                 <div className="flex flex-col items-center space-y-4">
                   <Avatar className="h-32 w-32 border-4 border-cyan-500/30">
@@ -390,9 +390,9 @@ function ProfileContent() {
                     </AvatarFallback>
                   </Avatar>
                   <label htmlFor="avatar-upload" className="cursor-pointer">
-                    <div className="flex items-center space-x-2 px-4 py-2 rounded-lg glass-surface border-white/20 hover:border-cyan-500/50 transition-all">
+                    <div className="flex items-center space-x-2 px-4 py-2 rounded-lg glass-surface border-foreground/20 hover:border-cyan-500/50 transition-all">
                       <Upload className="h-4 w-4" aria-hidden="true" />
-                      <span className="text-sm text-white">Upload Photo</span>
+                      <span className="text-sm text-foreground">Upload Photo</span>
                     </div>
                     <input
                       id="avatar-upload"
@@ -406,49 +406,49 @@ function ProfileContent() {
 
                 <div className="flex-1 space-y-5">
                   <div>
-                    <Label htmlFor="full_name" className="text-white mb-2 block">
+                    <Label htmlFor="full_name" className="text-foreground mb-2 block">
                       Full Name
                     </Label>
                     <Input
                       id="full_name"
                       value={profile.full_name}
                       onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                      className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                      className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                       placeholder="Enter your full name"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="username" className="text-white mb-2 block">
+                    <Label htmlFor="username" className="text-foreground mb-2 block">
                       Username
                     </Label>
                     <Input
                       id="username"
                       value={profile.username}
                       onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-                      className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                      className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                       placeholder="Choose a username"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="email" className="text-white mb-2 block">
+                    <Label htmlFor="email" className="text-foreground mb-2 block">
                       Email
                     </Label>
                     <Input
                       id="email"
                       value={user?.email}
                       disabled
-                      className="glass-surface border-white/20 text-white/50 opacity-70"
+                      className="glass-surface border-foreground/20 text-foreground/50 opacity-70"
                     />
-                    <p className="text-xs text-white/50 mt-1">Email cannot be changed</p>
+                    <p className="text-xs text-foreground/50 mt-1">Email cannot be changed</p>
                   </div>
 
                   <div className="pt-4">
                     <Button
                       onClick={handleUpdateProfile}
                       disabled={updating}
-                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                     >
                       {updating ? (
                         <>
@@ -472,7 +472,7 @@ function ProfileContent() {
             <ScrollReveal direction="up">
               <AnimatedCard variant="glow">
                 <div className="p-6">
-                  <h2 className="text-xl font-bold text-white mb-6">Learning Progress</h2>
+                  <h2 className="text-xl font-bold text-foreground mb-6">Learning Progress</h2>
                   <div className="space-y-6">
                     <div className="flex items-start space-x-4">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-pink-500/20 p-3 flex-shrink-0">
@@ -480,8 +480,8 @@ function ProfileContent() {
                       </div>
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center justify-between">
-                          <p className="font-semibold text-white">Assignments</p>
-                          <p className="text-sm text-white/60">{stats.assignments.total} total</p>
+                          <p className="font-semibold text-foreground">Assignments</p>
+                          <p className="text-sm text-foreground/60">{stats.assignments.total} total</p>
                         </div>
                         <Progress
                           value={
@@ -491,7 +491,7 @@ function ProfileContent() {
                           }
                           className="h-2"
                         />
-                        <p className="text-xs text-white/50">
+                        <p className="text-xs text-foreground/50">
                           {stats.assignments.completed} completed (
                           {stats.assignments.total > 0
                             ? Math.round((stats.assignments.completed / stats.assignments.total) * 100)
@@ -507,10 +507,10 @@ function ProfileContent() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <p className="font-semibold text-white">Flashcards</p>
-                          <p className="text-sm text-white/60">{stats.flashcards.sets} sets</p>
+                          <p className="font-semibold text-foreground">Flashcards</p>
+                          <p className="text-sm text-foreground/60">{stats.flashcards.sets} sets</p>
                         </div>
-                        <p className="text-sm text-white/70">{stats.flashcards.cards} cards created</p>
+                        <p className="text-sm text-foreground/70">{stats.flashcards.cards} cards created</p>
                       </div>
                     </div>
 
@@ -520,8 +520,8 @@ function ProfileContent() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <p className="font-semibold text-white">Study Resources</p>
-                          <p className="text-sm text-white/60">{stats.resources.total} created</p>
+                          <p className="font-semibold text-foreground">Study Resources</p>
+                          <p className="text-sm text-foreground/60">{stats.resources.total} created</p>
                         </div>
                       </div>
                     </div>
@@ -533,13 +533,13 @@ function ProfileContent() {
             <ScrollReveal direction="up" delay={0.1}>
               <AnimatedCard variant="glow" delay={0.1}>
                 <div className="p-6">
-                  <h2 className="text-xl font-bold text-white mb-6">AI Usage</h2>
+                  <h2 className="text-xl font-bold text-foreground mb-6">AI Usage</h2>
                   <div className="space-y-6">
                     <div>
-                      <p className="text-sm text-white/60 mb-2">Current Plan</p>
+                      <p className="text-sm text-foreground/60 mb-2">Current Plan</p>
                       <div className="flex items-center space-x-3 mb-4">
                         {getSubscriptionBadge()}
-                        <span className="text-sm text-white/70">
+                        <span className="text-sm text-foreground/70">
                           {user?.profile?.subscription_tier === "free"
                             ? "10 AI requests per month"
                             : "Unlimited AI requests"}
@@ -549,13 +549,13 @@ function ProfileContent() {
 
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm text-white/70">AI Requests Used</p>
-                        <p className="font-semibold text-white">{stats.aiUsage.total}</p>
+                        <p className="text-sm text-foreground/70">AI Requests Used</p>
+                        <p className="font-semibold text-foreground">{stats.aiUsage.total}</p>
                       </div>
                       {user?.profile?.subscription_tier === "free" && (
                         <>
                           <Progress value={(stats.aiUsage.total / 10) * 100} className="h-2 mb-2" />
-                          <div className="flex items-center justify-between text-xs text-white/50">
+                          <div className="flex items-center justify-between text-xs text-foreground/50">
                             <span>0</span>
                             <span>Remaining: {stats.aiUsage.remaining}</span>
                             <span>10</span>
@@ -566,11 +566,11 @@ function ProfileContent() {
 
                     {user?.profile?.subscription_tier === "free" && (
                       <GlassSurface className="p-4 border-cyan-500/30">
-                        <p className="text-sm text-white/80 mb-4">
+                        <p className="text-sm text-foreground/80 mb-4">
                           Upgrade to Pro or Ultimate plan for unlimited AI requests and premium features.
                         </p>
                         <Button
-                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-foreground"
                           onClick={() => router.push("/dashboard/subscription")}
                         >
                           Upgrade Plan
@@ -588,18 +588,18 @@ function ProfileContent() {
         <TabsContent value="subscription">
           <ScrollReveal direction="up">
             <GlassSurface className="p-6 lg:p-8">
-              <h2 className="text-xl font-bold text-white mb-6">Subscription Plan</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Subscription Plan</h2>
               <div className="glass-surface border-cyan-500/30 p-6 rounded-lg mb-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-1">
+                    <h3 className="text-2xl font-bold text-foreground mb-1">
                       {user?.profile?.subscription_tier === "ultimate"
                         ? "Ultimate Plan"
                         : user?.profile?.subscription_tier === "pro"
                           ? "Pro Plan"
                           : "Free Plan"}
                     </h3>
-                    <p className="text-white/70">
+                    <p className="text-foreground/70">
                       {user?.profile?.subscription_tier === "ultimate"
                         ? "$12.99/month"
                         : user?.profile?.subscription_tier === "pro"
@@ -611,57 +611,57 @@ function ProfileContent() {
                 </div>
 
                 <div className="space-y-2 mb-6">
-                  <h4 className="font-semibold text-white mb-3">Features included:</h4>
+                  <h4 className="font-semibold text-foreground mb-3">Features included:</h4>
                   <ul className="space-y-2">
                     {user?.profile?.subscription_tier === "ultimate" ? (
                       <>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Everything in Pro
                         </li>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Multi-project/class support
                         </li>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Study groups (peer-to-peer)
                         </li>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Voice assistant for Gemini AI
                         </li>
                       </>
                     ) : user?.profile?.subscription_tier === "pro" ? (
                       <>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Unlimited AI prompts
                         </li>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Priority support
                         </li>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Premium Gemini features
                         </li>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Flashcard & quiz generator
                         </li>
                       </>
                     ) : (
                       <>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Import calendar
                         </li>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           10 AI requests/month
                         </li>
-                        <li className="flex items-center text-white/80">
+                        <li className="flex items-center text-foreground/80">
                           <span className="mr-2 text-green-400">✓</span>
                           Access to Hugging Face basic tools
                         </li>
@@ -674,9 +674,9 @@ function ProfileContent() {
                   <div className="grid gap-4 md:grid-cols-2">
                     <AnimatedCard variant="3d">
                       <div className="p-6">
-                        <h4 className="text-lg font-bold text-white mb-2">Pro Plan</h4>
-                        <p className="text-white/60 mb-4">$6.99/month</p>
-                        <ul className="space-y-2 text-sm text-white/80 mb-6">
+                        <h4 className="text-lg font-bold text-foreground mb-2">Pro Plan</h4>
+                        <p className="text-foreground/60 mb-4">$6.99/month</p>
+                        <ul className="space-y-2 text-sm text-foreground/80 mb-6">
                           <li className="flex items-center">
                             <span className="mr-2 text-green-400">✓</span>
                             Unlimited AI prompts
@@ -687,7 +687,7 @@ function ProfileContent() {
                           </li>
                         </ul>
                         <Button
-                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-foreground"
                           onClick={() => router.push("/dashboard/subscription")}
                         >
                           Upgrade to Pro
@@ -697,9 +697,9 @@ function ProfileContent() {
 
                     <AnimatedCard variant="3d" delay={0.1}>
                       <div className="p-6">
-                        <h4 className="text-lg font-bold text-white mb-2">Ultimate Plan</h4>
-                        <p className="text-white/60 mb-4">$12.99/month</p>
-                        <ul className="space-y-2 text-sm text-white/80 mb-6">
+                        <h4 className="text-lg font-bold text-foreground mb-2">Ultimate Plan</h4>
+                        <p className="text-foreground/60 mb-4">$12.99/month</p>
+                        <ul className="space-y-2 text-sm text-foreground/80 mb-6">
                           <li className="flex items-center">
                             <span className="mr-2 text-green-400">✓</span>
                             Everything in Pro
@@ -710,7 +710,7 @@ function ProfileContent() {
                           </li>
                         </ul>
                         <Button
-                          className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+                          className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-foreground"
                           onClick={() => router.push("/dashboard/subscription")}
                         >
                           Upgrade to Ultimate
@@ -722,14 +722,14 @@ function ProfileContent() {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Button
                       variant="outline"
-                      className="glass-surface border-white/20 hover:border-red-500/50 text-red-400 hover:text-red-300"
+                      className="glass-surface border-foreground/20 hover:border-red-500/50 text-red-400 hover:text-red-300"
                       onClick={() => router.push("/dashboard/subscription")}
                     >
                       Cancel Subscription
                     </Button>
                     {user?.profile?.subscription_tier === "pro" && (
                       <Button
-                        className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+                        className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-foreground"
                         onClick={() => router.push("/dashboard/subscription")}
                       >
                         Upgrade to Ultimate
@@ -746,43 +746,43 @@ function ProfileContent() {
         <TabsContent value="security">
           <ScrollReveal direction="up">
             <GlassSurface className="p-6 lg:p-8">
-              <h2 className="text-xl font-bold text-white mb-6">Security Settings</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Security Settings</h2>
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Change Password</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Change Password</h3>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="current-password" className="text-white mb-2 block">
+                      <Label htmlFor="current-password" className="text-foreground mb-2 block">
                         Current Password
                       </Label>
                       <Input
                         id="current-password"
                         type="password"
-                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                        className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="new-password" className="text-white mb-2 block">
+                      <Label htmlFor="new-password" className="text-foreground mb-2 block">
                         New Password
                       </Label>
                       <Input
                         id="new-password"
                         type="password"
-                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                        className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="confirm-password" className="text-white mb-2 block">
+                      <Label htmlFor="confirm-password" className="text-foreground mb-2 block">
                         Confirm New Password
                       </Label>
                       <Input
                         id="confirm-password"
                         type="password"
-                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                        className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                       />
                     </div>
                     <Button
-                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                       onClick={() => {
                         toast({
                           title: "Password Update",
@@ -795,12 +795,12 @@ function ProfileContent() {
                   </div>
                 </div>
 
-                <div className="border-t border-white/10 pt-6">
-                  <h3 className="text-lg font-semibold text-white mb-4">Account Actions</h3>
+                <div className="border-t border-foreground/10 pt-6">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Account Actions</h3>
                   <div className="space-y-3">
                     <Button
                       variant="outline"
-                      className="w-full glass-surface border-white/20 hover:border-white/40 text-white justify-start"
+                      className="w-full glass-surface border-foreground/20 hover:border-white/40 text-white justify-start"
                       onClick={handleSignOut}
                     >
                       <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -824,23 +824,23 @@ function ProfileContent() {
 
       {/* Delete Account Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="glass-surface border-white/20">
+        <AlertDialogContent className="glass-surface border-foreground/20">
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center text-white">
+            <AlertDialogTitle className="flex items-center text-foreground">
               <AlertCircle className="h-5 w-5 text-red-400 mr-2" aria-hidden="true" />
               Delete Account
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-white/70">
+            <AlertDialogDescription className="text-foreground/70">
               This action cannot be undone. This will permanently delete your account and remove all your data from our
               servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="glass-surface border-white/20 text-white hover:bg-white/10">
+            <AlertDialogCancel className="glass-surface border-foreground/20 text-white hover:bg-foreground/10">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 hover:bg-red-700 text-foreground"
               onClick={handleDeleteAccount}
               disabled={updating}
             >

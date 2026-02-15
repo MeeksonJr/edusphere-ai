@@ -23,7 +23,7 @@ export default async function AssignmentsPage({
     return (
       <div className="p-6 md:p-8 lg:p-12">
         <GlassSurface className="p-8 text-center">
-          <p className="text-white/70">Please log in to view your assignments.</p>
+          <p className="text-foreground/70">Please log in to view your assignments.</p>
         </GlassSurface>
       </div>
     )
@@ -77,12 +77,12 @@ export default async function AssignmentsPage({
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              <span className="text-white">Assignments</span>
+              <span className="text-foreground">Assignments</span>
             </h1>
-            <p className="text-white/70">Manage your academic tasks and deadlines</p>
+            <p className="text-foreground/70">Manage your academic tasks and deadlines</p>
           </div>
           <Link href="/dashboard/assignments/new" className="mt-4 md:mt-0">
-            <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
+            <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground">
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
               New Assignment
             </Button>
@@ -96,11 +96,11 @@ export default async function AssignmentsPage({
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/40" aria-hidden="true" />
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/40" aria-hidden="true" />
               <Input
                 type="text"
                 placeholder="Search assignments..."
-                className="pl-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                className="pl-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
               />
             </div>
 
@@ -118,7 +118,7 @@ export default async function AssignmentsPage({
                       className={`inline-flex items-center px-3 py-1.5 text-sm font-medium transition-all ${
                         isActive
                           ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white border-cyan-500/30"
-                          : "glass-surface border-white/20 text-white/70 hover:text-white hover:border-white/40"
+                          : "glass-surface border-foreground/20 text-foreground/70 hover:text-foreground hover:border-white/40"
                       }`}
                     >
                       <Icon className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
@@ -134,14 +134,14 @@ export default async function AssignmentsPage({
           <div className="flex flex-wrap gap-2 mt-4">
             {/* Subject Filter */}
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-white/60" aria-hidden="true" />
-              <span className="text-sm text-white/60">Subject:</span>
+              <Filter className="h-4 w-4 text-foreground/60" aria-hidden="true" />
+              <span className="text-sm text-foreground/60">Subject:</span>
               <Link
                 href={`/dashboard/assignments?status=${status}&subject=all&sort=${sort}`}
                 className={`text-sm px-2 py-1 rounded ${
                   subject === "all"
                     ? "text-cyan-400 font-medium"
-                    : "text-white/70 hover:text-white"
+                    : "text-foreground/70 hover:text-foreground"
                 }`}
               >
                 All
@@ -153,7 +153,7 @@ export default async function AssignmentsPage({
                   className={`text-sm px-2 py-1 rounded ${
                     subject === subj
                       ? "text-cyan-400 font-medium"
-                      : "text-white/70 hover:text-white"
+                      : "text-foreground/70 hover:text-foreground"
                   }`}
                 >
                   {subj}
@@ -163,13 +163,13 @@ export default async function AssignmentsPage({
 
             {/* Sort */}
             <div className="flex items-center gap-2 ml-auto">
-              <span className="text-sm text-white/60">Sort:</span>
+              <span className="text-sm text-foreground/60">Sort:</span>
               <Link
                 href={`/dashboard/assignments?status=${status}&subject=${subject}&sort=due_date-asc`}
                 className={`p-1.5 rounded ${
                   sort === "due_date-asc"
                     ? "bg-cyan-500/20 text-cyan-400"
-                    : "text-white/60 hover:text-white"
+                    : "text-foreground/60 hover:text-foreground"
                 }`}
                 aria-label="Sort by due date ascending"
               >
@@ -180,7 +180,7 @@ export default async function AssignmentsPage({
                 className={`p-1.5 rounded ${
                   sort === "due_date-desc"
                     ? "bg-cyan-500/20 text-cyan-400"
-                    : "text-white/60 hover:text-white"
+                    : "text-foreground/60 hover:text-foreground"
                 }`}
                 aria-label="Sort by due date descending"
               >
@@ -218,7 +218,7 @@ export default async function AssignmentsPage({
                           <h3 className="text-lg font-semibold text-white group-hover:text-cyan-400 transition-colors">
                             {assignment.title}
                           </h3>
-                          <div className="flex items-center text-sm text-white/60 ml-4 flex-shrink-0">
+                          <div className="flex items-center text-sm text-foreground/60 ml-4 flex-shrink-0">
                             <Clock className="mr-1.5 h-4 w-4" aria-hidden="true" />
                             {assignment.due_date
                               ? new Date(assignment.due_date).toLocaleDateString()
@@ -226,13 +226,13 @@ export default async function AssignmentsPage({
                           </div>
                         </div>
                         {assignment.description && (
-                          <p className="text-white/70 text-sm mb-3 line-clamp-2">
+                          <p className="text-foreground/70 text-sm mb-3 line-clamp-2">
                             {assignment.description}
                           </p>
                         )}
                         <div className="flex items-center gap-2 flex-wrap">
                           {assignment.subject && (
-                            <Badge className="glass-surface border-white/10 text-white/80">
+                            <Badge className="glass-surface border-foreground/10 text-foreground/80">
                               {assignment.subject}
                             </Badge>
                           )}
@@ -269,15 +269,15 @@ export default async function AssignmentsPage({
         ) : (
           <ScrollReveal direction="up">
             <GlassSurface className="p-12 text-center">
-              <CheckSquare className="h-16 w-16 text-white/20 mx-auto mb-4" aria-hidden="true" />
-              <h3 className="text-xl font-semibold text-white mb-2">No assignments found</h3>
-              <p className="text-white/60 mb-6">
+              <CheckSquare className="h-16 w-16 text-foreground/20 mx-auto mb-4" aria-hidden="true" />
+              <h3 className="text-xl font-semibold text-foreground mb-2">No assignments found</h3>
+              <p className="text-foreground/60 mb-6">
                 {status !== "all"
                   ? `No ${status} assignments match your filters.`
                   : "Get started by creating your first assignment."}
               </p>
               <Link href="/dashboard/assignments/new">
-                <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
+                <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground">
                   <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
                   Create Assignment
                 </Button>

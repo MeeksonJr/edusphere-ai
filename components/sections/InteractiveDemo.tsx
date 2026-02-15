@@ -122,7 +122,7 @@ export function InteractiveDemo() {
                 key={preset.label}
                 onClick={() => handleGenerate(preset.topic)}
                 disabled={isGenerating}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-sm text-white/60 hover:text-white/90 hover:border-cyan-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-sm text-foreground/60 hover:text-foreground/90 hover:border-cyan-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Icon className="h-3.5 w-3.5" />
                 {preset.label}
@@ -139,7 +139,7 @@ export function InteractiveDemo() {
             onChange={(e) => setTopic(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
             placeholder="Or type any topic... (e.g., 'Introduction to Quantum Computing')"
-            className="flex-1 h-12 px-4 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/25 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm"
+            className="flex-1 h-12 px-4 rounded-xl bg-foreground/[0.04] border border-foreground/10 text-foreground placeholder:text-foreground/25 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm"
             disabled={isGenerating}
           />
           <Button
@@ -155,13 +155,13 @@ export function InteractiveDemo() {
         {/* Output Terminal */}
         <div className="glass-surface rounded-xl overflow-hidden">
           {/* Terminal header */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-white/[0.02]">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-foreground/5 bg-foreground/[0.02]">
             <div className="flex gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
               <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/40" />
               <div className="w-2.5 h-2.5 rounded-full bg-green-500/40" />
             </div>
-            <span className="text-xs text-white/20 font-mono ml-2">edusphere-ai — course-generator</span>
+            <span className="text-xs text-foreground/20 font-mono ml-2">edusphere-ai — course-generator</span>
             {isGenerating && (
               <div className="ml-auto flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -176,10 +176,10 @@ export function InteractiveDemo() {
             className="p-5 h-[300px] overflow-y-auto font-mono text-sm"
           >
             {output.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-white/20">
+              <div className="h-full flex flex-col items-center justify-center text-foreground/20">
                 <Sparkles className="h-8 w-8 mb-3 text-cyan-500/40" />
                 <p>Select a topic or type your own to see the magic</p>
-                <p className="text-xs mt-1 text-white/10">
+                <p className="text-xs mt-1 text-foreground/10">
                   AI generates a complete course outline in seconds
                 </p>
               </div>
@@ -194,14 +194,14 @@ export function InteractiveDemo() {
                     className={`${line.startsWith("Module")
                         ? "text-cyan-300 font-semibold"
                         : line.startsWith("  →")
-                          ? "text-white/50 pl-2"
+                          ? "text-foreground/50 pl-2"
                           : line.startsWith("✅")
                             ? "text-emerald-400 mt-2 font-semibold"
                             : line.startsWith("🎙️") || line.startsWith("📹")
                               ? "text-cyan-300/70"
                               : line.startsWith("📋")
                                 ? "text-amber-300/80"
-                                : "text-white/40"
+                                : "text-foreground/40"
                       }`}
                   >
                     {line || "\u00A0"}

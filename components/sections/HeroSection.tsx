@@ -10,7 +10,7 @@ export function HeroSection() {
     <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden pt-20 lg:pt-24 pb-16">
       {/* Mesh Gradient Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-100/40 via-background to-background dark:from-cyan-900/20 dark:via-background dark:to-background" />
         <div className="absolute inset-0 mesh-gradient-bg" />
         <div className="absolute inset-0 grid-pattern-dense opacity-40" />
       </div>
@@ -30,7 +30,7 @@ export function HeroSection() {
             transition={{ duration: 0.6 }}
           >
             <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-sm text-white/70 font-medium">
+            <span className="text-sm text-foreground/70 font-medium">
               Trusted by 5,000+ educators worldwide
             </span>
           </motion.div>
@@ -42,7 +42,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
           >
-            <span className="text-white block">Create Courses</span>
+            <span className="text-foreground block">Create Courses</span>
             <span className="text-gradient-brand block mt-2">
               10x Faster with AI
             </span>
@@ -50,7 +50,7 @@ export function HeroSection() {
 
           {/* Subheading */}
           <motion.p
-            className="text-lg md:text-xl text-white/55 mb-10 max-w-2xl mx-auto leading-relaxed"
+            className="text-lg md:text-xl text-foreground/55 mb-10 max-w-2xl mx-auto leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
@@ -79,7 +79,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="glass-surface border-white/15 hover:border-white/30 text-white px-8 py-7 text-lg rounded-xl backdrop-blur-md group"
+                className="glass-surface border-foreground/15 hover:border-foreground/30 text-foreground px-8 py-7 text-lg rounded-xl backdrop-blur-md group"
               >
                 <Play className="mr-2 h-5 w-5 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
                 Watch Demo
@@ -89,7 +89,7 @@ export function HeroSection() {
 
           {/* Trust Indicators */}
           <motion.div
-            className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/40"
+            className="flex flex-wrap items-center justify-center gap-6 text-sm text-foreground/40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.5 }}
@@ -115,33 +115,33 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-cyan-500/10">
+            <div className="relative rounded-xl overflow-hidden border border-foreground/10 shadow-2xl shadow-cyan-500/10">
               {/* Browser Chrome */}
-              <div className="bg-white/[0.03] border-b border-white/10 px-4 py-3 flex items-center gap-2">
+              <div className="bg-muted/50 dark:bg-foreground/[0.03] border-b border-foreground/10 px-4 py-3 flex items-center gap-2">
                 <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-white/10" />
-                  <div className="w-3 h-3 rounded-full bg-white/10" />
-                  <div className="w-3 h-3 rounded-full bg-white/10" />
+                  <div className="w-3 h-3 rounded-full bg-foreground/10" />
+                  <div className="w-3 h-3 rounded-full bg-foreground/10" />
+                  <div className="w-3 h-3 rounded-full bg-foreground/10" />
                 </div>
                 <div className="flex-1 mx-4">
                   <div className="glass-surface rounded-md h-7 max-w-md mx-auto flex items-center px-3">
-                    <span className="text-xs text-white/30">app.edusphere.ai/courses/create</span>
+                    <span className="text-xs text-foreground/30">app.edusphere.ai/courses/create</span>
                   </div>
                 </div>
               </div>
 
               {/* Mockup Content */}
-              <div className="bg-black/80 p-6 md:p-8 min-h-[300px] md:min-h-[400px]">
+              <div className="bg-background/80 p-6 md:p-8 min-h-[300px] md:min-h-[400px]">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                   {/* Left panel - Course outline */}
                   <div className="glass-surface p-4 rounded-lg">
-                    <div className="text-xs text-white/40 mb-3 font-medium uppercase tracking-wider">Course Outline</div>
+                    <div className="text-xs text-foreground/40 mb-3 font-medium uppercase tracking-wider">Course Outline</div>
                     {["Introduction to AI", "Neural Networks Basics", "Deep Learning", "Practical Applications"].map((item, i) => (
-                      <div key={item} className="flex items-center gap-2 py-2 border-b border-white/5 last:border-0">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? 'bg-cyan-500 text-white' : 'bg-white/10 text-white/40'}`}>
+                      <div key={item} className="flex items-center gap-2 py-2 border-b border-foreground/5 last:border-0">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? 'bg-cyan-500 text-white' : 'bg-foreground/10 text-foreground/40'}`}>
                           {i + 1}
                         </div>
-                        <span className={`text-sm ${i === 0 ? 'text-white' : 'text-white/50'}`}>{item}</span>
+                        <span className={`text-sm ${i === 0 ? 'text-foreground font-semibold' : 'text-foreground/50'}`}>{item}</span>
                       </div>
                     ))}
                   </div>
@@ -149,21 +149,21 @@ export function HeroSection() {
                   {/* Center panel - Preview */}
                   <div className="md:col-span-2 glass-surface p-4 rounded-lg">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="text-xs text-white/40 font-medium uppercase tracking-wider">Slide Preview</div>
+                      <div className="text-xs text-foreground/40 font-medium uppercase tracking-wider">Slide Preview</div>
                       <div className="flex items-center gap-1">
                         <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                         <span className="text-xs text-emerald-400/80">Generating...</span>
                       </div>
                     </div>
-                    <div className="aspect-video rounded-lg bg-gradient-to-br from-cyan-600/20 via-black to-cyan-600/10 flex items-center justify-center border border-white/5">
+                    <div className="aspect-video rounded-lg bg-gradient-to-br from-cyan-600/20 via-background to-cyan-600/10 flex items-center justify-center border border-foreground/5">
                       <div className="text-center">
-                        <div className="text-2xl md:text-3xl font-display font-bold text-white mb-2">Introduction to AI</div>
-                        <div className="text-sm text-white/50">Module 1 of 4</div>
+                        <div className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">Introduction to AI</div>
+                        <div className="text-sm text-foreground/50">Module 1 of 4</div>
                         <div className="mt-4 flex items-center justify-center gap-2">
                           <div className="h-1 w-16 rounded-full bg-cyan-500" />
-                          <div className="h-1 w-16 rounded-full bg-white/10" />
-                          <div className="h-1 w-16 rounded-full bg-white/10" />
-                          <div className="h-1 w-16 rounded-full bg-white/10" />
+                          <div className="h-1 w-16 rounded-full bg-foreground/10" />
+                          <div className="h-1 w-16 rounded-full bg-foreground/10" />
+                          <div className="h-1 w-16 rounded-full bg-foreground/10" />
                         </div>
                       </div>
                     </div>

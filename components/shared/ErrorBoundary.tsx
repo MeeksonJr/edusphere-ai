@@ -42,10 +42,10 @@ export class ErrorBoundary extends React.Component<
         <div className="min-h-screen flex items-center justify-center p-4">
           <GlassSurface className="p-8 max-w-md w-full text-center">
             <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               Something went wrong
             </h2>
-            <p className="text-white/70 mb-6">
+            <p className="text-foreground/70 mb-6">
               {this.state.error?.message || "An unexpected error occurred"}
             </p>
             <Button
@@ -53,7 +53,7 @@ export class ErrorBoundary extends React.Component<
                 this.setState({ hasError: false, error: null });
                 window.location.reload();
               }}
-              className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+              className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
             >
               Reload Page
             </Button>

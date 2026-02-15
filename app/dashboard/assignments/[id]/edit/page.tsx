@@ -208,7 +208,7 @@ export default function EditAssignmentPage({ params }: { params: { id: string } 
       <div className="mb-8">
         <Link
           href={`/dashboard/assignments/${params.id}`}
-          className="inline-flex items-center text-gray-400 hover:text-white mb-4"
+          className="inline-flex items-center text-gray-400 hover:text-foreground mb-4"
         >
           <ChevronLeft className="mr-1 h-4 w-4" /> Back to Assignment
         </Link>

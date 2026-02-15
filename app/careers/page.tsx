@@ -83,21 +83,21 @@ export default function CareersPage() {
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-background to-background" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
               <div className="max-w-3xl mx-auto text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-6">
-                  <Briefcase className="h-8 w-8 text-white" />
+                  <Briefcase className="h-8 w-8 text-foreground" />
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                  <span className="text-white">Join Our</span>{" "}
+                  <span className="text-foreground">Join Our</span>{" "}
                   <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Team
                   </span>
                 </h1>
-                <p className="text-xl text-white/70 mb-8">
+                <p className="text-xl text-foreground/70 mb-8">
                   Help us build the future of education technology
                 </p>
               </div>
@@ -109,7 +109,7 @@ export default function CareersPage() {
         <section className="py-12">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollReveal direction="up">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8 text-center">
                 Our Culture
               </h2>
             </ScrollReveal>
@@ -127,12 +127,12 @@ export default function CareersPage() {
                         <div
                           className={`w-14 h-14 rounded-xl bg-gradient-to-br ${value.gradient} p-3 mx-auto mb-4`}
                         >
-                          <Icon className="h-full w-full text-white" />
+                          <Icon className="h-full w-full text-foreground" />
                         </div>
-                        <h3 className="text-xl font-bold text-white mb-2">
+                        <h3 className="text-xl font-bold text-foreground mb-2">
                           {value.title}
                         </h3>
-                        <p className="text-white/70">{value.description}</p>
+                        <p className="text-foreground/70">{value.description}</p>
                       </div>
                     </AnimatedCard>
                   </ScrollReveal>
@@ -146,7 +146,7 @@ export default function CareersPage() {
         <section className="py-12">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollReveal direction="up">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8 text-center">
                 Benefits & Perks
               </h2>
             </ScrollReveal>
@@ -161,10 +161,10 @@ export default function CareersPage() {
                     <div className="flex items-start space-x-4">
                       <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
                       <div>
-                        <h3 className="text-lg font-semibold text-white mb-1">
+                        <h3 className="text-lg font-semibold text-foreground mb-1">
                           {benefit.title}
                         </h3>
-                        <p className="text-white/70 text-sm">
+                        <p className="text-foreground/70 text-sm">
                           {benefit.description}
                         </p>
                       </div>
@@ -180,7 +180,7 @@ export default function CareersPage() {
         <section className="py-12 pb-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollReveal direction="up">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8 text-center">
                 Open Positions
               </h2>
             </ScrollReveal>
@@ -195,10 +195,10 @@ export default function CareersPage() {
                     <Link href={`/careers/${position.title.toLowerCase().replace(/\s+/g, '-')}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                          <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-cyan-400 transition-colors">
                             {position.title}
                           </h3>
-                          <div className="flex items-center space-x-4 text-sm text-white/60">
+                          <div className="flex items-center space-x-4 text-sm text-foreground/60">
                             <span>{position.department}</span>
                             <span>•</span>
                             <span>{position.location}</span>
@@ -206,7 +206,7 @@ export default function CareersPage() {
                             <span>{position.type}</span>
                           </div>
                         </div>
-                        <ArrowRight className="h-5 w-5 text-white/40 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
+                        <ArrowRight className="h-5 w-5 text-foreground/40 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
                       </div>
                     </Link>
                   </GlassSurface>
@@ -216,14 +216,14 @@ export default function CareersPage() {
             {openPositions.length === 0 && (
               <ScrollReveal direction="up">
                 <GlassSurface className="p-12 text-center max-w-2xl mx-auto">
-                  <p className="text-white/70 text-lg mb-4">
+                  <p className="text-foreground/70 text-lg mb-4">
                     We don't have any open positions at the moment, but we're always looking 
                     for talented people to join our team.
                   </p>
                   <Link href="/contact">
                     <Button
                       variant="outline"
-                      className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
+                      className="glass-surface border-foreground/20 hover:border-cyan-500/50 text-foreground"
                     >
                       Get in Touch
                     </Button>
@@ -240,10 +240,10 @@ export default function CareersPage() {
             <ScrollReveal direction="up">
               <GlassSurface className="p-8 md:p-12 text-center max-w-3xl mx-auto">
                 <Heart className="h-16 w-16 text-cyan-400 mx-auto mb-6" />
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                   Don't See a Role That Fits?
                 </h2>
-                <p className="text-xl text-white/70 mb-8">
+                <p className="text-xl text-foreground/70 mb-8">
                   We're always looking for exceptional talent. Send us your resume and we'll 
                   keep you in mind for future opportunities.
                 </p>

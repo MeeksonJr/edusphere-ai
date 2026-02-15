@@ -359,7 +359,7 @@ ${resource.content}
   const getResourceTypeIcon = (type: string) => {
     const resourceType = resourceTypes.find((t) => t.value === type)
     const Icon = resourceType?.icon || FileText
-    return <Icon className="h-5 w-5 text-white/60" aria-hidden="true" />
+    return <Icon className="h-5 w-5 text-foreground/60" aria-hidden="true" />
   }
 
   return (
@@ -368,12 +368,12 @@ ${resource.content}
       <ScrollReveal direction="up">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">Study</span>{" "}
+            <span className="text-foreground">Study</span>{" "}
             <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
               Resources
             </span>
           </h1>
-          <p className="text-white/70">Create and manage your study materials</p>
+          <p className="text-foreground/70">Create and manage your study materials</p>
         </div>
       </ScrollReveal>
 
@@ -382,23 +382,23 @@ ${resource.content}
         <GlassSurface className="p-4 md:p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-white/40" aria-hidden="true" />
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/40" aria-hidden="true" />
               <Input
                 placeholder="Search resources..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                className="pl-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
               />
             </div>
             <div className="flex gap-2">
               <Select value={subjectFilter} onValueChange={setSubjectFilter}>
-                <SelectTrigger className="w-[180px] glass-surface border-white/20 text-white">
+                <SelectTrigger className="w-[180px] glass-surface border-foreground/20 text-foreground">
                   <SelectValue placeholder="Filter by subject" />
                 </SelectTrigger>
-                <SelectContent className="glass-surface border-white/20">
-                  <SelectItem value="all" className="text-white">All Subjects</SelectItem>
+                <SelectContent className="glass-surface border-foreground/20">
+                  <SelectItem value="all" className="text-foreground">All Subjects</SelectItem>
                   {subjects.map((subject) => (
-                    <SelectItem key={subject} value={subject} className="text-white">
+                    <SelectItem key={subject} value={subject} className="text-foreground">
                       {subject}
                     </SelectItem>
                   ))}
@@ -406,13 +406,13 @@ ${resource.content}
               </Select>
 
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-[180px] glass-surface border-white/20 text-white">
+                <SelectTrigger className="w-[180px] glass-surface border-foreground/20 text-foreground">
                   <SelectValue placeholder="Filter by type" />
                 </SelectTrigger>
-                <SelectContent className="glass-surface border-white/20">
-                  <SelectItem value="all" className="text-white">All Types</SelectItem>
+                <SelectContent className="glass-surface border-foreground/20">
+                  <SelectItem value="all" className="text-foreground">All Types</SelectItem>
                   {resourceTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value} className="text-white">
+                    <SelectItem key={type.value} value={type.value} className="text-foreground">
                       {type.label}
                     </SelectItem>
                   ))}
@@ -420,7 +420,7 @@ ${resource.content}
               </Select>
 
               <Button
-                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-foreground"
                 onClick={() => router.push("/dashboard/resources/new")}
               >
                 <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -436,11 +436,11 @@ ${resource.content}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="glass-surface p-6 animate-pulse">
-              <div className="h-6 bg-white/10 rounded w-3/4 mb-4"></div>
-              <div className="h-4 bg-white/10 rounded w-1/2 mb-4"></div>
+              <div className="h-6 bg-foreground/10 rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-foreground/10 rounded w-1/2 mb-4"></div>
               <div className="space-y-2">
-                <div className="h-4 bg-white/10 rounded w-full"></div>
-                <div className="h-4 bg-white/10 rounded w-full"></div>
+                <div className="h-4 bg-foreground/10 rounded w-full"></div>
+                <div className="h-4 bg-foreground/10 rounded w-full"></div>
               </div>
             </div>
           ))}
@@ -453,19 +453,19 @@ ${resource.content}
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-white mb-1 truncate group-hover:text-blue-400 transition-colors">
+                      <h3 className="text-lg font-bold text-foreground mb-1 truncate group-hover:text-blue-400 transition-colors">
                         {resource.title}
                       </h3>
-                      <p className="text-sm text-white/60 truncate">{resource.subject}</p>
+                      <p className="text-sm text-foreground/60 truncate">{resource.subject}</p>
                     </div>
                     <div className="flex items-center ml-2">{getResourceTypeIcon(resource.resource_type)}</div>
                   </div>
-                  <p className="text-sm text-white/70 line-clamp-3 mb-4">
+                  <p className="text-sm text-foreground/70 line-clamp-3 mb-4">
                     {resource.description || resource.content.substring(0, 150) + "..."}
                   </p>
                   <div className="flex flex-wrap gap-1 mb-4">
                     {resource.tags?.slice(0, 3).map((tag: string) => (
-                      <Badge key={tag} className="glass-surface border-white/10 text-white/80 text-xs">
+                      <Badge key={tag} className="glass-surface border-foreground/10 text-foreground/80 text-xs">
                         {tag}
                       </Badge>
                     ))}
@@ -476,11 +476,11 @@ ${resource.content}
                       </Badge>
                     )}
                   </div>
-                  <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                  <div className="flex items-center justify-between pt-4 border-t border-foreground/10">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="glass-surface border-white/20 hover:border-blue-500/50 text-white"
+                      className="glass-surface border-foreground/20 hover:border-blue-500/50 text-foreground"
                       onClick={() => handleViewResource(resource)}
                     >
                       View Resource
@@ -488,7 +488,7 @@ ${resource.content}
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="text-white/60 hover:text-white"
+                      className="text-foreground/60 hover:text-foreground"
                       onClick={() => downloadResource(resource)}
                       aria-label="Download resource"
                     >
@@ -503,15 +503,15 @@ ${resource.content}
       ) : (
         <ScrollReveal direction="up">
           <GlassSurface className="p-12 text-center">
-            <BookOpen className="mx-auto h-16 w-16 text-white/20 mb-4" aria-hidden="true" />
-            <h3 className="text-xl font-semibold text-white mb-2">No resources found</h3>
-            <p className="text-white/60 mb-6">
+            <BookOpen className="mx-auto h-16 w-16 text-foreground/20 mb-4" aria-hidden="true" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">No resources found</h3>
+            <p className="text-foreground/60 mb-6">
               {searchQuery || subjectFilter !== "all" || typeFilter !== "all"
                 ? "Try adjusting your filters or search query."
                 : "Start by creating your first study resource."}
             </p>
             <Button
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-foreground"
               onClick={() => router.push("/dashboard/resources/new")}
             >
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -523,10 +523,10 @@ ${resource.content}
 
       {/* Create Resource Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="glass-surface border-white/20 sm:max-w-[700px] max-h-[90vh] flex flex-col">
+        <DialogContent className="glass-surface border-foreground/20 sm:max-w-[700px] max-h-[90vh] flex flex-col">
           <DialogHeader className="flex-shrink-0">
-            <DialogTitle className="text-white">Create New Study Resource</DialogTitle>
-            <DialogDescription className="text-white/70">
+            <DialogTitle className="text-foreground">Create New Study Resource</DialogTitle>
+            <DialogDescription className="text-foreground/70">
               Create your own study material or let AI generate content for you.
             </DialogDescription>
           </DialogHeader>
@@ -534,7 +534,7 @@ ${resource.content}
           <form onSubmit={handleCreateResource} className="space-y-4 overflow-y-auto flex-1 pr-2">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="title" className="text-white mb-2 block">
+                <Label htmlFor="title" className="text-foreground mb-2 block">
                   Title <span className="text-red-400">*</span>
                 </Label>
                 <Input
@@ -542,13 +542,13 @@ ${resource.content}
                   value={newResource.title}
                   onChange={(e) => setNewResource({ ...newResource, title: e.target.value })}
                   placeholder="e.g., Quantum Physics Fundamentals"
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="subject" className="text-white mb-2 block">
+                <Label htmlFor="subject" className="text-foreground mb-2 block">
                   Subject <span className="text-red-400">*</span>
                 </Label>
                 <Select
@@ -556,12 +556,12 @@ ${resource.content}
                   onValueChange={(value) => setNewResource({ ...newResource, subject: value })}
                   required
                 >
-                  <SelectTrigger className="glass-surface border-white/20 text-white">
+                  <SelectTrigger className="glass-surface border-foreground/20 text-foreground">
                     <SelectValue placeholder="Select a subject" />
                   </SelectTrigger>
-                  <SelectContent className="glass-surface border-white/20">
+                  <SelectContent className="glass-surface border-foreground/20">
                     {subjects.map((subject) => (
-                      <SelectItem key={subject} value={subject} className="text-white">
+                      <SelectItem key={subject} value={subject} className="text-foreground">
                         {subject}
                       </SelectItem>
                     ))}
@@ -571,7 +571,7 @@ ${resource.content}
             </div>
 
             <div>
-              <Label htmlFor="description" className="text-white mb-2 block">
+              <Label htmlFor="description" className="text-foreground mb-2 block">
                 Description
               </Label>
               <Textarea
@@ -579,25 +579,25 @@ ${resource.content}
                 value={newResource.description}
                 onChange={(e) => setNewResource({ ...newResource, description: e.target.value })}
                 placeholder="Brief description of this resource"
-                className="glass-surface border-white/20 text-white placeholder:text-white/40 resize-none"
+                className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 resize-none"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="resource_type" className="text-white mb-2 block">
+                <Label htmlFor="resource_type" className="text-foreground mb-2 block">
                   Resource Type
                 </Label>
                 <Select
                   value={newResource.resource_type}
                   onValueChange={(value) => setNewResource({ ...newResource, resource_type: value })}
                 >
-                  <SelectTrigger className="glass-surface border-white/20 text-white">
+                  <SelectTrigger className="glass-surface border-foreground/20 text-foreground">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="glass-surface border-white/20">
+                  <SelectContent className="glass-surface border-foreground/20">
                     {resourceTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value} className="text-white">
+                      <SelectItem key={type.value} value={type.value} className="text-foreground">
                         {type.label}
                       </SelectItem>
                     ))}
@@ -606,7 +606,7 @@ ${resource.content}
               </div>
 
               <div>
-                <Label htmlFor="tags" className="text-white mb-2 block">
+                <Label htmlFor="tags" className="text-foreground mb-2 block">
                   Tags
                 </Label>
                 <div className="flex gap-2">
@@ -621,12 +621,12 @@ ${resource.content}
                       }
                     }}
                     placeholder="Add a tag and press Enter"
-                    className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                    className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                   />
                   <Button
                     type="button"
                     onClick={handleAddTag}
-                    className="glass-surface border-white/20 hover:border-blue-500/50 text-white"
+                    className="glass-surface border-foreground/20 hover:border-blue-500/50 text-foreground"
                   >
                     <Plus className="h-4 w-4" aria-hidden="true" />
                   </Button>
@@ -636,7 +636,7 @@ ${resource.content}
                     {newResource.tags.map((tag) => (
                       <Badge
                         key={tag}
-                        className="glass-surface border-white/10 text-white/80"
+                        className="glass-surface border-foreground/10 text-foreground/80"
                         onClick={() => handleRemoveTag(tag)}
                       >
                         {tag}
@@ -649,7 +649,7 @@ ${resource.content}
             </div>
 
             <div>
-              <Label htmlFor="content" className="text-white mb-2 block">
+              <Label htmlFor="content" className="text-foreground mb-2 block">
                 Content <span className="text-red-400">*</span>
               </Label>
               <Textarea
@@ -658,13 +658,13 @@ ${resource.content}
                 onChange={(e) => setNewResource({ ...newResource, content: e.target.value })}
                 placeholder="Enter your study resource content..."
                 rows={8}
-                className="glass-surface border-white/20 text-white placeholder:text-white/40 resize-none font-mono text-sm"
+                className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 resize-none font-mono text-sm"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="image" className="text-white mb-2 block">
+              <Label htmlFor="image" className="text-foreground mb-2 block">
                 Image (Optional)
               </Label>
               <div className="flex gap-2">
@@ -677,11 +677,11 @@ ${resource.content}
                       setImageFile(e.target.files[0])
                     }
                   }}
-                  className="glass-surface border-white/20 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-cyan-500 file:text-white hover:file:bg-cyan-600"
+                  className="glass-surface border-foreground/20 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-cyan-500 file:text-white hover:file:bg-cyan-600"
                   disabled={uploadingImage}
                 />
                 {imageFile && (
-                  <Badge className="glass-surface border-white/10 text-white/80">
+                  <Badge className="glass-surface border-foreground/10 text-foreground/80">
                     {imageFile.name}
                   </Badge>
                 )}
@@ -694,7 +694,7 @@ ${resource.content}
                 variant="outline"
                 onClick={handleGenerateResource}
                 disabled={generatingResource || !newResource.subject || !newResource.title}
-                className="flex-1 glass-surface border-white/20 hover:border-cyan-500/50 text-white"
+                className="flex-1 glass-surface border-foreground/20 hover:border-cyan-500/50 text-foreground"
               >
                 {generatingResource ? (
                   <>
@@ -710,18 +710,18 @@ ${resource.content}
               </Button>
             </div>
 
-            <DialogFooter className="flex-shrink-0 pt-4 border-t border-white/10">
+            <DialogFooter className="flex-shrink-0 pt-4 border-t border-foreground/10">
               <Button
                 type="button"
                 variant="outline"
-                className="glass-surface border-white/20 text-white hover:bg-white/10"
+                className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                 onClick={() => setIsCreateDialogOpen(false)}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-foreground"
               >
                 Create Resource
               </Button>
@@ -733,19 +733,19 @@ ${resource.content}
       {/* View Resource Dialog - Redesigned */}
       {currentResource && (
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-          <DialogContent className="glass-surface border-white/20 sm:max-w-[900px] max-w-[95vw] max-h-[90vh] p-0 flex flex-col">
+          <DialogContent className="glass-surface border-foreground/20 sm:max-w-[900px] max-w-[95vw] max-h-[90vh] p-0 flex flex-col">
             {/* Header */}
-            <div className="p-6 border-b border-white/10 flex-shrink-0">
+            <div className="p-6 border-b border-foreground/10 flex-shrink-0">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <DialogTitle className="text-white text-2xl mb-2">{currentResource.title}</DialogTitle>
                   <div className="flex items-center gap-3 flex-wrap">
                     {currentResource.subject && (
-                      <Badge className="glass-surface border-white/20 text-white/90">
+                      <Badge className="glass-surface border-foreground/20 text-white/90">
                         {currentResource.subject}
                       </Badge>
                     )}
-                    <Badge className="glass-surface border-white/20 text-white/90">
+                    <Badge className="glass-surface border-foreground/20 text-white/90">
                       {resourceTypes.find((t) => t.value === currentResource.resource_type)?.label || currentResource.resource_type}
                     </Badge>
                     {currentResource.ai_generated && (
@@ -760,7 +760,7 @@ ${resource.content}
                   <Button
                     variant="outline"
                     size="sm"
-                    className="glass-surface border-white/20 text-white hover:bg-white/10"
+                    className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                     onClick={() => downloadResource(currentResource)}
                     aria-label="Download resource"
                   >
@@ -783,13 +783,13 @@ ${resource.content}
               </div>
 
               {currentResource.description && (
-                <p className="text-white/80 text-sm leading-relaxed">{currentResource.description}</p>
+                <p className="text-foreground/80 text-sm leading-relaxed">{currentResource.description}</p>
               )}
 
               {currentResource.tags && currentResource.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {currentResource.tags.map((tag: string) => (
-                    <Badge key={tag} className="glass-surface border-white/10 text-white/80 text-xs">
+                    <Badge key={tag} className="glass-surface border-foreground/10 text-foreground/80 text-xs">
                       {tag}
                     </Badge>
                   ))}
@@ -809,7 +809,7 @@ ${resource.content}
                     />
                   </div>
                 )}
-                <div className="glass-surface border-white/10 p-6 md:p-8 rounded-xl">
+                <div className="glass-surface border-foreground/10 p-6 md:p-8 rounded-xl">
                   <div className="prose prose-invert max-w-none">
                     <div className="whitespace-pre-wrap text-white/90 leading-relaxed text-base md:text-lg">
                       {currentResource.content}
@@ -820,8 +820,8 @@ ${resource.content}
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-white/10 flex-shrink-0 text-center">
-              <p className="text-white/50 text-xs">
+            <div className="p-4 border-t border-foreground/10 flex-shrink-0 text-center">
+              <p className="text-foreground/50 text-xs">
                 Created {new Date(currentResource.created_at).toLocaleDateString()}
                 {currentResource.updated_at !== currentResource.created_at && (
                   <> • Updated {new Date(currentResource.updated_at).toLocaleDateString()}</>

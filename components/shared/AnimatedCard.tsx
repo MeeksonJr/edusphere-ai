@@ -84,7 +84,7 @@ export function AnimatedCard({
     },
     glow: {
       scale: 1.03,
-      boxShadow: "0 0 30px rgba(168, 85, 247, 0.3)",
+      boxShadow: "0 0 30px rgba(6, 182, 212, 0.3)",
       transition: { duration: 0.3 },
     },
   };

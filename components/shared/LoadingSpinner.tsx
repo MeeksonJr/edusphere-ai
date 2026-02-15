@@ -33,7 +33,7 @@ export function LoadingSpinner({
         <Loader2 className={`${sizes[size]} text-cyan-400`} aria-hidden="true" />
       </motion.div>
       {text && (
-        <p className="mt-4 text-white/70 text-sm" role="status" aria-live="polite">
+        <p className="mt-4 text-foreground/70 text-sm" role="status" aria-live="polite">
           {text}
         </p>
       )}

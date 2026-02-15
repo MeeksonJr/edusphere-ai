@@ -129,15 +129,15 @@ export default function SignupPage() {
             {/* Header */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-4">
-                <Sparkles className="h-8 w-8 text-white" />
+                <Sparkles className="h-8 w-8 text-foreground" />
               </div>
               <h1 className="text-4xl font-bold mb-2">
-                <span className="text-white">Create Your</span>{" "}
+                <span className="text-foreground">Create Your</span>{" "}
                 <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                   Account
                 </span>
               </h1>
-              <p className="text-white/70">
+              <p className="text-foreground/70">
                 Start creating amazing courses in minutes
               </p>
             </div>
@@ -152,11 +152,11 @@ export default function SignupPage() {
 
               <form onSubmit={handleSignup} className="space-y-5">
                 <div>
-                  <Label htmlFor="name" className="text-white mb-2 block">
+                  <Label htmlFor="name" className="text-foreground mb-2 block">
                     Full Name
                   </Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
                     <Input
                       id="name"
                       name="name"
@@ -165,17 +165,17 @@ export default function SignupPage() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="John Doe"
-                      className="pl-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                      className="pl-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="email" className="text-white mb-2 block">
+                  <Label htmlFor="email" className="text-foreground mb-2 block">
                     Email
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
                     <Input
                       id="email"
                       name="email"
@@ -184,17 +184,17 @@ export default function SignupPage() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="your@email.com"
-                      className="pl-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                      className="pl-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="password" className="text-white mb-2 block">
+                  <Label htmlFor="password" className="text-foreground mb-2 block">
                     Password
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
                     <Input
                       id="password"
                       name="password"
@@ -203,12 +203,12 @@ export default function SignupPage() {
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="Create a strong password"
-                      className="pl-10 pr-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                      className="pl-10 pr-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground/40 hover:text-foreground transition-colors"
                     >
                       {showPassword ? (
                         <EyeOff className="h-5 w-5" />
@@ -226,12 +226,12 @@ export default function SignupPage() {
                         >
                           <CheckCircle
                             className={`h-3 w-3 ${
-                              req.met ? "text-green-400" : "text-white/20"
+                              req.met ? "text-green-400" : "text-foreground/20"
                             }`}
                           />
                           <span
                             className={
-                              req.met ? "text-green-400" : "text-white/40"
+                              req.met ? "text-green-400" : "text-foreground/40"
                             }
                           >
                             {req.text}
@@ -245,12 +245,12 @@ export default function SignupPage() {
                 <div>
                   <Label
                     htmlFor="confirmPassword"
-                    className="text-white mb-2 block"
+                    className="text-foreground mb-2 block"
                   >
                     Confirm Password
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
                     <Input
                       id="confirmPassword"
                       name="confirmPassword"
@@ -259,14 +259,14 @@ export default function SignupPage() {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       placeholder="Confirm your password"
-                      className="pl-10 pr-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                      className="pl-10 pr-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                     />
                     <button
                       type="button"
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
                       }
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground/40 hover:text-foreground transition-colors"
                     >
                       {showConfirmPassword ? (
                         <EyeOff className="h-5 w-5" />
@@ -283,11 +283,11 @@ export default function SignupPage() {
                     id="terms"
                     checked={agreedToTerms}
                     onChange={(e) => setAgreedToTerms(e.target.checked)}
-                    className="mt-1 rounded border-white/20 bg-transparent"
+                    className="mt-1 rounded border-foreground/20 bg-transparent"
                   />
                   <label
                     htmlFor="terms"
-                    className="text-sm text-white/70 cursor-pointer"
+                    className="text-sm text-foreground/70 cursor-pointer"
                   >
                     I agree to the{" "}
                     <Link
@@ -310,7 +310,7 @@ export default function SignupPage() {
                   type="submit"
                   size="lg"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                 >
                   {loading ? (
                     <>
@@ -323,8 +323,8 @@ export default function SignupPage() {
                 </Button>
               </form>
 
-              <div className="mt-6 pt-6 border-t border-white/10">
-                <p className="text-center text-white/70 text-sm">
+              <div className="mt-6 pt-6 border-t border-foreground/10">
+                <p className="text-center text-foreground/70 text-sm">
                   Already have an account?{" "}
                   <Link
                     href="/login"

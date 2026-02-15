@@ -202,9 +202,9 @@ export default function CalendarPage() {
       <ScrollReveal direction="up">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">Calendar</span>
+            <span className="text-foreground">Calendar</span>
           </h1>
-          <p className="text-white/70">Manage your schedule and deadlines</p>
+          <p className="text-foreground/70">Manage your schedule and deadlines</p>
         </div>
       </ScrollReveal>
 
@@ -216,7 +216,7 @@ export default function CalendarPage() {
               <Button
                 variant="outline"
                 size="icon"
-                className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
+                className="glass-surface border-foreground/20 hover:border-cyan-500/50 text-foreground"
                 onClick={handlePrevious}
                 aria-label="Previous"
               >
@@ -225,7 +225,7 @@ export default function CalendarPage() {
               <Button
                 variant="outline"
                 size="icon"
-                className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
+                className="glass-surface border-foreground/20 hover:border-cyan-500/50 text-foreground"
                 onClick={handleNext}
                 aria-label="Next"
               >
@@ -233,7 +233,7 @@ export default function CalendarPage() {
               </Button>
               <Button
                 variant="outline"
-                className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
+                className="glass-surface border-foreground/20 hover:border-cyan-500/50 text-foreground"
                 onClick={handleToday}
               >
                 Today
@@ -241,14 +241,14 @@ export default function CalendarPage() {
               <h2 className="text-xl font-semibold text-white ml-2">{formatDateRange()}</h2>
             </div>
             <div className="flex items-center space-x-2 flex-wrap">
-              <div className="glass-surface border-white/20 rounded-lg p-1 flex">
+              <div className="glass-surface border-foreground/20 rounded-lg p-1 flex">
                 <Button
                   variant="ghost"
                   size="sm"
                   className={`${
                     view === "month"
-                      ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
-                      : "text-white/70 hover:text-white"
+                      ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-foreground"
+                      : "text-foreground/70 hover:text-foreground"
                   }`}
                   onClick={() => handleViewChange("month")}
                 >
@@ -259,8 +259,8 @@ export default function CalendarPage() {
                   size="sm"
                   className={`${
                     view === "week"
-                      ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
-                      : "text-white/70 hover:text-white"
+                      ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-foreground"
+                      : "text-foreground/70 hover:text-foreground"
                   }`}
                   onClick={() => handleViewChange("week")}
                 >
@@ -271,8 +271,8 @@ export default function CalendarPage() {
                   size="sm"
                   className={`${
                     view === "day"
-                      ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
-                      : "text-white/70 hover:text-white"
+                      ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-foreground"
+                      : "text-foreground/70 hover:text-foreground"
                   }`}
                   onClick={() => handleViewChange("day")}
                 >
@@ -281,14 +281,14 @@ export default function CalendarPage() {
               </div>
               <Button
                 variant="outline"
-                className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
+                className="glass-surface border-foreground/20 hover:border-cyan-500/50 text-foreground"
                 onClick={() => setIsImportDialogOpen(true)}
               >
                 <Upload className="h-4 w-4 mr-2" aria-hidden="true" />
                 Import
               </Button>
               <Button
-                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                 onClick={() => router.push("/dashboard/assignments/new")}
               >
                 <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -320,7 +320,7 @@ export default function CalendarPage() {
           <ScrollReveal direction="up" delay={0.3}>
             <GlassSurface className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">Upcoming</h2>
+                <h2 className="text-xl font-bold text-foreground">Upcoming</h2>
                 <Sparkles className="h-5 w-5 text-cyan-400" aria-hidden="true" />
               </div>
               {loading ? (
@@ -330,7 +330,7 @@ export default function CalendarPage() {
                   {upcomingAssignments.map((assignment, index) => (
                     <div
                       key={assignment.id}
-                      className="p-3 rounded-lg glass-surface border-white/10 hover:border-cyan-500/30 transition-colors cursor-pointer group"
+                      className="p-3 rounded-lg glass-surface border-foreground/10 hover:border-cyan-500/30 transition-colors cursor-pointer group"
                       onClick={() => {
                         setSelectedEvent(assignment)
                         setIsAIDialogOpen(true)
@@ -341,10 +341,10 @@ export default function CalendarPage() {
                           <CheckSquare className="h-full w-full text-cyan-400" aria-hidden="true" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-white mb-1 group-hover:text-cyan-400 transition-colors truncate">
+                          <h3 className="font-semibold text-foreground mb-1 group-hover:text-cyan-400 transition-colors truncate">
                             {assignment.title}
                           </h3>
-                          <div className="flex items-center space-x-2 text-xs text-white/60">
+                          <div className="flex items-center space-x-2 text-xs text-foreground/60">
                             <Clock className="h-3 w-3" aria-hidden="true" />
                             <span>{new Date(assignment.start).toLocaleDateString()}</span>
                           </div>
@@ -368,8 +368,8 @@ export default function CalendarPage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <CalendarComponent className="h-12 w-12 text-white/20 mx-auto mb-3" aria-hidden="true" />
-                  <p className="text-white/60 text-sm">No upcoming assignments</p>
+                  <CalendarComponent className="h-12 w-12 text-foreground/20 mx-auto mb-3" aria-hidden="true" />
+                  <p className="text-foreground/60 text-sm">No upcoming assignments</p>
                 </div>
               )}
             </GlassSurface>

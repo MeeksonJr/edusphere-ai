@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Menu, X, Sparkles, LogOut, LayoutDashboard } from "lucide-react"
 import { useSupabase } from "@/components/supabase-provider"
+import { ThemeToggle } from "@/components/shared/ThemeToggle"
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
 
 const navLinks = [
@@ -68,7 +69,7 @@ export function Navbar() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-        ? "bg-black/70 backdrop-blur-xl border-b border-white/5 py-3"
+        ? "bg-white/70 dark:bg-background/70 backdrop-blur-xl border-b border-black/5 dark:border-foreground/5 py-3"
         : "bg-transparent py-5"
         }`}
     >
@@ -80,8 +81,8 @@ export function Navbar() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-shadow">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <span className="text-lg font-bold font-display text-white">
-              EduSphere<span className="text-cyan-400"> AI</span>
+            <span className="text-lg font-bold font-display text-foreground">
+              EduSphere<span className="text-cyan-400 dark:text-cyan-400"> AI</span>
             </span>
           </Link>
 
@@ -92,8 +93,8 @@ export function Navbar() {
                 key={link.name}
                 href={link.href}
                 className={`relative px-4 py-2 text-sm font-medium transition-colors rounded-lg ${pathname === link.href
-                  ? "text-white"
-                  : "text-white/50 hover:text-white/80 hover:bg-white/[0.04]"
+                  ? "text-foreground"
+                  : "text-foreground/50 hover:text-foreground/80 hover:bg-foreground/[0.04]"
                   }`}
               >
                 {link.name}
@@ -110,12 +111,13 @@ export function Navbar() {
 
           {/* Auth Buttons */}
           <div className="hidden lg:flex items-center gap-3">
+            <ThemeToggle />
             {user ? (
               <>
                 <Link href="/dashboard">
                   <Button
                     variant="ghost"
-                    className="text-white/60 hover:text-white hover:bg-white/[0.04] gap-2"
+                    className="text-foreground/60 hover:text-foreground hover:bg-foreground/[0.04] gap-2"
                   >
                     <LayoutDashboard className="h-4 w-4" />
                     Dashboard
@@ -124,7 +126,7 @@ export function Navbar() {
                 <Button
                   variant="ghost"
                   onClick={handleLogout}
-                  className="text-white/40 hover:text-white hover:bg-white/[0.04] gap-2"
+                  className="text-foreground/40 hover:text-foreground hover:bg-foreground/[0.04] gap-2"
                 >
                   <LogOut className="h-4 w-4" />
                   Logout
@@ -133,7 +135,7 @@ export function Navbar() {
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" className="text-white/60 hover:text-white hover:bg-white/[0.04]">
+                  <Button variant="ghost" className="text-foreground/60 hover:text-foreground hover:bg-foreground/[0.04]">
                     Log In
                   </Button>
                 </Link>
@@ -149,7 +151,7 @@ export function Navbar() {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-white/[0.04] transition-colors text-white"
+            className="lg:hidden p-2 rounded-lg hover:bg-foreground/[0.04] transition-colors text-foreground"
             aria-label={isOpen ? "Close menu" : "Open menu"}
           >
             {isOpen ? (
@@ -169,7 +171,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden border-t border-white/5 overflow-hidden bg-black/95 backdrop-blur-xl"
+            className="lg:hidden border-t border-black/5 dark:border-foreground/5 overflow-hidden bg-white/95 dark:bg-background/95 backdrop-blur-xl"
           >
             <div className="container mx-auto px-4 py-6 space-y-2">
               {navLinks.map((link, i) => (
@@ -182,8 +184,8 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${pathname === link.href
-                      ? "text-white bg-white/[0.04]"
-                      : "text-white/50 hover:text-white hover:bg-white/[0.04]"
+                      ? "text-foreground bg-foreground/[0.04]"
+                      : "text-foreground/50 hover:text-foreground hover:bg-foreground/[0.04]"
                       }`}
                   >
                     {link.name}
@@ -191,11 +193,16 @@ export function Navbar() {
                 </motion.div>
               ))}
 
-              <div className="pt-4 border-t border-white/5 space-y-3">
+              <div className="flex items-center justify-between pt-4 border-t border-foreground/5 dark:border-foreground/5">
+                <span className="text-sm text-foreground/50">Theme</span>
+                <ThemeToggle />
+              </div>
+
+              <div className="pt-4 border-t border-foreground/5 dark:border-foreground/5 space-y-3">
                 {user ? (
                   <>
                     <Link href="/dashboard" className="block">
-                      <Button variant="outline" className="w-full glass-surface border-white/10 text-white gap-2">
+                      <Button variant="outline" className="w-full glass-surface border-foreground/10 text-foreground gap-2">
                         <LayoutDashboard className="h-4 w-4" />
                         Dashboard
                       </Button>
@@ -203,7 +210,7 @@ export function Navbar() {
                     <Button
                       variant="ghost"
                       onClick={handleLogout}
-                      className="w-full text-white/40 hover:text-white gap-2"
+                      className="w-full text-foreground/40 hover:text-foreground gap-2"
                     >
                       <LogOut className="h-4 w-4" />
                       Logout
@@ -212,7 +219,7 @@ export function Navbar() {
                 ) : (
                   <>
                     <Link href="/login" className="block">
-                      <Button variant="outline" className="w-full glass-surface border-white/10 text-white">
+                      <Button variant="outline" className="w-full glass-surface border-foreground/10 text-foreground">
                         Log In
                       </Button>
                     </Link>

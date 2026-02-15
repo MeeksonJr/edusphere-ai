@@ -117,18 +117,18 @@ export default function BlogPage() {
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-background to-background" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
               <div className="max-w-3xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                  <span className="text-white">Our</span>{" "}
+                  <span className="text-foreground">Our</span>{" "}
                   <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Blog
                   </span>
                 </h1>
-                <p className="text-xl text-white/70 mb-8">
+                <p className="text-xl text-foreground/70 mb-8">
                   Insights, tips, and updates about AI-powered education and course creation
                 </p>
               </div>
@@ -138,13 +138,13 @@ export default function BlogPage() {
             <ScrollReveal direction="up" delay={0.2}>
               <div className="max-w-2xl mx-auto">
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
                   <Input
                     type="text"
                     placeholder="Search articles..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 h-14 glass-surface border-white/20 text-white placeholder:text-white/40"
+                    className="pl-12 h-14 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                   />
                 </div>
               </div>
@@ -153,7 +153,7 @@ export default function BlogPage() {
         </section>
 
         {/* Categories */}
-        <section className="py-8 border-b border-white/10">
+        <section className="py-8 border-b border-foreground/10">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollReveal direction="up">
               <div className="flex flex-wrap gap-3 justify-center">
@@ -163,8 +163,8 @@ export default function BlogPage() {
                     onClick={() => setSelectedCategory(category)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedCategory === category
-                        ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
-                        : "glass-surface border-white/20 text-white/70 hover:text-white hover:border-white/40"
+                        ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-foreground"
+                        : "glass-surface border-foreground/20 text-foreground/70 hover:text-foreground hover:border-white/40"
                     }`}
                   >
                     {category}
@@ -190,22 +190,22 @@ export default function BlogPage() {
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <Badge className="absolute top-4 left-4 bg-gradient-to-r from-cyan-500 to-pink-500 text-white">
+                        <Badge className="absolute top-4 left-4 bg-gradient-to-r from-cyan-500 to-pink-500 text-foreground">
                           Featured
                         </Badge>
                       </div>
                       <div className="p-8 md:p-12 flex flex-col justify-center">
-                        <Badge className="w-fit mb-4 glass-surface border-white/20">
+                        <Badge className="w-fit mb-4 glass-surface border-foreground/20">
                           {featuredPost.category}
                         </Badge>
-                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 group-hover:text-cyan-400 transition-colors">
                           {featuredPost.title}
                         </h2>
-                        <p className="text-white/70 mb-6 text-lg leading-relaxed">
+                        <p className="text-foreground/70 mb-6 text-lg leading-relaxed">
                           {featuredPost.excerpt}
                         </p>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4 text-white/60 text-sm">
+                          <div className="flex items-center space-x-4 text-foreground/60 text-sm">
                             <div className="flex items-center space-x-2">
                               <User className="h-4 w-4" />
                               <span>{featuredPost.author}</span>
@@ -249,17 +249,17 @@ export default function BlogPage() {
                             />
                           </div>
                           <div className="p-6 flex-grow flex flex-col">
-                            <Badge className="w-fit mb-3 glass-surface border-white/10">
+                            <Badge className="w-fit mb-3 glass-surface border-foreground/10">
                               {post.category}
                             </Badge>
-                            <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors line-clamp-2">
+                            <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-cyan-400 transition-colors line-clamp-2">
                               {post.title}
                             </h3>
-                            <p className="text-white/60 text-sm mb-4 flex-grow line-clamp-3">
+                            <p className="text-foreground/60 text-sm mb-4 flex-grow line-clamp-3">
                               {post.excerpt}
                             </p>
-                            <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                              <div className="flex items-center space-x-3 text-white/50 text-xs">
+                            <div className="flex items-center justify-between pt-4 border-t border-foreground/10">
+                              <div className="flex items-center space-x-3 text-foreground/50 text-xs">
                                 <div className="flex items-center space-x-1">
                                   <User className="h-3 w-3" />
                                   <span>{post.author}</span>
@@ -281,7 +281,7 @@ export default function BlogPage() {
             ) : (
               <ScrollReveal direction="up">
                 <GlassSurface className="p-12 text-center">
-                  <p className="text-white/70 text-lg">
+                  <p className="text-foreground/70 text-lg">
                     No posts found. Try a different search or category.
                   </p>
                 </GlassSurface>

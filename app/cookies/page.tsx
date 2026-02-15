@@ -72,15 +72,15 @@ export default function CookiesPage() {
       icon={Cookie}
       lastUpdated="January 1, 2026"
     >
-      <h2 className="text-2xl font-bold text-white mb-4">What Are Cookies</h2>
-      <p className="text-white/70 mb-6 leading-relaxed">
+      <h2 className="text-2xl font-bold text-foreground mb-4">What Are Cookies</h2>
+      <p className="text-foreground/70 mb-6 leading-relaxed">
         Cookies are small text files that are placed on your computer or mobile device when 
         you visit a website. They are widely used to make websites work more efficiently and 
         provide information to the website owners.
       </p>
 
-      <h2 className="text-2xl font-bold text-white mb-4 mt-8">How We Use Cookies</h2>
-      <p className="text-white/70 mb-6 leading-relaxed">
+      <h2 className="text-2xl font-bold text-foreground mb-4 mt-8">How We Use Cookies</h2>
+      <p className="text-foreground/70 mb-6 leading-relaxed">
         At EduSphere AI, we use cookies to enhance your experience, analyze site usage, and 
         assist in our marketing efforts. Below you can manage your cookie preferences.
       </p>
@@ -89,14 +89,14 @@ export default function CookiesPage() {
       <div className="mt-8 mb-8">
         <ScrollReveal direction="up">
           <GlassSurface className="p-6">
-            <h3 className="text-xl font-bold text-white mb-6">
+            <h3 className="text-xl font-bold text-foreground mb-6">
               Manage Cookie Preferences
             </h3>
             <div className="space-y-6">
               {cookies.map((cookie) => (
                 <div
                   key={cookie.id}
-                  className="flex items-start justify-between p-4 glass-surface rounded-lg border border-white/10"
+                  className="flex items-start justify-between p-4 glass-surface rounded-lg border border-foreground/10"
                 >
                   <div className="flex-1 mr-4">
                     <div className="flex items-center space-x-2 mb-2">
@@ -112,7 +112,7 @@ export default function CookiesPage() {
                         </span>
                       )}
                     </div>
-                    <p className="text-white/60 text-sm">{cookie.description}</p>
+                    <p className="text-foreground/60 text-sm">{cookie.description}</p>
                   </div>
                   <Switch
                     id={cookie.id}
@@ -126,7 +126,7 @@ export default function CookiesPage() {
             <div className="mt-6 flex items-center justify-between">
               <Button
                 onClick={handleSave}
-                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
               >
                 Save Preferences
               </Button>
@@ -138,18 +138,18 @@ export default function CookiesPage() {
         </ScrollReveal>
       </div>
 
-      <h2 className="text-2xl font-bold text-white mb-4 mt-8">Managing Cookies</h2>
-      <p className="text-white/70 mb-4 leading-relaxed">
+      <h2 className="text-2xl font-bold text-foreground mb-4 mt-8">Managing Cookies</h2>
+      <p className="text-foreground/70 mb-4 leading-relaxed">
         Most web browsers allow you to control cookies through their settings. You can usually 
         find these settings in the "Options" or "Preferences" menu of your browser.
       </p>
-      <p className="text-white/70 mb-6 leading-relaxed">
+      <p className="text-foreground/70 mb-6 leading-relaxed">
         You can also set your browser to reject all cookies, but this might prevent some 
         websites from working properly.
       </p>
 
-      <h2 className="text-2xl font-bold text-white mb-4 mt-8">More Information</h2>
-      <p className="text-white/70 mb-6 leading-relaxed">
+      <h2 className="text-2xl font-bold text-foreground mb-4 mt-8">More Information</h2>
+      <p className="text-foreground/70 mb-6 leading-relaxed">
         For more information about cookies and how they work, visit{" "}
         <a
           href="https://www.allaboutcookies.org"
@@ -161,8 +161,8 @@ export default function CookiesPage() {
         </a>
       </p>
 
-      <h2 className="text-2xl font-bold text-white mb-4 mt-8">Contact Us</h2>
-      <p className="text-white/70 mb-6 leading-relaxed">
+      <h2 className="text-2xl font-bold text-foreground mb-4 mt-8">Contact Us</h2>
+      <p className="text-foreground/70 mb-6 leading-relaxed">
         If you have any questions about our use of cookies, please contact us at{" "}
         <a href="mailto:privacy@edusphere.ai" className="text-cyan-400 hover:text-cyan-300 underline">
           privacy@edusphere.ai

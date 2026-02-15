@@ -1,8 +1,8 @@
 export default function AIEngineerJobPage() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-foreground">
       {/* Header */}
-      <header className="bg-black/80 backdrop-blur-sm border-b border-cyan-900/50 sticky top-0 z-10">
+      <header className="bg-background/80 backdrop-blur-sm border-b border-cyan-900/50 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <a href="/" className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center">
@@ -238,7 +238,7 @@ export default function AIEngineerJobPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-black/80 border-t border-cyan-900/50 mt-20">
+      <footer className="bg-background/80 border-t border-cyan-900/50 mt-20">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Logo & Description */}

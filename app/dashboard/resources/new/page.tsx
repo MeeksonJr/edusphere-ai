@@ -248,25 +248,25 @@ export default function NewResourcePage() {
       <ScrollReveal direction="up">
         <div className="mb-8">
           <Link href="/dashboard/resources">
-            <Button variant="ghost" className="text-white/70 hover:text-white mb-4">
+            <Button variant="ghost" className="text-foreground/70 hover:text-foreground mb-4">
               <ChevronLeft className="mr-2 h-4 w-4" />
               Back to Study Resources
             </Button>
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">Create New Study Resource</span>
+            <span className="text-foreground">Create New Study Resource</span>
           </h1>
-          <p className="text-white/70">Create a new study resource to help with your learning</p>
+          <p className="text-foreground/70">Create a new study resource to help with your learning</p>
         </div>
       </ScrollReveal>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <ScrollReveal direction="up" delay={0.1}>
           <GlassSurface className="p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Resource Details</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Resource Details</h2>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="title" className="text-white">
+                <Label htmlFor="title" className="text-foreground">
                   Title *
                 </Label>
                 <Input
@@ -274,13 +274,13 @@ export default function NewResourcePage() {
                   value={newResource.title}
                   onChange={(e) => setNewResource((prev) => ({ ...prev, title: e.target.value }))}
                   placeholder="e.g., Calculus Derivatives Guide"
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 mt-1"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 mt-1"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="description" className="text-white">
+                <Label htmlFor="description" className="text-foreground">
                   Description
                 </Label>
                 <Textarea
@@ -288,27 +288,27 @@ export default function NewResourcePage() {
                   value={newResource.description}
                   onChange={(e) => setNewResource((prev) => ({ ...prev, description: e.target.value }))}
                   placeholder="Optional description"
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 mt-1"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 mt-1"
                   rows={2}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="subject" className="text-white">
+                  <Label htmlFor="subject" className="text-foreground">
                     Subject
                   </Label>
                   <Select
                     value={newResource.subject}
                     onValueChange={(value) => setNewResource((prev) => ({ ...prev, subject: value }))}
                   >
-                    <SelectTrigger className="glass-surface border-white/20 text-white mt-1">
+                    <SelectTrigger className="glass-surface border-foreground/20 text-white mt-1">
                       <SelectValue placeholder="Select a subject" />
                     </SelectTrigger>
-                    <SelectContent className="glass-surface border-white/20">
+                    <SelectContent className="glass-surface border-foreground/20">
                       <SelectItem value="none">None</SelectItem>
                       {subjects.map((subject) => (
-                        <SelectItem key={subject} value={subject} className="text-white">
+                        <SelectItem key={subject} value={subject} className="text-foreground">
                           {subject}
                         </SelectItem>
                       ))}
@@ -317,19 +317,19 @@ export default function NewResourcePage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="resource_type" className="text-white">
+                  <Label htmlFor="resource_type" className="text-foreground">
                     Resource Type
                   </Label>
                   <Select
                     value={newResource.resource_type}
                     onValueChange={(value) => setNewResource((prev) => ({ ...prev, resource_type: value }))}
                   >
-                    <SelectTrigger className="glass-surface border-white/20 text-white mt-1">
+                    <SelectTrigger className="glass-surface border-foreground/20 text-white mt-1">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="glass-surface border-white/20">
+                    <SelectContent className="glass-surface border-foreground/20">
                       {resourceTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value} className="text-white">
+                        <SelectItem key={type.value} value={type.value} className="text-foreground">
                           {type.label}
                         </SelectItem>
                       ))}
@@ -339,7 +339,7 @@ export default function NewResourcePage() {
               </div>
 
               <div>
-                <Label htmlFor="tags" className="text-white">
+                <Label htmlFor="tags" className="text-foreground">
                   Tags
                 </Label>
                 <div className="flex gap-2 mt-1">
@@ -354,9 +354,9 @@ export default function NewResourcePage() {
                       }
                     }}
                     placeholder="Add a tag and press Enter"
-                    className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                    className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                   />
-                  <Button type="button" onClick={handleAddTag} variant="outline" className="border-white/20 text-white">
+                  <Button type="button" onClick={handleAddTag} variant="outline" className="border-foreground/20 text-foreground">
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
@@ -382,7 +382,7 @@ export default function NewResourcePage() {
               </div>
 
               <div>
-                <Label htmlFor="image" className="text-white">
+                <Label htmlFor="image" className="text-foreground">
                   Image (Optional)
                 </Label>
                 {!imagePreview ? (
@@ -392,7 +392,7 @@ export default function NewResourcePage() {
                       type="file"
                       accept="image/*"
                       onChange={handleImageUpload}
-                      className="glass-surface border-white/20 text-white"
+                      className="glass-surface border-foreground/20 text-foreground"
                     />
                   </div>
                 ) : (
@@ -403,7 +403,7 @@ export default function NewResourcePage() {
                       variant="ghost"
                       size="sm"
                       onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-500 text-white"
+                      className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-500 text-foreground"
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -416,10 +416,10 @@ export default function NewResourcePage() {
 
         <ScrollReveal direction="up" delay={0.2}>
           <GlassSurface className="p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Content</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Content</h2>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="content" className="text-white">
+                <Label htmlFor="content" className="text-foreground">
                   Content *
                 </Label>
                 <Textarea
@@ -427,7 +427,7 @@ export default function NewResourcePage() {
                   value={newResource.content}
                   onChange={(e) => setNewResource((prev) => ({ ...prev, content: e.target.value }))}
                   placeholder="Enter your study resource content here..."
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 mt-1"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 mt-1"
                   rows={12}
                   required
                 />
@@ -437,7 +437,7 @@ export default function NewResourcePage() {
                 type="button"
                 onClick={handleGenerateResource}
                 disabled={generatingResource || !newResource.subject || !newResource.title}
-                className="w-full bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white"
+                className="w-full bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-foreground"
               >
                 {generatingResource ? (
                   <>
@@ -458,7 +458,7 @@ export default function NewResourcePage() {
         <ScrollReveal direction="up" delay={0.3}>
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center">
             <Link href="/dashboard/resources" className="flex-1 sm:flex-initial">
-              <Button type="button" variant="ghost" className="text-white/70 hover:text-white w-full sm:w-auto">
+              <Button type="button" variant="ghost" className="text-foreground/70 hover:text-foreground w-full sm:w-auto">
                 Cancel
               </Button>
             </Link>

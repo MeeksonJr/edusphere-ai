@@ -24,20 +24,20 @@ export function LegalPageTemplate({
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-12 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-background to-background" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
               <div className="max-w-3xl mx-auto text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-6">
-                  <Icon className="h-8 w-8 text-white" />
+                  <Icon className="h-8 w-8 text-foreground" />
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
                   <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     {title}
                   </span>
                 </h1>
-                <p className="text-white/60 text-sm">
+                <p className="text-foreground/60 text-sm">
                   Last updated: {lastUpdated}
                 </p>
               </div>

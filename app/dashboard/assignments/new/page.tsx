@@ -222,18 +222,18 @@ export default function NewAssignmentPage() {
         <div className="mb-8">
           <Link
             href="/dashboard/assignments"
-            className="inline-flex items-center text-white/70 hover:text-white mb-4 transition-colors"
+            className="inline-flex items-center text-foreground/70 hover:text-foreground mb-4 transition-colors"
           >
             <ChevronLeft className="mr-2 h-4 w-4" aria-hidden="true" />
             Back to Assignments
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">Create New</span>{" "}
+            <span className="text-foreground">Create New</span>{" "}
             <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
               Assignment
             </span>
           </h1>
-          <p className="text-white/70">Add a new assignment to track your academic tasks</p>
+          <p className="text-foreground/70">Add a new assignment to track your academic tasks</p>
         </div>
       </ScrollReveal>
 
@@ -241,10 +241,10 @@ export default function NewAssignmentPage() {
         {/* Basic Information */}
         <ScrollReveal direction="up" delay={0.1}>
           <GlassSurface className="p-6 lg:p-8">
-            <h2 className="text-xl font-bold text-white mb-6">Basic Information</h2>
+            <h2 className="text-xl font-bold text-foreground mb-6">Basic Information</h2>
             <div className="space-y-5">
               <div>
-                <Label htmlFor="title" className="text-white mb-2 block">
+                <Label htmlFor="title" className="text-foreground mb-2 block">
                   Title <span className="text-red-400">*</span>
                 </Label>
                 <Input
@@ -254,12 +254,12 @@ export default function NewAssignmentPage() {
                   value={formData.title}
                   onChange={handleChange}
                   placeholder="e.g., Math Homework Chapter 5"
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                 />
               </div>
 
               <div>
-                <Label htmlFor="description" className="text-white mb-2 block">
+                <Label htmlFor="description" className="text-foreground mb-2 block">
                   Description
                 </Label>
                 <Textarea
@@ -269,22 +269,22 @@ export default function NewAssignmentPage() {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Describe the assignment requirements..."
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 resize-none"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <Label htmlFor="subject" className="text-white mb-2 block">
+                  <Label htmlFor="subject" className="text-foreground mb-2 block">
                     Subject
                   </Label>
                   <Select value={formData.subject} onValueChange={(value) => handleSelectChange("subject", value)}>
-                    <SelectTrigger className="glass-surface border-white/20 text-white">
+                    <SelectTrigger className="glass-surface border-foreground/20 text-foreground">
                       <SelectValue placeholder="Select subject" />
                     </SelectTrigger>
-                    <SelectContent className="glass-surface border-white/20">
+                    <SelectContent className="glass-surface border-foreground/20">
                       {subjects.map((subject) => (
-                        <SelectItem key={subject} value={subject} className="text-white">
+                        <SelectItem key={subject} value={subject} className="text-foreground">
                           {subject}
                         </SelectItem>
                       ))}
@@ -293,21 +293,21 @@ export default function NewAssignmentPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="priority" className="text-white mb-2 block">
+                  <Label htmlFor="priority" className="text-foreground mb-2 block">
                     Priority
                   </Label>
                   <Select value={formData.priority} onValueChange={(value) => handleSelectChange("priority", value)}>
-                    <SelectTrigger className="glass-surface border-white/20 text-white">
+                    <SelectTrigger className="glass-surface border-foreground/20 text-foreground">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="glass-surface border-white/20">
-                      <SelectItem value="low" className="text-white">
+                    <SelectContent className="glass-surface border-foreground/20">
+                      <SelectItem value="low" className="text-foreground">
                         Low
                       </SelectItem>
-                      <SelectItem value="medium" className="text-white">
+                      <SelectItem value="medium" className="text-foreground">
                         Medium
                       </SelectItem>
-                      <SelectItem value="high" className="text-white">
+                      <SelectItem value="high" className="text-foreground">
                         High
                       </SelectItem>
                     </SelectContent>
@@ -316,7 +316,7 @@ export default function NewAssignmentPage() {
               </div>
 
               <div>
-                <Label htmlFor="due_date" className="text-white mb-2 block">
+                <Label htmlFor="due_date" className="text-foreground mb-2 block">
                   Due Date
                 </Label>
                 <Popover open={showCalendar} onOpenChange={setShowCalendar}>
@@ -324,13 +324,13 @@ export default function NewAssignmentPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full justify-start text-left font-normal glass-surface border-white/20 text-white hover:border-cyan-500/50"
+                      className="w-full justify-start text-left font-normal glass-surface border-foreground/20 text-white hover:border-cyan-500/50"
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4 text-white/60" aria-hidden="true" />
-                      {date ? format(date, "PPP") : <span className="text-white/60">Pick a date</span>}
+                      <CalendarIcon className="mr-2 h-4 w-4 text-foreground/60" aria-hidden="true" />
+                      {date ? format(date, "PPP") : <span className="text-foreground/60">Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 glass-surface border-white/20" align="start">
+                  <PopoverContent className="w-auto p-0 glass-surface border-foreground/20" align="start">
                     <Calendar mode="single" selected={date} onSelect={handleDateChange} initialFocus />
                   </PopoverContent>
                 </Popover>
@@ -345,10 +345,10 @@ export default function NewAssignmentPage() {
             <GlassSurface className="p-6 lg:p-8 border-cyan-500/30">
               <div className="flex items-center space-x-2 mb-4">
                 <Sparkles className="h-5 w-5 text-cyan-400" aria-hidden="true" />
-                <h2 className="text-xl font-bold text-white">AI-Generated Approach</h2>
+                <h2 className="text-xl font-bold text-foreground">AI-Generated Approach</h2>
               </div>
               <div className="prose prose-invert max-w-none">
-                <p className="text-white/80 whitespace-pre-wrap">{formData.ai_summary}</p>
+                <p className="text-foreground/80 whitespace-pre-wrap">{formData.ai_summary}</p>
               </div>
             </GlassSurface>
           </ScrollReveal>
@@ -369,7 +369,7 @@ export default function NewAssignmentPage() {
               variant="outline"
               onClick={generateAiSummary}
               disabled={aiLoading || !formData.title || !formData.description}
-              className="glass-surface border-white/20 hover:border-cyan-500/50 text-white w-full sm:w-auto"
+              className="glass-surface border-foreground/20 hover:border-cyan-500/50 text-white w-full sm:w-auto"
             >
               {aiLoading ? (
                 <>
@@ -386,7 +386,7 @@ export default function NewAssignmentPage() {
 
             <div className="flex gap-4 w-full sm:w-auto">
               <Link href="/dashboard/assignments" className="flex-1 sm:flex-initial">
-                <Button type="button" variant="ghost" className="text-white/70 hover:text-white w-full sm:w-auto">
+                <Button type="button" variant="ghost" className="text-foreground/70 hover:text-foreground w-full sm:w-auto">
                   Cancel
                 </Button>
               </Link>

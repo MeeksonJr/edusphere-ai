@@ -304,7 +304,7 @@ ${resource.content}
   return (
     <div className="p-6 md:p-8">
       <div className="mb-8">
-        <Link href="/dashboard/resources" className="inline-flex items-center text-gray-400 hover:text-white mb-4">
+        <Link href="/dashboard/resources" className="inline-flex items-center text-gray-400 hover:text-foreground mb-4">
           <ChevronLeft className="mr-1 h-4 w-4" /> Back to Resources
         </Link>
         <div className="flex items-center justify-between">
@@ -366,7 +366,7 @@ ${resource.content}
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute top-2 right-2 h-7 text-xs text-gray-400 hover:text-white"
+                className="absolute top-2 right-2 h-7 text-xs text-gray-400 hover:text-foreground"
                 onClick={() => copyToClipboard(resource.content)}
               >
                 {copiedText ? <Check className="h-3 w-3 mr-1" /> : <Copy className="h-3 w-3 mr-1" />}
@@ -533,7 +533,7 @@ ${resource.content}
                         {tag}
                         <button
                           type="button"
-                          className="ml-1 text-gray-400 hover:text-white"
+                          className="ml-1 text-gray-400 hover:text-foreground"
                           onClick={() => handleRemoveTag(tag)}
                         >
                           ×
@@ -626,7 +626,7 @@ ${resource.content}
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 hover:bg-red-700 text-foreground"
               onClick={handleDeleteResource}
               disabled={saving}
             >

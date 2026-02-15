@@ -122,23 +122,23 @@ export function FeatureShowcase() {
                 />
 
                 <div className="relative z-10 flex flex-col h-full">
-                  <div className={`w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-4 group-hover:border-white/15 transition-colors`}>
+                  <div className={`w-12 h-12 rounded-xl bg-foreground/[0.04] border border-white/[0.06] flex items-center justify-center mb-4 group-hover:border-foreground/15 transition-colors`}>
                     <Icon className={`h-6 w-6 ${feature.iconColor}`} />
                   </div>
 
-                  <h3 className="text-lg font-bold font-display text-white mb-2">
+                  <h3 className="text-lg font-bold font-display text-foreground mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-sm text-white/50 leading-relaxed flex-1">
+                  <p className="text-sm text-foreground/50 leading-relaxed flex-1">
                     {feature.description}
                   </p>
 
                   {/* Large cards get extra visual */}
                   {feature.size === "bento-large" && (
-                    <div className="mt-4 pt-4 border-t border-white/5">
+                    <div className="mt-4 pt-4 border-t border-foreground/5">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                        <span className="text-xs text-white/30">Included in all plans</span>
+                        <span className="text-xs text-foreground/30">Included in all plans</span>
                       </div>
                     </div>
                   )}

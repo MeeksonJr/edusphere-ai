@@ -79,14 +79,14 @@ export default function AssignmentDetailPage() {
         <div className="mb-8">
           <Link
             href="/dashboard/assignments"
-            className="inline-flex items-center text-white/70 hover:text-white mb-4 transition-colors"
+            className="inline-flex items-center text-foreground/70 hover:text-foreground mb-4 transition-colors"
           >
             <ChevronLeft className="mr-1 h-4 w-4" aria-hidden="true" />
             Back to Assignments
           </Link>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              <span className="text-white">{assignment.title}</span>
+              <span className="text-foreground">{assignment.title}</span>
             </h1>
             <div className="flex items-center space-x-2">
               <AssignmentActions assignment={assignment} />
@@ -94,7 +94,7 @@ export default function AssignmentDetailPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             {assignment.subject && (
-              <Badge className="glass-surface border-white/10 text-white/80">{assignment.subject}</Badge>
+              <Badge className="glass-surface border-foreground/10 text-foreground/80">{assignment.subject}</Badge>
             )}
             {assignment.priority && (
               <Badge
@@ -127,8 +127,8 @@ export default function AssignmentDetailPage() {
         <div className="md:col-span-2 space-y-6">
           <ScrollReveal direction="up" delay={0.1}>
             <GlassSurface className="p-6 lg:p-8">
-              <h2 className="text-xl font-bold text-white mb-4">Description</h2>
-              <p className="text-white/80 whitespace-pre-wrap leading-relaxed">
+              <h2 className="text-xl font-bold text-foreground mb-4">Description</h2>
+              <p className="text-foreground/80 whitespace-pre-wrap leading-relaxed">
                 {assignment.description || "No description provided."}
               </p>
             </GlassSurface>
@@ -139,9 +139,9 @@ export default function AssignmentDetailPage() {
               <GlassSurface className="p-6 lg:p-8 border-cyan-500/30">
                 <div className="flex items-center space-x-2 mb-4">
                   <Sparkles className="h-5 w-5 text-cyan-400" aria-hidden="true" />
-                  <h2 className="text-xl font-bold text-white">AI-Generated Approach</h2>
+                  <h2 className="text-xl font-bold text-foreground">AI-Generated Approach</h2>
                 </div>
-                <p className="text-white/80 whitespace-pre-wrap leading-relaxed">{assignment.ai_summary}</p>
+                <p className="text-foreground/80 whitespace-pre-wrap leading-relaxed">{assignment.ai_summary}</p>
               </GlassSurface>
             </ScrollReveal>
           )}
@@ -151,20 +151,20 @@ export default function AssignmentDetailPage() {
         <div className="space-y-6">
           <ScrollReveal direction="up" delay={0.3}>
             <GlassSurface className="p-6">
-              <h2 className="text-xl font-bold text-white mb-6">Details</h2>
+              <h2 className="text-xl font-bold text-foreground mb-6">Details</h2>
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
-                    <Clock className="h-4 w-4 text-white/60" aria-hidden="true" />
-                    <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Due Date</h3>
+                    <Clock className="h-4 w-4 text-foreground/60" aria-hidden="true" />
+                    <h3 className="text-sm font-semibold text-foreground/60 uppercase tracking-wide">Due Date</h3>
                   </div>
                   <p className="text-white font-medium">{formattedDate}</p>
                 </div>
 
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
-                    <CheckSquare className="h-4 w-4 text-white/60" aria-hidden="true" />
-                    <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Status</h3>
+                    <CheckSquare className="h-4 w-4 text-foreground/60" aria-hidden="true" />
+                    <h3 className="text-sm font-semibold text-foreground/60 uppercase tracking-wide">Status</h3>
                   </div>
                   <p className="text-white font-medium">
                     {assignment.status === "completed" ? "Completed" : "Ongoing"}
@@ -173,8 +173,8 @@ export default function AssignmentDetailPage() {
 
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
-                    <Calendar className="h-4 w-4 text-white/60" aria-hidden="true" />
-                    <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wide">Created</h3>
+                    <Calendar className="h-4 w-4 text-foreground/60" aria-hidden="true" />
+                    <h3 className="text-sm font-semibold text-foreground/60 uppercase tracking-wide">Created</h3>
                   </div>
                   <p className="text-white font-medium">
                     {new Date(assignment.created_at).toLocaleDateString("en-US", {

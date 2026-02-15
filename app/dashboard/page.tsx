@@ -29,7 +29,7 @@ export default async function Dashboard() {
     return (
       <div className="p-6 md:p-8 lg:p-12">
         <GlassSurface className="p-8 text-center">
-          <p className="text-white/70">Please log in to view your dashboard.</p>
+          <p className="text-foreground/70">Please log in to view your dashboard.</p>
         </GlassSurface>
       </div>
     )
@@ -121,12 +121,12 @@ export default async function Dashboard() {
       <ScrollReveal direction="up">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">Welcome back, </span>
+            <span className="text-foreground">Welcome back, </span>
             <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
               {profile?.full_name || "Student"}
             </span>
           </h1>
-          <p className="text-white/70">Here's an overview of your academic progress</p>
+          <p className="text-foreground/70">Here's an overview of your academic progress</p>
         </div>
       </ScrollReveal>
 
@@ -140,12 +140,12 @@ export default async function Dashboard() {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.gradient} p-3`}>
-                      <Icon className="h-full w-full text-white" aria-hidden="true" />
+                      <Icon className="h-full w-full text-foreground" aria-hidden="true" />
                     </div>
                   </div>
                   <div className="mb-2">
-                    <p className="text-sm text-white/60 mb-1">{stat.label}</p>
-                    <p className="text-2xl md:text-3xl font-bold text-white">
+                    <p className="text-sm text-foreground/60 mb-1">{stat.label}</p>
+                    <p className="text-2xl md:text-3xl font-bold text-foreground">
                       {typeof stat.value === "string" ? (
                         <span className="capitalize">{stat.value}</span>
                       ) : (
@@ -153,7 +153,7 @@ export default async function Dashboard() {
                       )}
                     </p>
                   </div>
-                  <p className="text-xs text-white/50">{stat.subtitle}</p>
+                  <p className="text-xs text-foreground/50">{stat.subtitle}</p>
                 </div>
               </AnimatedCard>
             </ScrollReveal>
@@ -167,8 +167,8 @@ export default async function Dashboard() {
           <GlassSurface className="md:col-span-2 p-6 lg:p-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-bold text-white mb-1">Upcoming Assignments</h2>
-                <p className="text-sm text-white/60">Your tasks due soon</p>
+                <h2 className="text-xl font-bold text-foreground mb-1">Upcoming Assignments</h2>
+                <p className="text-sm text-foreground/60">Your tasks due soon</p>
               </div>
               <Link href="/dashboard/assignments">
                 <Button
@@ -188,7 +188,7 @@ export default async function Dashboard() {
                 {assignments.map((assignment) => (
                   <div
                     key={assignment.id}
-                    className="p-4 rounded-lg glass-surface border border-white/10 hover:border-cyan-500/30 transition-colors"
+                    className="p-4 rounded-lg glass-surface border border-foreground/10 hover:border-cyan-500/30 transition-colors"
                   >
                     <div className="flex items-start space-x-4">
                       <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-pink-500/20 p-2 flex-shrink-0">
@@ -197,14 +197,14 @@ export default async function Dashboard() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-semibold text-white truncate">{assignment.title}</h3>
-                          <div className="flex items-center text-xs text-white/60 ml-2 flex-shrink-0">
+                          <div className="flex items-center text-xs text-foreground/60 ml-2 flex-shrink-0">
                             <Clock className="mr-1 h-3 w-3" aria-hidden="true" />
                             {new Date(assignment.due_date || "").toLocaleDateString()}
                           </div>
                         </div>
-                        <p className="text-sm text-white/70 line-clamp-2 mb-3">{assignment.description}</p>
+                        <p className="text-sm text-foreground/70 line-clamp-2 mb-3">{assignment.description}</p>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs px-2 py-1 rounded-full glass-surface border-white/10">
+                          <span className="text-xs px-2 py-1 rounded-full glass-surface border-foreground/10">
                             {assignment.subject}
                           </span>
                           <span
@@ -226,10 +226,10 @@ export default async function Dashboard() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <CheckSquare className="h-12 w-12 text-white/20 mx-auto mb-4" aria-hidden="true" />
-                <p className="text-white/60 mb-4">No upcoming assignments</p>
+                <CheckSquare className="h-12 w-12 text-foreground/20 mx-auto mb-4" aria-hidden="true" />
+                <p className="text-foreground/60 mb-4">No upcoming assignments</p>
                 <Link href="/dashboard/assignments/new">
-                  <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
+                  <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground">
                     Create Assignment
                   </Button>
                 </Link>
@@ -241,27 +241,27 @@ export default async function Dashboard() {
         {/* Quick Actions */}
         <ScrollReveal direction="up" delay={0.5}>
           <GlassSurface className="p-6 lg:p-8">
-            <h2 className="text-xl font-bold text-white mb-1">Quick Actions</h2>
-            <p className="text-sm text-white/60 mb-6">Frequently used tools</p>
+            <h2 className="text-xl font-bold text-foreground mb-1">Quick Actions</h2>
+            <p className="text-sm text-foreground/60 mb-6">Frequently used tools</p>
             <div className="space-y-3">
               {quickActions.map((action, index) => {
                 const Icon = action.icon
                 return (
                   <Link key={action.href} href={action.href}>
-                    <div className="p-4 rounded-lg glass-surface border border-white/10 hover:border-cyan-500/30 transition-all group cursor-pointer">
+                    <div className="p-4 rounded-lg glass-surface border border-foreground/10 hover:border-cyan-500/30 transition-all group cursor-pointer">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <div
                             className={`w-10 h-10 rounded-lg bg-gradient-to-br ${action.color} p-2 group-hover:scale-110 transition-transform`}
                           >
-                            <Icon className="h-full w-full text-white" aria-hidden="true" />
+                            <Icon className="h-full w-full text-foreground" aria-hidden="true" />
                           </div>
                           <span className="text-white font-medium group-hover:text-cyan-400 transition-colors">
                             {action.name}
                           </span>
                         </div>
                         <ArrowRight
-                          className="h-4 w-4 text-white/40 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all"
+                          className="h-4 w-4 text-foreground/40 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all"
                           aria-hidden="true"
                         />
                       </div>
@@ -278,7 +278,7 @@ export default async function Dashboard() {
       <ScrollReveal direction="up" delay={0.6}>
         <GlassSurface className="mt-8 p-6 lg:p-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-white">Latest Courses</h2>
+            <h2 className="text-xl font-bold text-foreground">Latest Courses</h2>
             <Link href="/dashboard/courses">
               <Button
                 variant="ghost"
@@ -300,18 +300,18 @@ export default async function Dashboard() {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center">
-                            <Video className="h-4 w-4 text-white" aria-hidden="true" />
+                            <Video className="h-4 w-4 text-foreground" aria-hidden="true" />
                           </div>
                           <h3 className="text-sm font-semibold text-white line-clamp-2">
                             {course.title || "Untitled course"}
                           </h3>
                         </div>
                       </div>
-                      <p className="text-xs text-white/60 mb-3">
+                      <p className="text-xs text-foreground/60 mb-3">
                         Created on{" "}
                         {course.created_at ? new Date(course.created_at).toLocaleDateString() : "N/A"}
                       </p>
-                      <div className="mt-auto flex items-center justify-between text-xs text-white/60">
+                      <div className="mt-auto flex items-center justify-between text-xs text-foreground/60">
                         <span>
                           {course.estimated_duration
                             ? `${Math.round(course.estimated_duration / 60)} min`
@@ -326,10 +326,10 @@ export default async function Dashboard() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <Video className="h-10 w-10 text-white/20 mx-auto mb-3" aria-hidden="true" />
-              <p className="text-white/60 mb-3">No courses created yet</p>
+              <Video className="h-10 w-10 text-foreground/20 mx-auto mb-3" aria-hidden="true" />
+              <p className="text-foreground/60 mb-3">No courses created yet</p>
               <Link href="/dashboard/courses/new">
-                <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
+                <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground">
                   Create your first course
                 </Button>
               </Link>

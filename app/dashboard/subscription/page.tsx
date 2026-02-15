@@ -109,12 +109,12 @@ export default function SubscriptionPage() {
       <ScrollReveal direction="up">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">Subscription</span>{" "}
+            <span className="text-foreground">Subscription</span>{" "}
             <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
               Plans
             </span>
           </h1>
-          <p className="text-white/70">Choose the plan that works best for you</p>
+          <p className="text-foreground/70">Choose the plan that works best for you</p>
         </div>
       </ScrollReveal>
 
@@ -124,18 +124,18 @@ export default function SubscriptionPage() {
           <GlassSurface className="p-6 lg:p-8 mb-8 border-cyan-500/30">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-bold text-white mb-2">
+                <h2 className="text-2xl font-bold text-foreground mb-2">
                   {currentTier === "ultimate" ? "Ultimate Plan" : "Pro Plan"}
                 </h2>
-                <p className="text-white/70">
+                <p className="text-foreground/70">
                   {currentTier === "ultimate" ? "$12.99/month" : "$6.99/month"}
                 </p>
               </div>
               <Badge
                 className={
                   currentTier === "ultimate"
-                    ? "bg-gradient-to-r from-pink-500 to-pink-600 text-white"
-                    : "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+                    ? "bg-gradient-to-r from-pink-500 to-pink-600 text-foreground"
+                    : "bg-gradient-to-r from-blue-500 to-blue-600 text-foreground"
                 }
               >
                 {currentTier === "ultimate" ? "Ultimate" : "Pro"}
@@ -143,7 +143,7 @@ export default function SubscriptionPage() {
             </div>
 
             {user?.profile?.subscription_id && (
-              <div className="space-y-2 text-sm text-white/60 mb-6">
+              <div className="space-y-2 text-sm text-foreground/60 mb-6">
                 <p>Subscription ID: {user.profile.subscription_id}</p>
                 <p>Status: {user.profile.subscription_status || "Active"}</p>
                 <p>
@@ -168,7 +168,7 @@ export default function SubscriptionPage() {
       {currentTier === "free" && (
         <ScrollReveal direction="up" delay={0.2}>
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-6">Available Plans</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Available Plans</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {/* Pro Plan */}
               <AnimatedCard
@@ -180,29 +180,29 @@ export default function SubscriptionPage() {
               >
                 <div className="p-6 lg:p-8">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-2xl font-bold text-white">Pro Plan</h3>
+                    <h3 className="text-2xl font-bold text-foreground">Pro Plan</h3>
                     {selectedPlan === "pro" && (
                       <CheckCircle2 className="h-6 w-6 text-blue-400" aria-hidden="true" />
                     )}
                   </div>
                   <div className="mb-6">
-                    <span className="text-4xl font-bold text-white">$6.99</span>
-                    <span className="text-white/60">/month</span>
+                    <span className="text-4xl font-bold text-foreground">$6.99</span>
+                    <span className="text-foreground/60">/month</span>
                   </div>
                   <ul className="space-y-3 mb-6">
-                    <li className="flex items-center text-white/80">
+                    <li className="flex items-center text-foreground/80">
                       <Zap className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                       Unlimited AI prompts
                     </li>
-                    <li className="flex items-center text-white/80">
+                    <li className="flex items-center text-foreground/80">
                       <Sparkles className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                       Priority support
                     </li>
-                    <li className="flex items-center text-white/80">
+                    <li className="flex items-center text-foreground/80">
                       <CreditCard className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                       Premium Gemini features
                     </li>
-                    <li className="flex items-center text-white/80">
+                    <li className="flex items-center text-foreground/80">
                       <Sparkles className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                       Flashcard & quiz generator
                     </li>
@@ -211,7 +211,7 @@ export default function SubscriptionPage() {
                     <PayPalButton planId={planIds.pro} tier="pro" />
                   ) : (
                     <Button
-                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-foreground"
                       onClick={(e) => {
                         e.stopPropagation()
                         handleSelectPlan("pro")
@@ -234,29 +234,29 @@ export default function SubscriptionPage() {
               >
                 <div className="p-6 lg:p-8">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-2xl font-bold text-white">Ultimate Plan</h3>
+                    <h3 className="text-2xl font-bold text-foreground">Ultimate Plan</h3>
                     {selectedPlan === "ultimate" && (
                       <CheckCircle2 className="h-6 w-6 text-pink-400" aria-hidden="true" />
                     )}
                   </div>
                   <div className="mb-6">
-                    <span className="text-4xl font-bold text-white">$12.99</span>
-                    <span className="text-white/60">/month</span>
+                    <span className="text-4xl font-bold text-foreground">$12.99</span>
+                    <span className="text-foreground/60">/month</span>
                   </div>
                   <ul className="space-y-3 mb-6">
-                    <li className="flex items-center text-white/80">
+                    <li className="flex items-center text-foreground/80">
                       <CheckCircle2 className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                       Everything in Pro
                     </li>
-                    <li className="flex items-center text-white/80">
+                    <li className="flex items-center text-foreground/80">
                       <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                       Multi-project/class support
                     </li>
-                    <li className="flex items-center text-white/80">
+                    <li className="flex items-center text-foreground/80">
                       <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                       Study groups (peer-to-peer)
                     </li>
-                    <li className="flex items-center text-white/80">
+                    <li className="flex items-center text-foreground/80">
                       <Mic className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                       Voice assistant for Gemini AI
                     </li>
@@ -265,7 +265,7 @@ export default function SubscriptionPage() {
                     <PayPalButton planId={planIds.ultimate} tier="ultimate" />
                   ) : (
                     <Button
-                      className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+                      className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-foreground"
                       onClick={(e) => {
                         e.stopPropagation()
                         handleSelectPlan("ultimate")
@@ -285,7 +285,7 @@ export default function SubscriptionPage() {
       {currentTier === "pro" && (
         <ScrollReveal direction="up" delay={0.2}>
           <div>
-            <h2 className="text-2xl font-bold text-white mb-6">Upgrade Your Plan</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Upgrade Your Plan</h2>
             <AnimatedCard
               variant="3d"
               className={`cursor-pointer transition-all max-w-2xl ${
@@ -295,29 +295,29 @@ export default function SubscriptionPage() {
             >
               <div className="p-6 lg:p-8">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-2xl font-bold text-white">Ultimate Plan</h3>
+                  <h3 className="text-2xl font-bold text-foreground">Ultimate Plan</h3>
                   {selectedPlan === "ultimate" && (
                     <CheckCircle2 className="h-6 w-6 text-pink-400" aria-hidden="true" />
                   )}
                 </div>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold text-white">$12.99</span>
-                  <span className="text-white/60">/month</span>
+                  <span className="text-4xl font-bold text-foreground">$12.99</span>
+                  <span className="text-foreground/60">/month</span>
                 </div>
                 <ul className="space-y-3 mb-6">
-                  <li className="flex items-center text-white/80">
+                  <li className="flex items-center text-foreground/80">
                     <CheckCircle2 className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                     Everything in Pro
                   </li>
-                  <li className="flex items-center text-white/80">
+                  <li className="flex items-center text-foreground/80">
                     <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                     Multi-project/class support
                   </li>
-                  <li className="flex items-center text-white/80">
+                  <li className="flex items-center text-foreground/80">
                     <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                     Study groups (peer-to-peer)
                   </li>
-                  <li className="flex items-center text-white/80">
+                  <li className="flex items-center text-foreground/80">
                     <Mic className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
                     Voice assistant for Gemini AI
                   </li>
@@ -326,7 +326,7 @@ export default function SubscriptionPage() {
                   <PayPalButton planId={planIds.ultimate} tier="ultimate" />
                 ) : (
                   <Button
-                    className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+                    className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-foreground"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleSelectPlan("ultimate")

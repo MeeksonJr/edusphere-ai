@@ -26,7 +26,7 @@ export default function NotFound() {
               </h1>
               <div className="flex items-center justify-center space-x-2 mb-6">
                 <Sparkles className="h-6 w-6 text-cyan-400 animate-pulse" />
-                <p className="text-2xl md:text-3xl font-semibold text-white">
+                <p className="text-2xl md:text-3xl font-semibold text-foreground">
                   Page Not Found
                 </p>
                 <Sparkles className="h-6 w-6 text-cyan-400 animate-pulse" />
@@ -37,10 +37,10 @@ export default function NotFound() {
           {/* Message */}
           <ScrollReveal direction="up" delay={0.2}>
             <GlassSurface className="p-8 mb-8">
-              <p className="text-xl text-white/70 mb-6">
+              <p className="text-xl text-foreground/70 mb-6">
                 Oops! The page you're looking for doesn't exist or has been moved.
               </p>
-              <p className="text-white/50">
+              <p className="text-foreground/50">
                 Don't worry, let's get you back on track.
               </p>
             </GlassSurface>
@@ -52,7 +52,7 @@ export default function NotFound() {
               <Link href="/">
                 <Button
                   size="lg"
-                  className="w-full glass-surface border-white/20 hover:border-cyan-500/50 text-white group"
+                  className="w-full glass-surface border-foreground/20 hover:border-cyan-500/50 text-white group"
                 >
                   <Home className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   Go Home
@@ -62,7 +62,7 @@ export default function NotFound() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full glass-surface border-white/20 hover:border-cyan-500/50 text-white group"
+                  className="w-full glass-surface border-foreground/20 hover:border-cyan-500/50 text-white group"
                 >
                   <Search className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   Browse Blog
@@ -74,7 +74,7 @@ export default function NotFound() {
           {/* Popular Links */}
           <ScrollReveal direction="up" delay={0.4}>
             <GlassSurface className="p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">
                 Popular Pages
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -87,7 +87,7 @@ export default function NotFound() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-sm text-white/60 hover:text-white hover:translate-x-1 transition-all inline-block"
+                    className="text-sm text-foreground/60 hover:text-foreground hover:translate-x-1 transition-all inline-block"
                   >
                     {link.label}
                   </Link>
@@ -102,7 +102,7 @@ export default function NotFound() {
               <Button
                 variant="ghost"
                 onClick={() => window.history.back()}
-                className="text-white/60 hover:text-white"
+                className="text-foreground/60 hover:text-foreground"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Go Back

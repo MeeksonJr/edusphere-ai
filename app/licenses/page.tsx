@@ -64,8 +64,8 @@ export default function LicensesPage() {
       icon={FileText}
       lastUpdated="January 1, 2026"
     >
-      <h2 className="text-2xl font-bold text-white mb-4">Third-Party Libraries</h2>
-      <p className="text-white/70 mb-6 leading-relaxed">
+      <h2 className="text-2xl font-bold text-foreground mb-4">Third-Party Libraries</h2>
+      <p className="text-foreground/70 mb-6 leading-relaxed">
         EduSphere AI is built with the help of many amazing open-source projects. 
         Below is a list of the major libraries and frameworks we use, along with their licenses.
       </p>
@@ -77,16 +77,16 @@ export default function LicensesPage() {
             direction="up"
             delay={0.05 * index}
           >
-            <GlassSurface className="p-6 border border-white/10">
+            <GlassSurface className="p-6 border border-foreground/10">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-xl font-bold text-white">
+                    <h3 className="text-xl font-bold text-foreground">
                       {license.name}
                     </h3>
-                    <span className="text-sm text-white/50">v{license.version}</span>
+                    <span className="text-sm text-foreground/50">v{license.version}</span>
                   </div>
-                  <p className="text-white/60 mb-3">{license.description}</p>
+                  <p className="text-foreground/60 mb-3">{license.description}</p>
                   <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
                     {license.license}
                   </Badge>
@@ -97,14 +97,14 @@ export default function LicensesPage() {
         ))}
       </div>
 
-      <h2 className="text-2xl font-bold text-white mb-4 mt-8">Our License</h2>
-      <p className="text-white/70 mb-6 leading-relaxed">
+      <h2 className="text-2xl font-bold text-foreground mb-4 mt-8">Our License</h2>
+      <p className="text-foreground/70 mb-6 leading-relaxed">
         EduSphere AI proprietary code is protected by copyright. However, we are committed 
         to using and contributing to open-source software wherever possible.
       </p>
 
-      <h2 className="text-2xl font-bold text-white mb-4 mt-8">Attributions</h2>
-      <p className="text-white/70 mb-6 leading-relaxed">
+      <h2 className="text-2xl font-bold text-foreground mb-4 mt-8">Attributions</h2>
+      <p className="text-foreground/70 mb-6 leading-relaxed">
         We thank all the developers and organizations who have contributed to the open-source 
         projects we use. Their work makes EduSphere AI possible.
       </p>

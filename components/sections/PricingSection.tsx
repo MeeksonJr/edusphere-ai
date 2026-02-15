@@ -83,13 +83,13 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
         <ScrollReveal direction="up">
           <div className="text-center mb-16 max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              <span className="text-white">Simple, Transparent</span>
+              <span className="text-foreground">Simple, Transparent</span>
               <br />
               <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                 Pricing
               </span>
             </h2>
-            <p className="text-xl text-white/70">
+            <p className="text-xl text-foreground/70">
               Choose the plan that's right for you. All plans include a free trial.
             </p>
           </div>
@@ -104,8 +104,8 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
               onClick={() => setAnnual(false)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 !annual
-                  ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
-                  : "text-white/60 hover:text-white"
+                  ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-foreground"
+                  : "text-foreground/60 hover:text-foreground"
               }`}
             >
               Monthly
@@ -114,8 +114,8 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
               onClick={() => setAnnual(true)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all relative ${
                 annual
-                  ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
-                  : "text-white/60 hover:text-white"
+                  ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-foreground"
+                  : "text-foreground/60 hover:text-foreground"
               }`}
             >
               Annual
@@ -154,28 +154,28 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
                   <div
                     className={`w-12 h-12 rounded-xl bg-gradient-to-br ${plan.gradient} p-3 mb-4`}
                   >
-                    <Zap className="h-full w-full text-white" />
+                    <Zap className="h-full w-full text-foreground" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-2">
+                  <h3 className="text-2xl font-bold text-foreground mb-2">
                     {plan.name}
                   </h3>
-                  <p className="text-white/60 text-sm">{plan.description}</p>
+                  <p className="text-foreground/60 text-sm">{plan.description}</p>
                 </div>
 
                 {/* Price */}
                 <div className="mb-6">
                   <div className="flex items-baseline">
-                    <span className="text-5xl font-bold text-white">
+                    <span className="text-5xl font-bold text-foreground">
                       ${plan.price[annual ? "annual" : "monthly"]}
                     </span>
                     {plan.price.monthly > 0 && (
-                      <span className="text-white/60 ml-2">
+                      <span className="text-foreground/60 ml-2">
                         /{annual ? "year" : "month"}
                       </span>
                     )}
                   </div>
                   {annual && plan.price.monthly > 0 && (
-                    <p className="text-white/40 text-sm mt-1">
+                    <p className="text-foreground/40 text-sm mt-1">
                       ${plan.price.monthly}/month billed annually
                     </p>
                   )}
@@ -192,7 +192,7 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
                       className="flex items-start space-x-3"
                     >
                       <Check className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                      <span className="text-white/80 text-sm">{feature}</span>
+                      <span className="text-foreground/80 text-sm">{feature}</span>
                     </motion.li>
                   ))}
                   {plan.limitations.map((limit, idx) => (
@@ -200,7 +200,7 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
                       key={`limit-${idx}`}
                       className="flex items-start space-x-3 opacity-50"
                     >
-                      <span className="text-white/40 text-sm line-through">
+                      <span className="text-foreground/40 text-sm line-through">
                         {limit}
                       </span>
                     </li>
@@ -216,8 +216,8 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
                     size="lg"
                     className={`w-full ${
                       plan.popular
-                        ? "bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
-                        : "glass-surface border-white/20 hover:border-cyan-500/50 text-white"
+                        ? "bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
+                        : "glass-surface border-foreground/20 hover:border-cyan-500/50 text-foreground"
                     }`}
                   >
                     {plan.cta}
@@ -232,7 +232,7 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
       {/* FAQ Link */}
       <ScrollReveal direction="up" delay={0.5}>
         <div className="text-center mt-12">
-          <p className="text-white/60 mb-4">
+          <p className="text-foreground/60 mb-4">
             Have questions about pricing?
           </p>
           <Link href="/faq">

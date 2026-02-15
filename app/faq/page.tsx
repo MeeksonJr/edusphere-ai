@@ -170,16 +170,16 @@ export default function FAQPage() {
           <ScrollReveal direction="up">
             <div className="text-center mb-12 max-w-3xl mx-auto">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-6">
-                <HelpCircle className="h-8 w-8 text-white" />
+                <HelpCircle className="h-8 w-8 text-foreground" />
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                <span className="text-white">Frequently Asked</span>
+                <span className="text-foreground">Frequently Asked</span>
                 <br />
                 <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                   Questions
                 </span>
               </h1>
-              <p className="text-xl text-white/70">
+              <p className="text-xl text-foreground/70">
                 Find answers to common questions about EduSphere AI
               </p>
             </div>
@@ -189,13 +189,13 @@ export default function FAQPage() {
           <ScrollReveal direction="up" delay={0.2}>
             <div className="max-w-2xl mx-auto mb-12">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
                 <Input
                   type="text"
                   placeholder="Search for answers..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-14 glass-surface border-white/20 text-white placeholder:text-white/40 text-lg"
+                  className="pl-12 h-14 glass-surface border-foreground/20 text-white placeholder:text-foreground/40 text-lg"
                 />
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function FAQPage() {
                 <GlassSurface className="p-6 md:p-8">
                   <div className="flex items-center space-x-3 mb-6">
                     <span className="text-3xl">{category.icon}</span>
-                    <h2 className="text-2xl font-bold text-white">
+                    <h2 className="text-2xl font-bold text-foreground">
                       {category.title}
                     </h2>
                   </div>
@@ -228,12 +228,12 @@ export default function FAQPage() {
                       <AccordionItem
                         key={index}
                         value={`${category.title}-${index}`}
-                        className="border-white/10"
+                        className="border-foreground/10"
                       >
                         <AccordionTrigger className="text-left text-white hover:text-cyan-400 transition-colors">
                           {item.question}
                         </AccordionTrigger>
-                        <AccordionContent className="text-white/70 leading-relaxed pt-2">
+                        <AccordionContent className="text-foreground/70 leading-relaxed pt-2">
                           {item.answer}
                         </AccordionContent>
                       </AccordionItem>
@@ -248,10 +248,10 @@ export default function FAQPage() {
           <ScrollReveal direction="up" delay={0.5}>
             <div className="max-w-2xl mx-auto mt-16">
               <GlassSurface className="p-8 text-center">
-                <h3 className="text-2xl font-bold text-white mb-4">
+                <h3 className="text-2xl font-bold text-foreground mb-4">
                   Still have questions?
                 </h3>
-                <p className="text-white/70 mb-6">
+                <p className="text-foreground/70 mb-6">
                   Can't find what you're looking for? Our support team is here to help.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -263,7 +263,7 @@ export default function FAQPage() {
                   </a>
                   <a
                     href="/support"
-                    className="inline-flex items-center justify-center px-6 py-3 glass-surface border-white/20 hover:border-cyan-500/50 text-white rounded-lg transition-all"
+                    className="inline-flex items-center justify-center px-6 py-3 glass-surface border-foreground/20 hover:border-cyan-500/50 text-white rounded-lg transition-all"
                   >
                     Visit Help Center
                   </a>

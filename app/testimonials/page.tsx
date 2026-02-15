@@ -92,13 +92,13 @@ export default function TestimonialsPage() {
           <ScrollReveal direction="up">
             <div className="text-center mb-16 max-w-3xl mx-auto">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                <span className="text-white">What Our Users</span>
+                <span className="text-foreground">What Our Users</span>
                 <br />
                 <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                   Are Saying
                 </span>
               </h1>
-              <p className="text-xl text-white/70">
+              <p className="text-xl text-foreground/70">
                 Join thousands of creators who are transforming education with AI-powered course creation
               </p>
             </div>
@@ -117,10 +117,10 @@ export default function TestimonialsPage() {
                 >
                   <GlassSurface className="p-6 text-center">
                     <div className="text-3xl mb-2">{stat.icon}</div>
-                    <div className="text-2xl md:text-3xl font-bold text-white mb-1">
+                    <div className="text-2xl md:text-3xl font-bold text-foreground mb-1">
                       {stat.value}
                     </div>
-                    <div className="text-sm text-white/60">{stat.label}</div>
+                    <div className="text-sm text-foreground/60">{stat.label}</div>
                   </GlassSurface>
                 </motion.div>
               ))}
@@ -153,12 +153,12 @@ export default function TestimonialsPage() {
                     </div>
 
                     {/* Content */}
-                    <p className="text-white/80 mb-6 flex-grow italic leading-relaxed">
+                    <p className="text-foreground/80 mb-6 flex-grow italic leading-relaxed">
                       "{testimonial.content}"
                     </p>
 
                     {/* Author */}
-                    <div className="flex items-center space-x-3 pt-4 border-t border-white/10">
+                    <div className="flex items-center space-x-3 pt-4 border-t border-foreground/10">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                         {testimonial.avatar}
                       </div>
@@ -171,10 +171,10 @@ export default function TestimonialsPage() {
                             <Verified className="h-4 w-4 text-blue-400 flex-shrink-0" />
                           )}
                         </div>
-                        <p className="text-white/60 text-sm truncate">
+                        <p className="text-foreground/60 text-sm truncate">
                           {testimonial.role}
                         </p>
-                        <p className="text-white/40 text-xs truncate">
+                        <p className="text-foreground/40 text-xs truncate">
                           {testimonial.company}
                         </p>
                       </div>
@@ -188,10 +188,10 @@ export default function TestimonialsPage() {
           {/* CTA Section */}
           <ScrollReveal direction="up" delay={0.5}>
             <GlassSurface className="p-8 md:p-12 text-center max-w-3xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Ready to Join Them?
               </h2>
-              <p className="text-xl text-white/70 mb-8">
+              <p className="text-xl text-foreground/70 mb-8">
                 Start creating amazing courses today. No credit card required.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -203,7 +203,7 @@ export default function TestimonialsPage() {
                 </a>
                 <a
                   href="/pricing"
-                  className="inline-flex items-center justify-center px-8 py-4 glass-surface border-white/20 hover:border-cyan-500/50 text-white rounded-lg transition-all font-semibold"
+                  className="inline-flex items-center justify-center px-8 py-4 glass-surface border-foreground/20 hover:border-cyan-500/50 text-white rounded-lg transition-all font-semibold"
                 >
                   View Pricing
                 </a>

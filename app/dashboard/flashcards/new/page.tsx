@@ -209,25 +209,25 @@ export default function NewFlashcardPage() {
       <ScrollReveal direction="up">
         <div className="mb-8">
           <Link href="/dashboard/flashcards">
-            <Button variant="ghost" className="text-white/70 hover:text-white mb-4">
+            <Button variant="ghost" className="text-foreground/70 hover:text-foreground mb-4">
               <ChevronLeft className="mr-2 h-4 w-4" />
               Back to Flashcards
             </Button>
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">Create New Flashcard Set</span>
+            <span className="text-foreground">Create New Flashcard Set</span>
           </h1>
-          <p className="text-white/70">Build a new set of flashcards for studying</p>
+          <p className="text-foreground/70">Build a new set of flashcards for studying</p>
         </div>
       </ScrollReveal>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <ScrollReveal direction="up" delay={0.1}>
           <GlassSurface className="p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Flashcard Set Details</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Flashcard Set Details</h2>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="title" className="text-white">
+                <Label htmlFor="title" className="text-foreground">
                   Title *
                 </Label>
                 <Input
@@ -235,13 +235,13 @@ export default function NewFlashcardPage() {
                   value={newSet.title}
                   onChange={(e) => setNewSet((prev) => ({ ...prev, title: e.target.value }))}
                   placeholder="e.g., Biology Chapter 5"
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 mt-1"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 mt-1"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="description" className="text-white">
+                <Label htmlFor="description" className="text-foreground">
                   Description
                 </Label>
                 <Textarea
@@ -249,23 +249,23 @@ export default function NewFlashcardPage() {
                   value={newSet.description}
                   onChange={(e) => setNewSet((prev) => ({ ...prev, description: e.target.value }))}
                   placeholder="Optional description for this flashcard set"
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 mt-1"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 mt-1"
                   rows={3}
                 />
               </div>
 
               <div>
-                <Label htmlFor="subject" className="text-white">
+                <Label htmlFor="subject" className="text-foreground">
                   Subject
                 </Label>
                 <Select value={newSet.subject} onValueChange={(value) => setNewSet((prev) => ({ ...prev, subject: value }))}>
-                  <SelectTrigger className="glass-surface border-white/20 text-white mt-1">
+                  <SelectTrigger className="glass-surface border-foreground/20 text-white mt-1">
                     <SelectValue placeholder="Select a subject" />
                   </SelectTrigger>
-                  <SelectContent className="glass-surface border-white/20">
+                  <SelectContent className="glass-surface border-foreground/20">
                     <SelectItem value="none">None</SelectItem>
                     {subjects.map((subject) => (
-                      <SelectItem key={subject} value={subject} className="text-white">
+                      <SelectItem key={subject} value={subject} className="text-foreground">
                         {subject}
                       </SelectItem>
                     ))}
@@ -278,10 +278,10 @@ export default function NewFlashcardPage() {
 
         <ScrollReveal direction="up" delay={0.2}>
           <GlassSurface className="p-6">
-            <h2 className="text-xl font-bold text-white mb-4">AI Generation</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">AI Generation</h2>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="topic" className="text-white">
+                <Label htmlFor="topic" className="text-foreground">
                   Topic
                 </Label>
                 <Input
@@ -289,12 +289,12 @@ export default function NewFlashcardPage() {
                   value={flashcardTopic}
                   onChange={(e) => setFlashcardTopic(e.target.value)}
                   placeholder="e.g., Photosynthesis, World War II, Calculus Derivatives"
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 mt-1"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 mt-1"
                 />
               </div>
 
               <div>
-                <Label htmlFor="count" className="text-white">
+                <Label htmlFor="count" className="text-foreground">
                   Number of Flashcards
                 </Label>
                 <Input
@@ -304,7 +304,7 @@ export default function NewFlashcardPage() {
                   max="50"
                   value={flashcardCount}
                   onChange={(e) => setFlashcardCount(e.target.value)}
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 mt-1"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 mt-1"
                 />
               </div>
 
@@ -312,7 +312,7 @@ export default function NewFlashcardPage() {
                 type="button"
                 onClick={handleGenerateFlashcards}
                 disabled={generatingFlashcards || !flashcardTopic}
-                className="w-full bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white"
+                className="w-full bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-foreground"
               >
                 {generatingFlashcards ? (
                   <>
@@ -332,10 +332,10 @@ export default function NewFlashcardPage() {
 
         <ScrollReveal direction="up" delay={0.3}>
           <GlassSurface className="p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Add Flashcards Manually</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Add Flashcards Manually</h2>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="question" className="text-white">
+                <Label htmlFor="question" className="text-foreground">
                   Question
                 </Label>
                 <Textarea
@@ -343,13 +343,13 @@ export default function NewFlashcardPage() {
                   value={newCard.question}
                   onChange={(e) => setNewCard((prev) => ({ ...prev, question: e.target.value }))}
                   placeholder="Enter the question"
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 mt-1"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 mt-1"
                   rows={2}
                 />
               </div>
 
               <div>
-                <Label htmlFor="answer" className="text-white">
+                <Label htmlFor="answer" className="text-foreground">
                   Answer
                 </Label>
                 <Textarea
@@ -357,7 +357,7 @@ export default function NewFlashcardPage() {
                   value={newCard.answer}
                   onChange={(e) => setNewCard((prev) => ({ ...prev, answer: e.target.value }))}
                   placeholder="Enter the answer"
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 mt-1"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 mt-1"
                   rows={3}
                 />
               </div>
@@ -366,7 +366,7 @@ export default function NewFlashcardPage() {
                 type="button"
                 onClick={handleAddCard}
                 disabled={!newCard.question || !newCard.answer}
-                className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Flashcard
@@ -379,13 +379,13 @@ export default function NewFlashcardPage() {
           <ScrollReveal direction="up" delay={0.4}>
             <GlassSurface className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-white">
+                <h2 className="text-xl font-bold text-foreground">
                   Flashcards ({newSet.cards.length})
                 </h2>
                 <Button
                   type="submit"
                   disabled={loading || !newSet.title || !newSet.cards.length}
-                  className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                  className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                 >
                   {loading ? (
                     <>
@@ -402,9 +402,9 @@ export default function NewFlashcardPage() {
               </div>
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {newSet.cards.map((card, index) => (
-                  <div key={index} className="glass-surface border-white/10 p-4 rounded-lg">
+                  <div key={index} className="glass-surface border-foreground/10 p-4 rounded-lg">
                     <div className="flex justify-between items-start mb-2">
-                      <span className="text-white/60 text-sm">Card {index + 1}</span>
+                      <span className="text-foreground/60 text-sm">Card {index + 1}</span>
                       <Button
                         type="button"
                         variant="ghost"
@@ -416,7 +416,7 @@ export default function NewFlashcardPage() {
                       </Button>
                     </div>
                     <p className="text-white font-medium mb-1">Q: {card.question}</p>
-                    <p className="text-white/70 text-sm">A: {card.answer}</p>
+                    <p className="text-foreground/70 text-sm">A: {card.answer}</p>
                   </div>
                 ))}
               </div>
@@ -427,7 +427,7 @@ export default function NewFlashcardPage() {
         <ScrollReveal direction="up" delay={0.5}>
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center">
             <Link href="/dashboard/flashcards" className="flex-1 sm:flex-initial">
-              <Button type="button" variant="ghost" className="text-white/70 hover:text-white w-full sm:w-auto">
+              <Button type="button" variant="ghost" className="text-foreground/70 hover:text-foreground w-full sm:w-auto">
                 Cancel
               </Button>
             </Link>

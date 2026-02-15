@@ -94,15 +94,15 @@ export default function LoginPage() {
             {/* Header */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-4">
-                <Sparkles className="h-8 w-8 text-white" />
+                <Sparkles className="h-8 w-8 text-foreground" />
               </div>
               <h1 className="text-4xl font-bold mb-2">
-                <span className="text-white">Welcome</span>{" "}
+                <span className="text-foreground">Welcome</span>{" "}
                 <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                   Back
                 </span>
               </h1>
-              <p className="text-white/70">
+              <p className="text-foreground/70">
                 Sign in to continue to your dashboard
               </p>
             </div>
@@ -125,11 +125,11 @@ export default function LoginPage() {
 
               <form onSubmit={handleLogin} className="space-y-6">
                 <div>
-                  <Label htmlFor="email" className="text-white mb-2 block">
+                  <Label htmlFor="email" className="text-foreground mb-2 block">
                     Email
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
                     <Input
                       id="email"
                       type="email"
@@ -137,17 +137,17 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="your@email.com"
-                      className="pl-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                      className="pl-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="password" className="text-white mb-2 block">
+                  <Label htmlFor="password" className="text-foreground mb-2 block">
                     Password
                   </Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
@@ -155,12 +155,12 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="pl-10 pr-10 glass-surface border-white/20 text-white placeholder:text-white/40"
+                      className="pl-10 pr-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-foreground/40 hover:text-foreground transition-colors"
                     >
                       {showPassword ? (
                         <EyeOff className="h-5 w-5" />
@@ -175,9 +175,9 @@ export default function LoginPage() {
                   <label className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      className="rounded border-white/20 bg-transparent"
+                      className="rounded border-foreground/20 bg-transparent"
                     />
-                    <span className="text-white/70">Remember me</span>
+                    <span className="text-foreground/70">Remember me</span>
                   </label>
                   <Link
                     href="/forgot-password"
@@ -191,7 +191,7 @@ export default function LoginPage() {
                   type="submit"
                   size="lg"
                   disabled={loading || initializing || !supabase}
-                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                 >
                   {loading ? (
                     <>
@@ -204,8 +204,8 @@ export default function LoginPage() {
                 </Button>
               </form>
 
-              <div className="mt-6 pt-6 border-t border-white/10">
-                <p className="text-center text-white/70 text-sm">
+              <div className="mt-6 pt-6 border-t border-foreground/10">
+                <p className="text-center text-foreground/70 text-sm">
                   Don't have an account?{" "}
                   <Link
                     href="/signup"

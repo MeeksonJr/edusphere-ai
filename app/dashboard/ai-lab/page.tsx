@@ -700,15 +700,15 @@ export default function AILabPage() {
       <ScrollReveal direction="up">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <span className="text-white">AI</span>{" "}
+            <span className="text-foreground">AI</span>{" "}
             <span className="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
               Lab
             </span>
           </h1>
           <div className="flex items-center gap-4">
-            <p className="text-white/70">Leverage AI to enhance your learning experience</p>
+            <p className="text-foreground/70">Leverage AI to enhance your learning experience</p>
             {user?.profile?.subscription_tier === "free" && (
-              <Badge className="glass-surface border-white/10 text-white/80">
+              <Badge className="glass-surface border-foreground/10 text-foreground/80">
                 {10 - (user?.profile?.ai_requests_count || 0)} requests remaining
               </Badge>
             )}
@@ -720,19 +720,19 @@ export default function AILabPage() {
       <ScrollReveal direction="up" delay={0.1}>
         <GlassSurface className="p-4 mb-6">
           <div className="flex items-center space-x-4">
-            <span className="text-sm font-medium text-white">AI Provider:</span>
+            <span className="text-sm font-medium text-foreground">AI Provider:</span>
             <Select value={aiProvider} onValueChange={(value: "gemini" | "huggingface") => setAiProvider(value)}>
-              <SelectTrigger className="w-[180px] glass-surface border-white/20 text-white">
+              <SelectTrigger className="w-[180px] glass-surface border-foreground/20 text-foreground">
                 <SelectValue placeholder="Select provider" />
               </SelectTrigger>
-              <SelectContent className="glass-surface border-white/20">
-                <SelectItem value="gemini" className="text-white">
+              <SelectContent className="glass-surface border-foreground/20">
+                <SelectItem value="gemini" className="text-foreground">
                   <div className="flex items-center">
                     <Sparkles className="mr-2 h-4 w-4 text-blue-400" aria-hidden="true" />
                     Gemini AI
                   </div>
                 </SelectItem>
-                <SelectItem value="huggingface" className="text-white">
+                <SelectItem value="huggingface" className="text-foreground">
                   <div className="flex items-center">
                     <Zap className="mr-2 h-4 w-4 text-yellow-400" aria-hidden="true" />
                     Hugging Face
@@ -740,7 +740,7 @@ export default function AILabPage() {
                 </SelectItem>
               </SelectContent>
             </Select>
-            <Badge className="glass-surface border-white/10 text-white/80">
+            <Badge className="glass-surface border-foreground/10 text-foreground/80">
               {aiProvider === "gemini" ? "Gemini 1.5 Flash" : "Hugging Face Models"}
             </Badge>
           </div>
@@ -748,7 +748,7 @@ export default function AILabPage() {
       </ScrollReveal>
 
       <Tabs defaultValue="chat" className="space-y-6">
-        <TabsList className="glass-surface border-white/20 p-1">
+        <TabsList className="glass-surface border-foreground/20 p-1">
           <TabsTrigger
             value="chat"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
@@ -786,12 +786,12 @@ export default function AILabPage() {
               <ScrollReveal direction="up" delay={0.2}>
                 <GlassSurface className="p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-white">AI Assistant</h2>
+                    <h2 className="text-xl font-bold text-foreground">AI Assistant</h2>
                     <div className="flex space-x-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="glass-surface border-white/20 text-white hover:bg-white/10"
+                        className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                         onClick={handleNewChat}
                       >
                         <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -800,7 +800,7 @@ export default function AILabPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="glass-surface border-white/20 text-white hover:bg-white/10"
+                        className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                         onClick={() => setChatHistory([])}
                       >
                         <RefreshCw className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -812,8 +812,8 @@ export default function AILabPage() {
                     {chatHistory.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-center">
                         <Sparkles className="h-12 w-12 text-cyan-400 mb-4" aria-hidden="true" />
-                        <h3 className="text-xl font-semibold text-white mb-2">Ask me anything!</h3>
-                        <p className="text-white/70 max-w-md">
+                        <h3 className="text-xl font-semibold text-foreground mb-2">Ask me anything!</h3>
+                        <p className="text-foreground/70 max-w-md">
                           I can help with homework, explain concepts, solve problems, and more.
                         </p>
                       </div>
@@ -827,19 +827,19 @@ export default function AILabPage() {
                             className={`max-w-[80%] rounded-lg p-4 ${
                               message.role === "user"
                                 ? "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 border border-cyan-500/30"
-                                : "glass-surface border-white/10"
+                                : "glass-surface border-foreground/10"
                             }`}
                           >
                             <div className="flex items-start mb-2">
                               {message.role === "assistant" && (
                                 <Avatar className="h-8 w-8 mr-2 border-2 border-cyan-500/30">
-                                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-foreground">
                                     AI
                                   </AvatarFallback>
                                 </Avatar>
                               )}
                               <div className={`flex-1 ${message.role === "user" ? "text-right" : "text-left"}`}>
-                                <p className="text-sm font-medium mb-1 text-white/80">
+                                <p className="text-sm font-medium mb-1 text-foreground/80">
                                   {message.role === "assistant" ? "AI Assistant" : "You"}
                                 </p>
                                 <div className="whitespace-pre-wrap text-left text-white/90">{message.content}</div>
@@ -847,7 +847,7 @@ export default function AILabPage() {
                               {message.role === "user" && (
                                 <Avatar className="h-8 w-8 ml-2 border-2 border-cyan-500/30">
                                   <AvatarImage src={user?.profile?.avatar_url || ""} />
-                                  <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-pink-500 text-white">
+                                  <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-pink-500 text-foreground">
                                     {user?.profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                                   </AvatarFallback>
                                 </Avatar>
@@ -858,7 +858,7 @@ export default function AILabPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-7 text-xs text-white/60 hover:text-white"
+                                  className="h-7 text-xs text-foreground/60 hover:text-foreground"
                                   onClick={() => copyToClipboard(message.content, index)}
                                 >
                                   {copiedIndex === index ? (
@@ -876,20 +876,20 @@ export default function AILabPage() {
                     )}
                     {isThinking && (
                       <div className="flex justify-start">
-                        <div className="glass-surface border-white/10 max-w-[80%] rounded-lg p-4">
+                        <div className="glass-surface border-foreground/10 max-w-[80%] rounded-lg p-4">
                           <div className="flex items-start mb-2">
                             <Avatar className="h-8 w-8 mr-2 border-2 border-cyan-500/30">
-                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-foreground">
                                 AI
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
-                              <p className="text-sm font-medium mb-1 text-white/80">AI Assistant</p>
+                              <p className="text-sm font-medium mb-1 text-foreground/80">AI Assistant</p>
                               <div className="flex items-center space-x-2">
                                 <div className="h-2 w-2 bg-cyan-400 rounded-full animate-pulse"></div>
                                 <div className="h-2 w-2 bg-cyan-400 rounded-full animate-pulse delay-150"></div>
                                 <div className="h-2 w-2 bg-cyan-400 rounded-full animate-pulse delay-300"></div>
-                                <span className="text-sm text-white/60 ml-1">Thinking...</span>
+                                <span className="text-sm text-foreground/60 ml-1">Thinking...</span>
                               </div>
                             </div>
                           </div>
@@ -905,7 +905,7 @@ export default function AILabPage() {
                       value={chatInput}
                       onChange={(e) => setChatInput(e.target.value)}
                       placeholder="Ask a question..."
-                      className="flex-1 glass-surface border-white/20 text-white placeholder:text-white/40 min-h-[60px] max-h-[200px] resize-none"
+                      className="flex-1 glass-surface border-foreground/20 text-white placeholder:text-foreground/40 min-h-[60px] max-h-[200px] resize-none"
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault()
@@ -918,7 +918,7 @@ export default function AILabPage() {
                     <div className="flex flex-col gap-2 self-end">
                       <Button
                         type="submit"
-                        className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                        className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                         disabled={loading || !chatInput.trim()}
                       >
                         {loading ? (
@@ -930,7 +930,7 @@ export default function AILabPage() {
                       <Button
                         type="button"
                         variant="outline"
-                        className="glass-surface border-white/20 text-white hover:bg-white/10"
+                        className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                         onClick={handleSaveChat}
                         disabled={chatHistory.length === 0}
                       >
@@ -945,14 +945,14 @@ export default function AILabPage() {
             <div>
               <ScrollReveal direction="up" delay={0.3}>
                 <GlassSurface className="p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Saved Chats</h3>
+                  <h3 className="text-lg font-bold text-foreground mb-4">Saved Chats</h3>
                   <div className="max-h-[400px] overflow-y-auto space-y-2">
                     {savedChats.length > 0 ? (
                       savedChats.map((chat) => (
                         <div key={chat.id} className="flex items-center justify-between gap-2">
                           <Button
                             variant="outline"
-                            className="flex-1 justify-start glass-surface border-white/20 text-white hover:bg-white/10 text-left"
+                            className="flex-1 justify-start glass-surface border-foreground/20 text-white hover:bg-foreground/10 text-left"
                             onClick={() => loadSavedChat(chat.id)}
                           >
                             <FileText className="h-4 w-4 mr-2 flex-shrink-0" aria-hidden="true" />
@@ -960,11 +960,11 @@ export default function AILabPage() {
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground/60 hover:text-foreground">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="glass-surface border-white/20">
+                            <DropdownMenuContent align="end" className="glass-surface border-foreground/20">
                               <DropdownMenuItem
                                 onClick={() => deleteSavedChat(chat.id)}
                                 className="text-red-400 hover:text-red-300"
@@ -977,7 +977,7 @@ export default function AILabPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-white/60">No saved chats yet.</p>
+                      <p className="text-sm text-foreground/60">No saved chats yet.</p>
                     )}
                   </div>
                 </GlassSurface>
@@ -990,12 +990,12 @@ export default function AILabPage() {
         <TabsContent value="summarize">
           <ScrollReveal direction="up" delay={0.2}>
             <GlassSurface className="p-6 lg:p-8">
-              <h2 className="text-xl font-bold text-white mb-2">Text Summarizer</h2>
-              <p className="text-white/70 mb-6">
+              <h2 className="text-xl font-bold text-foreground mb-2">Text Summarizer</h2>
+              <p className="text-foreground/70 mb-6">
                 Paste any text to get a concise summary. Great for articles, research papers, or long documents.
               </p>
               <div className="mb-4">
-                <Label htmlFor="summary-input" className="text-white mb-2 block">
+                <Label htmlFor="summary-input" className="text-foreground mb-2 block">
                   Text to Summarize
                 </Label>
                 <Textarea
@@ -1003,14 +1003,14 @@ export default function AILabPage() {
                   value={summaryInput}
                   onChange={(e) => setSummaryInput(e.target.value)}
                   placeholder="Paste the text you want to summarize..."
-                  className="glass-surface border-white/20 text-white placeholder:text-white/40 min-h-[200px] resize-none"
+                  className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 min-h-[200px] resize-none"
                 />
               </div>
 
               <div className="flex justify-between mb-6">
                 <Button
                   onClick={handleSummarize}
-                  className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                  className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                   disabled={loading || !summaryInput.trim()}
                 >
                   {loading ? (
@@ -1029,7 +1029,7 @@ export default function AILabPage() {
                 {summaryResult && (
                   <Button
                     variant="outline"
-                    className="glass-surface border-white/20 text-white hover:bg-white/10"
+                    className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                     onClick={downloadSummary}
                   >
                     <Download className="h-5 w-5 mr-2" aria-hidden="true" />
@@ -1040,13 +1040,13 @@ export default function AILabPage() {
 
               {summaryResult && (
                 <div className="mt-4">
-                  <h3 className="text-lg font-semibold text-white mb-2">Summary</h3>
-                  <div className="glass-surface border-white/10 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">Summary</h3>
+                  <div className="glass-surface border-foreground/10 p-4 rounded-lg">
                     <p className="text-white/90 whitespace-pre-wrap leading-relaxed">{summaryResult}</p>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="mt-2 h-7 text-xs text-white/60 hover:text-white"
+                      className="mt-2 h-7 text-xs text-foreground/60 hover:text-foreground"
                       onClick={() => copyToClipboard(summaryResult, 0)}
                     >
                       {copiedIndex === 0 ? (
@@ -1069,14 +1069,14 @@ export default function AILabPage() {
             <div className="md:col-span-3">
               <ScrollReveal direction="up" delay={0.2}>
                 <GlassSurface className="p-6 lg:p-8">
-                  <h2 className="text-xl font-bold text-white mb-2">Study Plan Generator</h2>
-                  <p className="text-white/70 mb-6">
+                  <h2 className="text-xl font-bold text-foreground mb-2">Study Plan Generator</h2>
+                  <p className="text-foreground/70 mb-6">
                     Create a personalized study plan for any subject or topic. Includes learning objectives, resources,
                     and a timeline.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <Label htmlFor="study-subject" className="text-white mb-2 block">
+                      <Label htmlFor="study-subject" className="text-foreground mb-2 block">
                         Subject
                       </Label>
                       <Input
@@ -1084,11 +1084,11 @@ export default function AILabPage() {
                         value={studySubject}
                         onChange={(e) => setStudySubject(e.target.value)}
                         placeholder="e.g., Mathematics, Physics, History"
-                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                        className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="study-topic" className="text-white mb-2 block">
+                      <Label htmlFor="study-topic" className="text-foreground mb-2 block">
                         Specific Topic
                       </Label>
                       <Input
@@ -1096,7 +1096,7 @@ export default function AILabPage() {
                         value={studyTopic}
                         onChange={(e) => setStudyTopic(e.target.value)}
                         placeholder="e.g., Calculus, Quantum Mechanics, World War II"
-                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                        className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                       />
                     </div>
                   </div>
@@ -1104,7 +1104,7 @@ export default function AILabPage() {
                   <div className="flex justify-between mb-6">
                     <Button
                       onClick={handleGenerateStudyPlan}
-                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                       disabled={loading || !studySubject.trim() || !studyTopic.trim()}
                     >
                       {loading ? (
@@ -1124,7 +1124,7 @@ export default function AILabPage() {
                       <div className="flex space-x-2">
                         <Button
                           variant="outline"
-                          className="glass-surface border-white/20 text-white hover:bg-white/10"
+                          className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                           onClick={downloadStudyPlan}
                         >
                           <Download className="h-5 w-5 mr-2" aria-hidden="true" />
@@ -1132,7 +1132,7 @@ export default function AILabPage() {
                         </Button>
                         <Button
                           variant="outline"
-                          className="glass-surface border-white/20 text-white hover:bg-white/10"
+                          className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                           onClick={() => setIsSaveStudyPlanDialogOpen(true)}
                         >
                           <Save className="h-5 w-5 mr-2" aria-hidden="true" />
@@ -1144,15 +1144,15 @@ export default function AILabPage() {
 
                   {studyPlan && (
                     <div className="mt-4">
-                      <h3 className="text-lg font-semibold text-white mb-2">Your Study Plan</h3>
-                      <div className="glass-surface border-white/10 p-6 rounded-lg">
+                      <h3 className="text-lg font-semibold text-foreground mb-2">Your Study Plan</h3>
+                      <div className="glass-surface border-foreground/10 p-6 rounded-lg">
                         <pre className="whitespace-pre-wrap text-white/90 font-mono text-sm leading-relaxed">
                           {studyPlan}
                         </pre>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="mt-2 h-7 text-xs text-white/60 hover:text-white"
+                          className="mt-2 h-7 text-xs text-foreground/60 hover:text-foreground"
                           onClick={() => copyToClipboard(studyPlan, 0)}
                         >
                           {copiedIndex === 0 ? (
@@ -1172,14 +1172,14 @@ export default function AILabPage() {
             <div>
               <ScrollReveal direction="up" delay={0.3}>
                 <GlassSurface className="p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Saved Study Plans</h3>
+                  <h3 className="text-lg font-bold text-foreground mb-4">Saved Study Plans</h3>
                   <div className="max-h-[400px] overflow-y-auto space-y-2">
                     {savedStudyPlans.length > 0 ? (
                       savedStudyPlans.map((plan) => (
                         <div key={plan.id} className="flex items-center justify-between gap-2">
                           <Button
                             variant="outline"
-                            className="flex-1 justify-start glass-surface border-white/20 text-white hover:bg-white/10 text-left"
+                            className="flex-1 justify-start glass-surface border-foreground/20 text-white hover:bg-foreground/10 text-left"
                             onClick={() => loadSavedStudyPlan(plan.id)}
                           >
                             <BookOpen className="h-4 w-4 mr-2 flex-shrink-0" aria-hidden="true" />
@@ -1187,11 +1187,11 @@ export default function AILabPage() {
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground/60 hover:text-foreground">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="glass-surface border-white/20">
+                            <DropdownMenuContent align="end" className="glass-surface border-foreground/20">
                               <DropdownMenuItem
                                 onClick={() => deleteSavedStudyPlan(plan.id)}
                                 className="text-red-400 hover:text-red-300"
@@ -1204,7 +1204,7 @@ export default function AILabPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-white/60">No saved study plans yet.</p>
+                      <p className="text-sm text-foreground/60">No saved study plans yet.</p>
                     )}
                   </div>
                 </GlassSurface>
@@ -1219,13 +1219,13 @@ export default function AILabPage() {
             <div className="md:col-span-3">
               <ScrollReveal direction="up" delay={0.2}>
                 <GlassSurface className="p-6 lg:p-8">
-                  <h2 className="text-xl font-bold text-white mb-2">Flashcard Generator</h2>
-                  <p className="text-white/70 mb-6">
+                  <h2 className="text-xl font-bold text-foreground mb-2">Flashcard Generator</h2>
+                  <p className="text-foreground/70 mb-6">
                     Create flashcards for any topic to help with memorization and quick review.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div className="md:col-span-2">
-                      <Label htmlFor="flashcard-topic" className="text-white mb-2 block">
+                      <Label htmlFor="flashcard-topic" className="text-foreground mb-2 block">
                         Topic
                       </Label>
                       <Input
@@ -1233,22 +1233,22 @@ export default function AILabPage() {
                         value={flashcardTopic}
                         onChange={(e) => setFlashcardTopic(e.target.value)}
                         placeholder="e.g., Spanish Vocabulary, Chemical Elements, Historical Dates"
-                        className="glass-surface border-white/20 text-white placeholder:text-white/40"
+                        className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="flashcard-count" className="text-white mb-2 block">
+                      <Label htmlFor="flashcard-count" className="text-foreground mb-2 block">
                         Number of Cards
                       </Label>
                       <Select value={flashcardCount} onValueChange={setFlashcardCount}>
-                        <SelectTrigger className="glass-surface border-white/20 text-white">
+                        <SelectTrigger className="glass-surface border-foreground/20 text-foreground">
                           <SelectValue placeholder="Select count" />
                         </SelectTrigger>
-                        <SelectContent className="glass-surface border-white/20">
-                          <SelectItem value="5" className="text-white">5 cards</SelectItem>
-                          <SelectItem value="10" className="text-white">10 cards</SelectItem>
-                          <SelectItem value="15" className="text-white">15 cards</SelectItem>
-                          <SelectItem value="20" className="text-white">20 cards</SelectItem>
+                        <SelectContent className="glass-surface border-foreground/20">
+                          <SelectItem value="5" className="text-foreground">5 cards</SelectItem>
+                          <SelectItem value="10" className="text-foreground">10 cards</SelectItem>
+                          <SelectItem value="15" className="text-foreground">15 cards</SelectItem>
+                          <SelectItem value="20" className="text-foreground">20 cards</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1257,7 +1257,7 @@ export default function AILabPage() {
                   <div className="flex justify-between mb-6">
                     <Button
                       onClick={handleGenerateFlashcards}
-                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                       disabled={loading || !flashcardTopic.trim()}
                     >
                       {loading ? (
@@ -1277,7 +1277,7 @@ export default function AILabPage() {
                       <div className="flex space-x-2">
                         <Button
                           variant="outline"
-                          className="glass-surface border-white/20 text-white hover:bg-white/10"
+                          className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                           onClick={downloadFlashcards}
                         >
                           <Download className="h-5 w-5 mr-2" aria-hidden="true" />
@@ -1285,7 +1285,7 @@ export default function AILabPage() {
                         </Button>
                         <Button
                           variant="outline"
-                          className="glass-surface border-white/20 text-white hover:bg-white/10"
+                          className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                           onClick={handleSaveFlashcards}
                         >
                           <Save className="h-5 w-5 mr-2" aria-hidden="true" />
@@ -1298,14 +1298,14 @@ export default function AILabPage() {
                   {flashcards.length > 0 && (
                     <div className="mt-4">
                       <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold text-white">
+                        <h3 className="text-lg font-semibold text-foreground">
                           Flashcard {activeFlashcard + 1} of {flashcards.length}
                         </h3>
                         <div className="flex items-center space-x-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="glass-surface border-white/20 text-white hover:bg-white/10"
+                            className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                             onClick={() =>
                               getFlashcardExplanation(
                                 flashcards[activeFlashcard]?.question,
@@ -1318,12 +1318,12 @@ export default function AILabPage() {
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="text-white/60 hover:text-white">
+                              <Button variant="ghost" size="sm" className="text-foreground/60 hover:text-foreground">
                                 <MoreHorizontal className="h-4 w-4 mr-2" />
                                 Actions
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="glass-surface border-white/20">
+                            <DropdownMenuContent align="end" className="glass-surface border-foreground/20">
                               <DropdownMenuItem
                                 onClick={() => {
                                   setEditingFlashcard({
@@ -1333,7 +1333,7 @@ export default function AILabPage() {
                                   })
                                   setIsEditDialogOpen(true)
                                 }}
-                                className="text-white"
+                                className="text-foreground"
                               >
                                 Edit Question
                               </DropdownMenuItem>
@@ -1346,7 +1346,7 @@ export default function AILabPage() {
                                   })
                                   setIsEditDialogOpen(true)
                                 }}
-                                className="text-white"
+                                className="text-foreground"
                               >
                                 Edit Answer
                               </DropdownMenuItem>
@@ -1364,15 +1364,15 @@ export default function AILabPage() {
 
                       <div className="flashcard mb-4">
                         <div className={`flashcard-inner ${showAnswer ? "flipped" : ""}`}>
-                          <div className="flashcard-front glass-surface border-white/10 rounded-lg p-8 min-h-[250px] flex items-center justify-center">
+                          <div className="flashcard-front glass-surface border-foreground/10 rounded-lg p-8 min-h-[250px] flex items-center justify-center">
                             <div>
-                              <p className="font-semibold text-white mb-3">Question:</p>
+                              <p className="font-semibold text-foreground mb-3">Question:</p>
                               <p className="text-white/90 text-lg">{flashcards[activeFlashcard]?.question}</p>
                             </div>
                           </div>
-                          <div className="flashcard-back glass-surface border-white/10 rounded-lg p-8 min-h-[250px] flex items-center justify-center">
+                          <div className="flashcard-back glass-surface border-foreground/10 rounded-lg p-8 min-h-[250px] flex items-center justify-center">
                             <div>
-                              <p className="font-semibold text-white mb-3">Answer:</p>
+                              <p className="font-semibold text-foreground mb-3">Answer:</p>
                               <p className="text-white/90 text-lg">{flashcards[activeFlashcard]?.answer}</p>
                             </div>
                           </div>
@@ -1383,7 +1383,7 @@ export default function AILabPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="glass-surface border-white/20 text-white"
+                          className="glass-surface border-foreground/20 text-foreground"
                           onClick={handlePrevFlashcard}
                           disabled={activeFlashcard === 0}
                         >
@@ -1392,8 +1392,8 @@ export default function AILabPage() {
                         <Button
                           className={
                             showAnswer
-                              ? "glass-surface border-white/20 text-white"
-                              : "bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                              ? "glass-surface border-foreground/20 text-foreground"
+                              : "bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                           }
                           onClick={() => setShowAnswer(!showAnswer)}
                         >
@@ -1402,7 +1402,7 @@ export default function AILabPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="glass-surface border-white/20 text-white"
+                          className="glass-surface border-foreground/20 text-foreground"
                           onClick={handleNextFlashcard}
                           disabled={activeFlashcard === flashcards.length - 1}
                         >
@@ -1418,14 +1418,14 @@ export default function AILabPage() {
             <div>
               <ScrollReveal direction="up" delay={0.3}>
                 <GlassSurface className="p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Saved Flashcards</h3>
+                  <h3 className="text-lg font-bold text-foreground mb-4">Saved Flashcards</h3>
                   <div className="max-h-[400px] overflow-y-auto space-y-2">
                     {savedFlashcards.length > 0 ? (
                       savedFlashcards.map((set) => (
                         <div key={set.id} className="flex items-center justify-between gap-2">
                           <Button
                             variant="outline"
-                            className="flex-1 justify-start glass-surface border-white/20 text-white hover:bg-white/10 text-left"
+                            className="flex-1 justify-start glass-surface border-foreground/20 text-white hover:bg-foreground/10 text-left"
                             onClick={() => loadSavedFlashcards(set.id)}
                           >
                             <BrainCircuit className="h-4 w-4 mr-2 flex-shrink-0" aria-hidden="true" />
@@ -1433,11 +1433,11 @@ export default function AILabPage() {
                           </Button>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white">
+                              <Button variant="ghost" size="icon" className="h-8 w-8 text-foreground/60 hover:text-foreground">
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="glass-surface border-white/20">
+                            <DropdownMenuContent align="end" className="glass-surface border-foreground/20">
                               <DropdownMenuItem
                                 onClick={() => deleteSavedFlashcardSet(set.id)}
                                 className="text-red-400 hover:text-red-300"
@@ -1450,7 +1450,7 @@ export default function AILabPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-white/60">No saved flashcard sets yet.</p>
+                      <p className="text-sm text-foreground/60">No saved flashcard sets yet.</p>
                     )}
                   </div>
                 </GlassSurface>
@@ -1462,9 +1462,9 @@ export default function AILabPage() {
 
       {/* Edit Flashcard Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="glass-surface border-white/20">
+        <DialogContent className="glass-surface border-foreground/20">
           <DialogHeader>
-            <DialogTitle className="text-white">
+            <DialogTitle className="text-foreground">
               Edit {editingFlashcard?.field === "question" ? "Question" : "Answer"}
             </DialogTitle>
           </DialogHeader>
@@ -1476,18 +1476,18 @@ export default function AILabPage() {
                   editingFlashcard ? { ...editingFlashcard, value: e.target.value } : null,
                 )
               }
-              className="glass-surface border-white/20 text-white placeholder:text-white/40 min-h-[100px] resize-none"
+              className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 min-h-[100px] resize-none"
             />
             <DialogFooter>
               <Button
                 variant="outline"
-                className="glass-surface border-white/20 text-white hover:bg-white/10"
+                className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                 onClick={() => setIsEditDialogOpen(false)}
               >
                 Cancel
               </Button>
               <Button
-                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                 onClick={handleEditFlashcard}
               >
                 Save
@@ -1499,10 +1499,10 @@ export default function AILabPage() {
 
       {/* Save Study Plan Dialog */}
       <Dialog open={isSaveStudyPlanDialogOpen} onOpenChange={setIsSaveStudyPlanDialogOpen}>
-        <DialogContent className="glass-surface border-white/20">
+        <DialogContent className="glass-surface border-foreground/20">
           <DialogHeader>
-            <DialogTitle className="text-white">Save Study Plan</DialogTitle>
-            <DialogDescription className="text-white/70">
+            <DialogTitle className="text-foreground">Save Study Plan</DialogTitle>
+            <DialogDescription className="text-foreground/70">
               Give your study plan a title to save it for later.
             </DialogDescription>
           </DialogHeader>
@@ -1511,18 +1511,18 @@ export default function AILabPage() {
               value={studyPlanTitle}
               onChange={(e) => setStudyPlanTitle(e.target.value)}
               placeholder="Enter a title for your study plan"
-              className="glass-surface border-white/20 text-white placeholder:text-white/40"
+              className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
             />
             <DialogFooter>
               <Button
                 variant="outline"
-                className="glass-surface border-white/20 text-white hover:bg-white/10"
+                className="glass-surface border-foreground/20 text-white hover:bg-foreground/10"
                 onClick={() => setIsSaveStudyPlanDialogOpen(false)}
               >
                 Cancel
               </Button>
               <Button
-                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
                 onClick={handleSaveStudyPlan}
               >
                 Save
