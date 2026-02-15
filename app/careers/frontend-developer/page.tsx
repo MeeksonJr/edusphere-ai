@@ -2,41 +2,41 @@ export default function FrontendDeveloperJobPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="bg-black/80 backdrop-blur-sm border-b border-purple-900/50 sticky top-0 z-10">
+      <header className="bg-black/80 backdrop-blur-sm border-b border-cyan-900/50 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <a href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-pink-600 flex items-center justify-center">
               <span className="text-white font-bold text-xl">E</span>
             </div>
-            <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+            <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-pink-500">
               EduSphere AI
             </span>
           </a>
           <nav className="hidden md:flex items-center gap-6">
             <a
               href="/"
-              className="text-gray-300 hover:text-purple-400 transition"
+              className="text-gray-300 hover:text-cyan-400 transition"
             >
               Home
             </a>
             <a
               href="/features"
-              className="text-gray-300 hover:text-purple-400 transition"
+              className="text-gray-300 hover:text-cyan-400 transition"
             >
               Features
             </a>
             <a
               href="/pricing"
-              className="text-gray-300 hover:text-purple-400 transition"
+              className="text-gray-300 hover:text-cyan-400 transition"
             >
               Pricing
             </a>
-            <a href="/careers" className="text-purple-400 font-medium">
+            <a href="/careers" className="text-cyan-400 font-medium">
               Careers
             </a>
             <a
               href="/login"
-              className="px-4 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white transition"
+              className="px-4 py-2 rounded-md bg-cyan-600 hover:bg-cyan-700 text-white transition"
             >
               Login
             </a>
@@ -49,30 +49,30 @@ export default function FrontendDeveloperJobPage() {
         <div className="max-w-4xl mx-auto">
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-8">
-            <a href="/" className="hover:text-purple-400 transition">
+            <a href="/" className="hover:text-cyan-400 transition">
               Home
             </a>
             <span>/</span>
-            <a href="/careers" className="hover:text-purple-400 transition">
+            <a href="/careers" className="hover:text-cyan-400 transition">
               Careers
             </a>
             <span>/</span>
-            <span className="text-purple-400">Frontend Developer</span>
+            <span className="text-cyan-400">Frontend Developer</span>
           </div>
 
           {/* Job Header */}
           <div className="mb-12">
-            <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+            <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-pink-500">
               Frontend Developer
             </h1>
             <div className="flex flex-wrap gap-4 mb-6">
-              <span className="px-3 py-1 rounded-full bg-purple-900/30 border border-purple-700/50 text-purple-400 text-sm">
+              <span className="px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-700/50 text-cyan-400 text-sm">
                 Full-time
               </span>
-              <span className="px-3 py-1 rounded-full bg-purple-900/30 border border-purple-700/50 text-purple-400 text-sm">
+              <span className="px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-700/50 text-cyan-400 text-sm">
                 Remote / San Francisco
               </span>
-              <span className="px-3 py-1 rounded-full bg-purple-900/30 border border-purple-700/50 text-purple-400 text-sm">
+              <span className="px-3 py-1 rounded-full bg-cyan-900/30 border border-cyan-700/50 text-cyan-400 text-sm">
                 Engineering Team
               </span>
             </div>
@@ -85,7 +85,7 @@ export default function FrontendDeveloperJobPage() {
           {/* Job Description */}
           <div className="space-y-10">
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-purple-400">
+              <h2 className="text-2xl font-semibold mb-4 text-cyan-400">
                 About the Role
               </h2>
               <p className="text-gray-300 leading-relaxed">
@@ -101,7 +101,7 @@ export default function FrontendDeveloperJobPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-purple-400">
+              <h2 className="text-2xl font-semibold mb-4 text-cyan-400">
                 Key Responsibilities
               </h2>
               <ul className="list-disc pl-5 space-y-2 text-gray-300">
@@ -138,7 +138,7 @@ export default function FrontendDeveloperJobPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-purple-400">
+              <h2 className="text-2xl font-semibold mb-4 text-cyan-400">
                 Requirements
               </h2>
               <ul className="list-disc pl-5 space-y-2 text-gray-300">
@@ -168,7 +168,7 @@ export default function FrontendDeveloperJobPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-purple-400">
+              <h2 className="text-2xl font-semibold mb-4 text-cyan-400">
                 Nice to Have
               </h2>
               <ul className="list-disc pl-5 space-y-2 text-gray-300">
@@ -191,7 +191,7 @@ export default function FrontendDeveloperJobPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-purple-400">
+              <h2 className="text-2xl font-semibold mb-4 text-cyan-400">
                 Benefits
               </h2>
               <ul className="list-disc pl-5 space-y-2 text-gray-300">
@@ -207,7 +207,7 @@ export default function FrontendDeveloperJobPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4 text-purple-400">
+              <h2 className="text-2xl font-semibold mb-4 text-cyan-400">
                 Our Commitment to Diversity
               </h2>
               <p className="text-gray-300 leading-relaxed">
@@ -224,7 +224,7 @@ export default function FrontendDeveloperJobPage() {
             <div className="pt-6">
               <a
                 href="/careers/frontend-developer/apply"
-                className="inline-block px-8 py-4 rounded-md bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium text-lg hover:from-purple-700 hover:to-pink-700 transition shadow-lg shadow-purple-900/30"
+                className="inline-block px-8 py-4 rounded-md bg-gradient-to-r from-cyan-600 to-pink-600 text-white font-medium text-lg hover:from-cyan-700 hover:to-pink-700 transition shadow-lg shadow-cyan-900/30"
               >
                 Apply for this Position
               </a>
@@ -234,7 +234,7 @@ export default function FrontendDeveloperJobPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-black/80 border-t border-purple-900/50 mt-20">
+      <footer className="bg-black/80 border-t border-cyan-900/50 mt-20">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Logo & Description */}
@@ -244,10 +244,10 @@ export default function FrontendDeveloperJobPage() {
                 className="flex items-center gap-2 mb-4"
                 aria-label="EduSphere AI Home"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-pink-600 flex items-center justify-center">
                   <span className="text-white font-bold text-xl">E</span>
                 </div>
-                <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+                <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-pink-500">
                   EduSphere AI
                 </span>
               </a>
@@ -258,7 +258,7 @@ export default function FrontendDeveloperJobPage() {
               <div className="flex gap-4">
                 <a
                   href="https://www.facebook.com/profile.php?id=100011003917426"
-                  className="text-gray-400 hover:text-purple-400 transition"
+                  className="text-gray-400 hover:text-cyan-400 transition"
                   aria-label="Facebook"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -279,7 +279,7 @@ export default function FrontendDeveloperJobPage() {
                 </a>
                 <a
                   href="https://twitter.com"
-                  className="text-gray-400 hover:text-purple-400 transition"
+                  className="text-gray-400 hover:text-cyan-400 transition"
                   aria-label="Twitter"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -296,7 +296,7 @@ export default function FrontendDeveloperJobPage() {
                 </a>
                 <a
                   href="https://github.com/MeeksonJr"
-                  className="text-gray-400 hover:text-purple-400 transition"
+                  className="text-gray-400 hover:text-cyan-400 transition"
                   aria-label="GitHub"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -317,7 +317,7 @@ export default function FrontendDeveloperJobPage() {
                 </a>
                 <a
                   href="https://www.linkedin.com/in/mohamed-datt-b60907296"
-                  className="text-gray-400 hover:text-purple-400 transition"
+                  className="text-gray-400 hover:text-cyan-400 transition"
                   aria-label="LinkedIn"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -337,14 +337,14 @@ export default function FrontendDeveloperJobPage() {
 
             {/* Company Links */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">
+              <h3 className="text-lg font-semibold mb-4 text-cyan-400">
                 Company
               </h3>
               <ul className="space-y-2">
                 <li>
                   <a
                     href="/about"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     About Us
                   </a>
@@ -352,7 +352,7 @@ export default function FrontendDeveloperJobPage() {
                 <li>
                   <a
                     href="/careers"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Careers
                   </a>
@@ -360,7 +360,7 @@ export default function FrontendDeveloperJobPage() {
                 <li>
                   <a
                     href="/blog"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Blog
                   </a>
@@ -368,7 +368,7 @@ export default function FrontendDeveloperJobPage() {
                 <li>
                   <a
                     href="/contact"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Contact
                   </a>
@@ -378,14 +378,14 @@ export default function FrontendDeveloperJobPage() {
 
             {/* Resources Links */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">
+              <h3 className="text-lg font-semibold mb-4 text-cyan-400">
                 Resources
               </h3>
               <ul className="space-y-2">
                 <li>
                   <a
                     href="/documentation"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Documentation
                   </a>
@@ -393,7 +393,7 @@ export default function FrontendDeveloperJobPage() {
                 <li>
                   <a
                     href="/support"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Support
                   </a>
@@ -401,7 +401,7 @@ export default function FrontendDeveloperJobPage() {
                 <li>
                   <a
                     href="/roadmap"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Roadmap
                   </a>
@@ -409,7 +409,7 @@ export default function FrontendDeveloperJobPage() {
                 <li>
                   <a
                     href="/features"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Features
                   </a>
@@ -419,14 +419,14 @@ export default function FrontendDeveloperJobPage() {
 
             {/* Legal Links */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">
+              <h3 className="text-lg font-semibold mb-4 text-cyan-400">
                 Legal
               </h3>
               <ul className="space-y-2">
                 <li>
                   <a
                     href="/terms"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Terms of Service
                   </a>
@@ -434,7 +434,7 @@ export default function FrontendDeveloperJobPage() {
                 <li>
                   <a
                     href="/privacy"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Privacy Policy
                   </a>
@@ -442,7 +442,7 @@ export default function FrontendDeveloperJobPage() {
                 <li>
                   <a
                     href="/cookies"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Cookie Policy
                   </a>
@@ -450,7 +450,7 @@ export default function FrontendDeveloperJobPage() {
                 <li>
                   <a
                     href="/licenses"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Licenses
                   </a>
@@ -460,7 +460,7 @@ export default function FrontendDeveloperJobPage() {
           </div>
 
           {/* Bottom Text */}
-          <div className="border-t border-purple-900/50 mt-12 pt-8 text-center text-gray-400">
+          <div className="border-t border-cyan-900/50 mt-12 pt-8 text-center text-gray-400">
             <p>
               © {new Date().getFullYear()} EduSphere AI. All rights reserved.
             </p>

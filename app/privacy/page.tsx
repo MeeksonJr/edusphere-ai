@@ -102,7 +102,7 @@ export default function PrivacyPage() {
       <h2 className="text-2xl font-bold text-white mb-4 mt-8">Contact Us</h2>
       <p className="text-white/70 mb-6 leading-relaxed">
         If you have any questions about this Privacy Policy, please contact us at{" "}
-        <a href="mailto:privacy@edusphere.ai" className="text-purple-400 hover:text-purple-300 underline">
+        <a href="mailto:privacy@edusphere.ai" className="text-cyan-400 hover:text-cyan-300 underline">
           privacy@edusphere.ai
         </a>
       </p>

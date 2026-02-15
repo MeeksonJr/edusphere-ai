@@ -751,28 +751,28 @@ export default function AILabPage() {
         <TabsList className="glass-surface border-white/20 p-1">
           <TabsTrigger
             value="chat"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <MessageSquare className="h-4 w-4 mr-2" aria-hidden="true" />
             AI Chat
           </TabsTrigger>
           <TabsTrigger
             value="summarize"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <Lightbulb className="h-4 w-4 mr-2" aria-hidden="true" />
             Summarize
           </TabsTrigger>
           <TabsTrigger
             value="study-plan"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <BookOpen className="h-4 w-4 mr-2" aria-hidden="true" />
             Study Plan
           </TabsTrigger>
           <TabsTrigger
             value="flashcards"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <BrainCircuit className="h-4 w-4 mr-2" aria-hidden="true" />
             Flashcards
@@ -811,7 +811,7 @@ export default function AILabPage() {
                   <div className="h-[400px] overflow-y-auto mb-4 space-y-4 pr-2" id="chat-container">
                     {chatHistory.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-center">
-                        <Sparkles className="h-12 w-12 text-purple-400 mb-4" aria-hidden="true" />
+                        <Sparkles className="h-12 w-12 text-cyan-400 mb-4" aria-hidden="true" />
                         <h3 className="text-xl font-semibold text-white mb-2">Ask me anything!</h3>
                         <p className="text-white/70 max-w-md">
                           I can help with homework, explain concepts, solve problems, and more.
@@ -826,13 +826,13 @@ export default function AILabPage() {
                           <div
                             className={`max-w-[80%] rounded-lg p-4 ${
                               message.role === "user"
-                                ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30"
+                                ? "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 border border-cyan-500/30"
                                 : "glass-surface border-white/10"
                             }`}
                           >
                             <div className="flex items-start mb-2">
                               {message.role === "assistant" && (
-                                <Avatar className="h-8 w-8 mr-2 border-2 border-purple-500/30">
+                                <Avatar className="h-8 w-8 mr-2 border-2 border-cyan-500/30">
                                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
                                     AI
                                   </AvatarFallback>
@@ -845,9 +845,9 @@ export default function AILabPage() {
                                 <div className="whitespace-pre-wrap text-left text-white/90">{message.content}</div>
                               </div>
                               {message.role === "user" && (
-                                <Avatar className="h-8 w-8 ml-2 border-2 border-purple-500/30">
+                                <Avatar className="h-8 w-8 ml-2 border-2 border-cyan-500/30">
                                   <AvatarImage src={user?.profile?.avatar_url || ""} />
-                                  <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                                  <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-pink-500 text-white">
                                     {user?.profile?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                                   </AvatarFallback>
                                 </Avatar>
@@ -878,7 +878,7 @@ export default function AILabPage() {
                       <div className="flex justify-start">
                         <div className="glass-surface border-white/10 max-w-[80%] rounded-lg p-4">
                           <div className="flex items-start mb-2">
-                            <Avatar className="h-8 w-8 mr-2 border-2 border-purple-500/30">
+                            <Avatar className="h-8 w-8 mr-2 border-2 border-cyan-500/30">
                               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
                                 AI
                               </AvatarFallback>
@@ -886,9 +886,9 @@ export default function AILabPage() {
                             <div className="flex-1">
                               <p className="text-sm font-medium mb-1 text-white/80">AI Assistant</p>
                               <div className="flex items-center space-x-2">
-                                <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse"></div>
-                                <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse delay-150"></div>
-                                <div className="h-2 w-2 bg-purple-400 rounded-full animate-pulse delay-300"></div>
+                                <div className="h-2 w-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                                <div className="h-2 w-2 bg-cyan-400 rounded-full animate-pulse delay-150"></div>
+                                <div className="h-2 w-2 bg-cyan-400 rounded-full animate-pulse delay-300"></div>
                                 <span className="text-sm text-white/60 ml-1">Thinking...</span>
                               </div>
                             </div>
@@ -918,7 +918,7 @@ export default function AILabPage() {
                     <div className="flex flex-col gap-2 self-end">
                       <Button
                         type="submit"
-                        className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                        className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                         disabled={loading || !chatInput.trim()}
                       >
                         {loading ? (
@@ -1010,7 +1010,7 @@ export default function AILabPage() {
               <div className="flex justify-between mb-6">
                 <Button
                   onClick={handleSummarize}
-                  className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                  className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                   disabled={loading || !summaryInput.trim()}
                 >
                   {loading ? (
@@ -1104,7 +1104,7 @@ export default function AILabPage() {
                   <div className="flex justify-between mb-6">
                     <Button
                       onClick={handleGenerateStudyPlan}
-                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                       disabled={loading || !studySubject.trim() || !studyTopic.trim()}
                     >
                       {loading ? (
@@ -1257,7 +1257,7 @@ export default function AILabPage() {
                   <div className="flex justify-between mb-6">
                     <Button
                       onClick={handleGenerateFlashcards}
-                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                       disabled={loading || !flashcardTopic.trim()}
                     >
                       {loading ? (
@@ -1393,7 +1393,7 @@ export default function AILabPage() {
                           className={
                             showAnswer
                               ? "glass-surface border-white/20 text-white"
-                              : "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                              : "bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                           }
                           onClick={() => setShowAnswer(!showAnswer)}
                         >
@@ -1487,7 +1487,7 @@ export default function AILabPage() {
                 Cancel
               </Button>
               <Button
-                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                 onClick={handleEditFlashcard}
               >
                 Save
@@ -1522,7 +1522,7 @@ export default function AILabPage() {
                 Cancel
               </Button>
               <Button
-                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                 onClick={handleSaveStudyPlan}
               >
                 Save

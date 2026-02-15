@@ -79,7 +79,7 @@ export default async function Dashboard() {
       value: assignments?.length || 0,
       subtitle: `${dueThisWeekCount || 0} due this week`,
       icon: CheckSquare,
-      gradient: "from-purple-500 to-purple-600",
+      gradient: "from-cyan-500 to-cyan-600",
     },
     {
       label: "AI Requests",
@@ -108,7 +108,7 @@ export default async function Dashboard() {
   ]
 
   const quickActions = [
-    { name: "AI Lab", href: "/dashboard/ai-lab", icon: Beaker, color: "from-purple-500 to-purple-600" },
+    { name: "AI Lab", href: "/dashboard/ai-lab", icon: Beaker, color: "from-cyan-500 to-cyan-600" },
     { name: "New Assignment", href: "/dashboard/assignments/new", icon: CheckSquare, color: "from-blue-500 to-blue-600" },
     { name: "Calendar", href: "/dashboard/calendar", icon: Calendar, color: "from-green-500 to-green-600" },
     { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit, color: "from-pink-500 to-pink-600" },
@@ -122,7 +122,7 @@ export default async function Dashboard() {
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             <span className="text-white">Welcome back, </span>
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
               {profile?.full_name || "Student"}
             </span>
           </h1>
@@ -174,7 +174,7 @@ export default async function Dashboard() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-purple-400 hover:text-purple-300"
+                  className="text-cyan-400 hover:text-cyan-300"
                   aria-label="View all assignments"
                 >
                   View All
@@ -188,11 +188,11 @@ export default async function Dashboard() {
                 {assignments.map((assignment) => (
                   <div
                     key={assignment.id}
-                    className="p-4 rounded-lg glass-surface border border-white/10 hover:border-purple-500/30 transition-colors"
+                    className="p-4 rounded-lg glass-surface border border-white/10 hover:border-cyan-500/30 transition-colors"
                   >
                     <div className="flex items-start space-x-4">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-2 flex-shrink-0">
-                        <CheckSquare className="h-full w-full text-purple-400" aria-hidden="true" />
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-pink-500/20 p-2 flex-shrink-0">
+                        <CheckSquare className="h-full w-full text-cyan-400" aria-hidden="true" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-2">
@@ -229,7 +229,7 @@ export default async function Dashboard() {
                 <CheckSquare className="h-12 w-12 text-white/20 mx-auto mb-4" aria-hidden="true" />
                 <p className="text-white/60 mb-4">No upcoming assignments</p>
                 <Link href="/dashboard/assignments/new">
-                  <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+                  <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
                     Create Assignment
                   </Button>
                 </Link>
@@ -248,7 +248,7 @@ export default async function Dashboard() {
                 const Icon = action.icon
                 return (
                   <Link key={action.href} href={action.href}>
-                    <div className="p-4 rounded-lg glass-surface border border-white/10 hover:border-purple-500/30 transition-all group cursor-pointer">
+                    <div className="p-4 rounded-lg glass-surface border border-white/10 hover:border-cyan-500/30 transition-all group cursor-pointer">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <div
@@ -256,12 +256,12 @@ export default async function Dashboard() {
                           >
                             <Icon className="h-full w-full text-white" aria-hidden="true" />
                           </div>
-                          <span className="text-white font-medium group-hover:text-purple-400 transition-colors">
+                          <span className="text-white font-medium group-hover:text-cyan-400 transition-colors">
                             {action.name}
                           </span>
                         </div>
                         <ArrowRight
-                          className="h-4 w-4 text-white/40 group-hover:text-purple-400 group-hover:translate-x-1 transition-all"
+                          className="h-4 w-4 text-white/40 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all"
                           aria-hidden="true"
                         />
                       </div>
@@ -283,7 +283,7 @@ export default async function Dashboard() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-purple-400 hover:text-purple-300"
+                className="text-cyan-400 hover:text-cyan-300"
                 aria-label="View all courses"
               >
                 View All
@@ -299,7 +299,7 @@ export default async function Dashboard() {
                     <div className="p-4 flex flex-col h-full">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center">
                             <Video className="h-4 w-4 text-white" aria-hidden="true" />
                           </div>
                           <h3 className="text-sm font-semibold text-white line-clamp-2">
@@ -329,7 +329,7 @@ export default async function Dashboard() {
               <Video className="h-10 w-10 text-white/20 mx-auto mb-3" aria-hidden="true" />
               <p className="text-white/60 mb-3">No courses created yet</p>
               <Link href="/dashboard/courses/new">
-                <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+                <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
                   Create your first course
                 </Button>
               </Link>

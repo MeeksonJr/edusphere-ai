@@ -216,7 +216,7 @@ export default function CalendarPage() {
               <Button
                 variant="outline"
                 size="icon"
-                className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
                 onClick={handlePrevious}
                 aria-label="Previous"
               >
@@ -225,7 +225,7 @@ export default function CalendarPage() {
               <Button
                 variant="outline"
                 size="icon"
-                className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
                 onClick={handleNext}
                 aria-label="Next"
               >
@@ -233,7 +233,7 @@ export default function CalendarPage() {
               </Button>
               <Button
                 variant="outline"
-                className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
                 onClick={handleToday}
               >
                 Today
@@ -247,7 +247,7 @@ export default function CalendarPage() {
                   size="sm"
                   className={`${
                     view === "month"
-                      ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white"
+                      ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
                       : "text-white/70 hover:text-white"
                   }`}
                   onClick={() => handleViewChange("month")}
@@ -259,7 +259,7 @@ export default function CalendarPage() {
                   size="sm"
                   className={`${
                     view === "week"
-                      ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white"
+                      ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
                       : "text-white/70 hover:text-white"
                   }`}
                   onClick={() => handleViewChange("week")}
@@ -271,7 +271,7 @@ export default function CalendarPage() {
                   size="sm"
                   className={`${
                     view === "day"
-                      ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white"
+                      ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
                       : "text-white/70 hover:text-white"
                   }`}
                   onClick={() => handleViewChange("day")}
@@ -281,14 +281,14 @@ export default function CalendarPage() {
               </div>
               <Button
                 variant="outline"
-                className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
                 onClick={() => setIsImportDialogOpen(true)}
               >
                 <Upload className="h-4 w-4 mr-2" aria-hidden="true" />
                 Import
               </Button>
               <Button
-                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                 onClick={() => router.push("/dashboard/assignments/new")}
               >
                 <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -321,7 +321,7 @@ export default function CalendarPage() {
             <GlassSurface className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Upcoming</h2>
-                <Sparkles className="h-5 w-5 text-purple-400" aria-hidden="true" />
+                <Sparkles className="h-5 w-5 text-cyan-400" aria-hidden="true" />
               </div>
               {loading ? (
                 <LoadingSpinner size="sm" text="Loading..." />
@@ -330,18 +330,18 @@ export default function CalendarPage() {
                   {upcomingAssignments.map((assignment, index) => (
                     <div
                       key={assignment.id}
-                      className="p-3 rounded-lg glass-surface border-white/10 hover:border-purple-500/30 transition-colors cursor-pointer group"
+                      className="p-3 rounded-lg glass-surface border-white/10 hover:border-cyan-500/30 transition-colors cursor-pointer group"
                       onClick={() => {
                         setSelectedEvent(assignment)
                         setIsAIDialogOpen(true)
                       }}
                     >
                       <div className="flex items-start space-x-3">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-2 flex-shrink-0">
-                          <CheckSquare className="h-full w-full text-purple-400" aria-hidden="true" />
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-pink-500/20 p-2 flex-shrink-0">
+                          <CheckSquare className="h-full w-full text-cyan-400" aria-hidden="true" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-white mb-1 group-hover:text-purple-400 transition-colors truncate">
+                          <h3 className="font-semibold text-white mb-1 group-hover:text-cyan-400 transition-colors truncate">
                             {assignment.title}
                           </h3>
                           <div className="flex items-center space-x-2 text-xs text-white/60">

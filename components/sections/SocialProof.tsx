@@ -82,11 +82,11 @@ export function SocialProof() {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="glass-card p-6 text-center group hover:border-purple-500/20 transition-all"
+              className="glass-card p-6 text-center group hover:border-cyan-500/20 transition-all"
             >
               <div className="text-3xl md:text-4xl font-bold font-display text-white mb-1">
                 {stat.isDecimal ? (
-                  <span>{stat.value}<span className="text-purple-400">/5</span></span>
+                  <span>{stat.value}<span className="text-cyan-400">/5</span></span>
                 ) : (
                   <AnimatedCounter
                     target={stat.value}

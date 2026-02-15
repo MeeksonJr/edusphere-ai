@@ -34,7 +34,7 @@ export function SectionHeader({
                         <>
                             <span className="text-white">{title}</span>
                             <br className="hidden sm:block" />
-                            <span className="text-gradient-purple"> {titleGradient}</span>
+                            <span className="text-gradient-brand"> {titleGradient}</span>
                         </>
                     ) : (
                         <span className="text-white">{title}</span>

@@ -103,7 +103,7 @@ export default function TermsPage() {
       <h2 className="text-2xl font-bold text-white mb-4 mt-8">Contact Information</h2>
       <p className="text-white/70 mb-6 leading-relaxed">
         If you have any questions about these Terms of Service, please contact us at{" "}
-        <a href="mailto:legal@edusphere.ai" className="text-purple-400 hover:text-purple-300 underline">
+        <a href="mailto:legal@edusphere.ai" className="text-cyan-400 hover:text-cyan-300 underline">
           legal@edusphere.ai
         </a>
       </p>

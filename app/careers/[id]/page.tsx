@@ -110,7 +110,7 @@ export default function CareerDetailPage() {
           <p className="mb-6">Sorry, the job position you're looking for doesn't exist.</p>
           <Link
             href="/careers"
-            className="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+            className="px-6 py-3 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition-colors"
           >
             Back to Careers
           </Link>
@@ -122,18 +122,18 @@ export default function CareerDetailPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="bg-black/50 backdrop-blur-sm border-b border-purple-900/50 sticky top-0 z-10">
+      <header className="bg-black/50 backdrop-blur-sm border-b border-cyan-900/50 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <a href="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+            <span className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-transparent bg-clip-text">
               EduSphere AI
             </span>
           </a>
           <nav className="hidden md:flex gap-6">
-            <a href="/" className="hover:text-purple-400 transition-colors">
+            <a href="/" className="hover:text-cyan-400 transition-colors">
               Home
             </a>
-            <a href="/careers" className="text-purple-400 transition-colors">
+            <a href="/careers" className="text-cyan-400 transition-colors">
               Careers
             </a>
           </nav>
@@ -143,22 +143,22 @@ export default function CareerDetailPage() {
       {/* Breadcrumbs */}
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center gap-2 text-sm text-gray-400">
-          <a href="/" className="hover:text-purple-400 transition-colors">
+          <a href="/" className="hover:text-cyan-400 transition-colors">
             Home
           </a>
           <span>/</span>
-          <a href="/careers" className="hover:text-purple-400 transition-colors">
+          <a href="/careers" className="hover:text-cyan-400 transition-colors">
             Careers
           </a>
           <span>/</span>
-          <span className="text-purple-400">{job.title}</span>
+          <span className="text-cyan-400">{job.title}</span>
         </div>
       </div>
 
       {/* Job Details */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-transparent bg-clip-text">
             {job.title}
           </h1>
 
@@ -166,7 +166,7 @@ export default function CareerDetailPage() {
             <div className="flex items-center gap-2 bg-gray-900 px-3 py-1 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-purple-400"
+                className="h-4 w-4 text-cyan-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -189,7 +189,7 @@ export default function CareerDetailPage() {
             <div className="flex items-center gap-2 bg-gray-900 px-3 py-1 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-purple-400"
+                className="h-4 w-4 text-cyan-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -206,7 +206,7 @@ export default function CareerDetailPage() {
             <div className="flex items-center gap-2 bg-gray-900 px-3 py-1 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-purple-400"
+                className="h-4 w-4 text-cyan-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -225,21 +225,21 @@ export default function CareerDetailPage() {
           <div className="prose prose-invert max-w-none">
             <p className="text-lg mb-8">{job.description}</p>
 
-            <h2 className="text-xl font-semibold text-purple-400 mt-8 mb-4">Key Responsibilities</h2>
+            <h2 className="text-xl font-semibold text-cyan-400 mt-8 mb-4">Key Responsibilities</h2>
             <ul className="list-disc pl-5 space-y-2">
               {job.responsibilities.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
 
-            <h2 className="text-xl font-semibold text-purple-400 mt-8 mb-4">Requirements</h2>
+            <h2 className="text-xl font-semibold text-cyan-400 mt-8 mb-4">Requirements</h2>
             <ul className="list-disc pl-5 space-y-2">
               {job.requirements.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
 
-            <h2 className="text-xl font-semibold text-purple-400 mt-8 mb-4">Benefits</h2>
+            <h2 className="text-xl font-semibold text-cyan-400 mt-8 mb-4">Benefits</h2>
             <ul className="list-disc pl-5 space-y-2">
               {job.benefits.map((item, index) => (
                 <li key={index}>{item}</li>
@@ -250,7 +250,7 @@ export default function CareerDetailPage() {
           <div className="mt-12">
             <Link
               href={`/careers/${id}/apply`}
-              className="inline-block px-8 py-4 rounded-md bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-colors text-lg font-semibold"
+              className="inline-block px-8 py-4 rounded-md bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 transition-colors text-lg font-semibold"
             >
               Apply for this Position
             </Link>
@@ -259,7 +259,7 @@ export default function CareerDetailPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-black/50 backdrop-blur-sm border-t border-purple-900/50 mt-16">
+      <footer className="bg-black/50 backdrop-blur-sm border-t border-cyan-900/50 mt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-400">
             <p>© {new Date().getFullYear()} EduSphere AI. All rights reserved.</p>

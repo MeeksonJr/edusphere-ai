@@ -107,7 +107,7 @@ export default function CookiesPage() {
                         {cookie.name}
                       </Label>
                       {cookie.required && (
-                        <span className="text-xs text-purple-400 bg-purple-500/20 px-2 py-1 rounded">
+                        <span className="text-xs text-cyan-400 bg-cyan-500/20 px-2 py-1 rounded">
                           Required
                         </span>
                       )}
@@ -126,7 +126,7 @@ export default function CookiesPage() {
             <div className="mt-6 flex items-center justify-between">
               <Button
                 onClick={handleSave}
-                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
               >
                 Save Preferences
               </Button>
@@ -155,7 +155,7 @@ export default function CookiesPage() {
           href="https://www.allaboutcookies.org"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-purple-400 hover:text-purple-300 underline"
+          className="text-cyan-400 hover:text-cyan-300 underline"
         >
           www.allaboutcookies.org
         </a>
@@ -164,7 +164,7 @@ export default function CookiesPage() {
       <h2 className="text-2xl font-bold text-white mb-4 mt-8">Contact Us</h2>
       <p className="text-white/70 mb-6 leading-relaxed">
         If you have any questions about our use of cookies, please contact us at{" "}
-        <a href="mailto:privacy@edusphere.ai" className="text-purple-400 hover:text-purple-300 underline">
+        <a href="mailto:privacy@edusphere.ai" className="text-cyan-400 hover:text-cyan-300 underline">
           privacy@edusphere.ai
         </a>
       </p>

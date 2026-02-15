@@ -10,13 +10,13 @@ export function CTASection() {
         <section className="relative py-24 lg:py-32 overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0">
-                <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/20 to-black" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black via-cyan-950/20 to-black" />
                 <div className="absolute inset-0 mesh-gradient-bg opacity-60" />
                 <div className="absolute inset-0 grid-pattern opacity-20" />
             </div>
 
             {/* Glow Orbs */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-purple-600/10 blur-[150px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-cyan-600/10 blur-[150px]" />
 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <motion.div
@@ -29,7 +29,7 @@ export function CTASection() {
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-6 leading-tight">
                         <span className="text-white">Start Creating</span>
                         <br />
-                        <span className="text-gradient-purple">Today</span>
+                        <span className="text-gradient-brand">Today</span>
                     </h2>
                     <p className="text-lg text-white/50 mb-10 max-w-xl mx-auto leading-relaxed">
                         Join thousands of educators and creators already using AI to build
@@ -41,7 +41,7 @@ export function CTASection() {
                         <Link href="/signup">
                             <Button
                                 size="lg"
-                                className="glow-button group bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white border-0 shadow-lg shadow-purple-500/25 px-10 py-7 text-lg rounded-xl"
+                                className="glow-button group bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white border-0 shadow-lg shadow-cyan-500/25 px-10 py-7 text-lg rounded-xl"
                             >
                                 Get Started Free
                                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

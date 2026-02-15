@@ -470,7 +470,7 @@ ${resource.content}
                       </Badge>
                     ))}
                     {resource.ai_generated && (
-                      <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs">
+                      <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30 text-xs">
                         <Sparkles className="h-3 w-3 mr-1" aria-hidden="true" />
                         AI
                       </Badge>
@@ -677,7 +677,7 @@ ${resource.content}
                       setImageFile(e.target.files[0])
                     }
                   }}
-                  className="glass-surface border-white/20 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-500 file:text-white hover:file:bg-purple-600"
+                  className="glass-surface border-white/20 text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-cyan-500 file:text-white hover:file:bg-cyan-600"
                   disabled={uploadingImage}
                 />
                 {imageFile && (
@@ -694,7 +694,7 @@ ${resource.content}
                 variant="outline"
                 onClick={handleGenerateResource}
                 disabled={generatingResource || !newResource.subject || !newResource.title}
-                className="flex-1 glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                className="flex-1 glass-surface border-white/20 hover:border-cyan-500/50 text-white"
               >
                 {generatingResource ? (
                   <>
@@ -749,7 +749,7 @@ ${resource.content}
                       {resourceTypes.find((t) => t.value === currentResource.resource_type)?.label || currentResource.resource_type}
                     </Badge>
                     {currentResource.ai_generated && (
-                      <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                      <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
                         <Sparkles className="h-3 w-3 mr-1" aria-hidden="true" />
                         AI Generated
                       </Badge>

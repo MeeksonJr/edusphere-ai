@@ -52,7 +52,7 @@ export function ComparisonSection() {
                                 <span className="text-sm font-semibold text-white/40">Traditional</span>
                             </div>
                             <div className="text-center">
-                                <span className="text-sm font-semibold text-gradient-purple">EduSphere AI</span>
+                                <span className="text-sm font-semibold text-gradient-brand">EduSphere AI</span>
                             </div>
                         </div>
 

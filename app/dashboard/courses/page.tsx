@@ -79,14 +79,14 @@ export default async function CoursesPage() {
           <div>
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
               <span className="text-white">My </span>
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                 Courses
               </span>
             </h1>
             <p className="text-white/70">Create and manage your AI-generated courses</p>
           </div>
           <Link href="/dashboard/courses/new">
-            <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+            <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
               <Plus className="mr-2 h-4 w-4" />
               New Course
             </Button>
@@ -106,7 +106,7 @@ export default async function CoursesPage() {
                     <div className="flex items-center justify-between mb-4">
                       {getStatusBadge(course.status)}
                       {course.final_video_url && (
-                        <Play className="h-4 w-4 text-purple-400" />
+                        <Play className="h-4 w-4 text-cyan-400" />
                       )}
                     </div>
 
@@ -158,15 +158,15 @@ export default async function CoursesPage() {
       ) : (
         <ScrollReveal direction="up">
           <GlassSurface className="p-12 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 mb-4">
-              <Video className="h-8 w-8 text-purple-400" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500/20 to-pink-500/20 mb-4">
+              <Video className="h-8 w-8 text-cyan-400" />
             </div>
             <h3 className="text-xl font-bold text-white mb-2">No courses yet</h3>
             <p className="text-white/70 mb-6">
               Create your first AI-generated course to get started
             </p>
             <Link href="/dashboard/courses/new">
-              <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+              <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Your First Course
               </Button>

@@ -67,7 +67,7 @@ export default function CareerApplyPage() {
           <p className="mb-6">Sorry, the job position you're looking for doesn't exist.</p>
           <Link
             href="/careers"
-            className="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+            className="px-6 py-3 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition-colors"
           >
             Back to Careers
           </Link>
@@ -79,18 +79,18 @@ export default function CareerApplyPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="bg-black/50 backdrop-blur-sm border-b border-purple-900/50 sticky top-0 z-10">
+      <header className="bg-black/50 backdrop-blur-sm border-b border-cyan-900/50 sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <a href="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+            <span className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-transparent bg-clip-text">
               EduSphere AI
             </span>
           </a>
           <nav className="hidden md:flex gap-6">
-            <a href="/" className="hover:text-purple-400 transition-colors">
+            <a href="/" className="hover:text-cyan-400 transition-colors">
               Home
             </a>
-            <a href="/careers" className="text-purple-400 transition-colors">
+            <a href="/careers" className="text-cyan-400 transition-colors">
               Careers
             </a>
           </nav>
@@ -100,26 +100,26 @@ export default function CareerApplyPage() {
       {/* Breadcrumbs */}
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center gap-2 text-sm text-gray-400">
-          <a href="/" className="hover:text-purple-400 transition-colors">
+          <a href="/" className="hover:text-cyan-400 transition-colors">
             Home
           </a>
           <span>/</span>
-          <a href="/careers" className="hover:text-purple-400 transition-colors">
+          <a href="/careers" className="hover:text-cyan-400 transition-colors">
             Careers
           </a>
           <span>/</span>
-          <a href={`/careers/${id}`} className="hover:text-purple-400 transition-colors">
+          <a href={`/careers/${id}`} className="hover:text-cyan-400 transition-colors">
             {jobTitle}
           </a>
           <span>/</span>
-          <span className="text-purple-400">Apply</span>
+          <span className="text-cyan-400">Apply</span>
         </div>
       </div>
 
       {/* Application Form */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-transparent bg-clip-text">
             Apply for {jobTitle}
           </h1>
           <p className="text-gray-400 mb-8">
@@ -129,7 +129,7 @@ export default function CareerApplyPage() {
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Personal Information */}
             <section className="space-y-4">
-              <h2 className="text-xl font-semibold text-purple-400">Personal Information</h2>
+              <h2 className="text-xl font-semibold text-cyan-400">Personal Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="firstName" className="block text-sm font-medium mb-1">
@@ -142,7 +142,7 @@ export default function CareerApplyPage() {
                     required
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                   />
                 </div>
                 <div>
@@ -156,7 +156,7 @@ export default function CareerApplyPage() {
                     required
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                   />
                 </div>
               </div>
@@ -172,7 +172,7 @@ export default function CareerApplyPage() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                   />
                 </div>
                 <div>
@@ -186,7 +186,7 @@ export default function CareerApplyPage() {
                     required
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                   />
                 </div>
               </div>
@@ -202,14 +202,14 @@ export default function CareerApplyPage() {
                   placeholder="City, State, Country"
                   value={formData.location}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                 />
               </div>
             </section>
 
             {/* Professional Information */}
             <section className="space-y-4">
-              <h2 className="text-xl font-semibold text-purple-400">Professional Information</h2>
+              <h2 className="text-xl font-semibold text-cyan-400">Professional Information</h2>
               <div>
                 <label htmlFor="resume" className="block text-sm font-medium mb-1">
                   Resume/CV *
@@ -217,7 +217,7 @@ export default function CareerApplyPage() {
                 <div className="flex items-center justify-center w-full">
                   <label
                     htmlFor="resume"
-                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer border-gray-700 hover:border-purple-500 bg-gray-900/50"
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer border-gray-700 hover:border-cyan-500 bg-gray-900/50"
                   >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <svg
@@ -256,7 +256,7 @@ export default function CareerApplyPage() {
                     placeholder="https://yourportfolio.com"
                     value={formData.portfolio}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                   />
                 </div>
                 <div>
@@ -271,7 +271,7 @@ export default function CareerApplyPage() {
                     placeholder="https://github.com/yourusername"
                     value={formData.github}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                   />
                 </div>
                 <div>
@@ -286,7 +286,7 @@ export default function CareerApplyPage() {
                     placeholder="https://linkedin.com/in/yourusername"
                     value={formData.linkedin}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                   />
                 </div>
               </div>
@@ -294,7 +294,7 @@ export default function CareerApplyPage() {
 
             {/* Experience & Skills */}
             <section className="space-y-4">
-              <h2 className="text-xl font-semibold text-purple-400">Experience & Skills</h2>
+              <h2 className="text-xl font-semibold text-cyan-400">Experience & Skills</h2>
               <div>
                 <label htmlFor="experience" className="block text-sm font-medium mb-1">
                   Years of Experience *
@@ -305,7 +305,7 @@ export default function CareerApplyPage() {
                   required
                   value={formData.experience}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                 >
                   <option value="">Select years of experience</option>
                   <option value="0-1">Less than 1 year</option>
@@ -327,7 +327,7 @@ export default function CareerApplyPage() {
                   placeholder="List your relevant skills, frameworks, and technologies you're proficient with"
                   value={formData.skills}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                 ></textarea>
               </div>
               <div>
@@ -342,14 +342,14 @@ export default function CareerApplyPage() {
                   placeholder="Tell us why you're interested in this position and what you can bring to our team"
                   value={formData.whyJoin}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                 ></textarea>
               </div>
             </section>
 
             {/* Additional Information */}
             <section className="space-y-4">
-              <h2 className="text-xl font-semibold text-purple-400">Additional Information</h2>
+              <h2 className="text-xl font-semibold text-cyan-400">Additional Information</h2>
               <div>
                 <label htmlFor="additionalInfo" className="block text-sm font-medium mb-1">
                   Anything else you'd like to share?
@@ -361,7 +361,7 @@ export default function CareerApplyPage() {
                   placeholder="Any additional information you'd like us to know"
                   value={formData.additionalInfo}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-full px-4 py-2 rounded-md bg-gray-900 border border-gray-700 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
                 ></textarea>
               </div>
             </section>
@@ -371,7 +371,7 @@ export default function CareerApplyPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full md:w-auto px-8 py-4 rounded-md bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition-colors text-lg font-semibold disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full md:w-auto px-8 py-4 rounded-md bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 transition-colors text-lg font-semibold disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center">
@@ -407,7 +407,7 @@ export default function CareerApplyPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-black/50 backdrop-blur-sm border-t border-purple-900/50 mt-16">
+      <footer className="bg-black/50 backdrop-blur-sm border-t border-cyan-900/50 mt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-gray-400">
             <p>© {new Date().getFullYear()} EduSphere AI. All rights reserved.</p>

@@ -73,14 +73,14 @@ function ThankYouContent() {
               <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 mb-6">
                 <CheckCircle className="h-12 w-12 text-white" />
               </div>
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4 -mt-12 ml-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-4 -mt-12 ml-8">
                 <Icon className="h-8 w-8 text-white" />
               </div>
             </motion.div>
 
             {/* Title */}
             <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                 {currentMessage.title}
               </span>
             </h1>
@@ -104,7 +104,7 @@ function ThankYouContent() {
                     transition={{ delay: 0.3 + index * 0.1 }}
                     className="flex items-start space-x-3"
                   >
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <span className="text-white text-xs font-bold">
                         {index + 1}
                       </span>
@@ -121,7 +121,7 @@ function ThankYouContent() {
                 <Link href="/dashboard">
                   <Button
                     size="lg"
-                    className="w-full sm:w-auto bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-8"
+                    className="w-full sm:w-auto bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8"
                   >
                     Go to Dashboard
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -132,7 +132,7 @@ function ThankYouContent() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto glass-surface border-white/20 hover:border-purple-500/50 text-white px-8"
+                  className="w-full sm:w-auto glass-surface border-white/20 hover:border-cyan-500/50 text-white px-8"
                 >
                   <Home className="mr-2 h-5 w-5" />
                   Back to Home
@@ -151,7 +151,7 @@ function ThankYouContent() {
                 Need help?{" "}
                 <Link
                   href="/contact"
-                  className="text-purple-400 hover:text-purple-300 underline"
+                  className="text-cyan-400 hover:text-cyan-300 underline"
                 >
                   Contact our support team
                 </Link>

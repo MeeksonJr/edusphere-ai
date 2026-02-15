@@ -365,7 +365,7 @@ export default function NewResourcePage() {
                     {newResource.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center gap-1 px-2 py-1 bg-purple-500/20 text-purple-200 rounded-md text-sm"
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-cyan-500/20 text-cyan-200 rounded-md text-sm"
                       >
                         {tag}
                         <button
@@ -437,7 +437,7 @@ export default function NewResourcePage() {
                 type="button"
                 onClick={handleGenerateResource}
                 disabled={generatingResource || !newResource.subject || !newResource.title}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                className="w-full bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white"
               >
                 {generatingResource ? (
                   <>
@@ -465,7 +465,7 @@ export default function NewResourcePage() {
             <Button
               type="submit"
               disabled={loading || uploadingImage || !newResource.title || !newResource.content}
-              className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white flex-1 sm:flex-initial"
+              className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white flex-1 sm:flex-initial"
             >
               {loading || uploadingImage ? (
                 <>

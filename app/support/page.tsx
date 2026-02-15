@@ -26,7 +26,7 @@ const helpCategories = [
     title: "Getting Started",
     description: "New to EduSphere AI? Start here.",
     articles: 12,
-    gradient: "from-purple-500 to-purple-600",
+    gradient: "from-cyan-500 to-cyan-600",
     href: "/faq",
   },
   {
@@ -86,18 +86,18 @@ export default function SupportPage() {
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
               <div className="max-w-3xl mx-auto text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-6">
                   <HelpCircle className="h-8 w-8 text-white" />
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
                   <span className="text-white">How Can We</span>
                   <br />
-                  <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Help You?
                   </span>
                 </h1>
@@ -164,7 +164,7 @@ export default function SupportPage() {
                           <div className="text-white/40 text-xs">
                             {category.articles} articles
                           </div>
-                          <ArrowRight className="h-5 w-5 text-purple-400 mx-auto mt-4 group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="h-5 w-5 text-cyan-400 mx-auto mt-4 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </AnimatedCard>
                     </Link>
@@ -192,10 +192,10 @@ export default function SupportPage() {
                     direction="up"
                     delay={0.1 * index}
                   >
-                    <GlassSurface className="p-6 hover:border-purple-500/30 transition-colors group cursor-pointer">
+                    <GlassSurface className="p-6 hover:border-cyan-500/30 transition-colors group cursor-pointer">
                       <Link href="/faq" className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-purple-400 transition-colors">
+                          <h3 className="text-lg font-semibold text-white mb-1 group-hover:text-cyan-400 transition-colors">
                             {article.title}
                           </h3>
                           <div className="flex items-center space-x-4 text-sm text-white/50">
@@ -204,7 +204,7 @@ export default function SupportPage() {
                             <span>{article.views} views</span>
                           </div>
                         </div>
-                        <ExternalLink className="h-5 w-5 text-white/40 group-hover:text-purple-400 transition-colors ml-4" />
+                        <ExternalLink className="h-5 w-5 text-white/40 group-hover:text-cyan-400 transition-colors ml-4" />
                       </Link>
                     </GlassSurface>
                   </ScrollReveal>
@@ -219,7 +219,7 @@ export default function SupportPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollReveal direction="up">
               <GlassSurface className="p-8 md:p-12 text-center max-w-3xl mx-auto">
-                <MessageCircle className="h-16 w-16 text-purple-400 mx-auto mb-6" />
+                <MessageCircle className="h-16 w-16 text-cyan-400 mx-auto mb-6" />
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                   Still Need Help?
                 </h2>
@@ -230,7 +230,7 @@ export default function SupportPage() {
                   <Link href="/contact">
                     <Button
                       size="lg"
-                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-8"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8"
                     >
                       <Mail className="mr-2 h-5 w-5" />
                       Contact Support
@@ -240,7 +240,7 @@ export default function SupportPage() {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="glass-surface border-white/20 hover:border-purple-500/50 text-white px-8"
+                      className="glass-surface border-white/20 hover:border-cyan-500/50 text-white px-8"
                     >
                       View FAQ
                     </Button>

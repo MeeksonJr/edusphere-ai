@@ -312,7 +312,7 @@ export default function NewFlashcardPage() {
                 type="button"
                 onClick={handleGenerateFlashcards}
                 disabled={generatingFlashcards || !flashcardTopic}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                className="w-full bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white"
               >
                 {generatingFlashcards ? (
                   <>
@@ -366,7 +366,7 @@ export default function NewFlashcardPage() {
                 type="button"
                 onClick={handleAddCard}
                 disabled={!newCard.question || !newCard.answer}
-                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
               >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Flashcard
@@ -385,7 +385,7 @@ export default function NewFlashcardPage() {
                 <Button
                   type="submit"
                   disabled={loading || !newSet.title || !newSet.cards.length}
-                  className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                  className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                 >
                   {loading ? (
                     <>
@@ -434,7 +434,7 @@ export default function NewFlashcardPage() {
             <Button
               type="submit"
               disabled={loading || !newSet.title || !newSet.cards.length}
-              className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white flex-1 sm:flex-initial"
+              className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white flex-1 sm:flex-initial"
             >
               {loading ? (
                 <>

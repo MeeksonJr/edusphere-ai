@@ -122,7 +122,7 @@ export function InteractiveDemo() {
                 key={preset.label}
                 onClick={() => handleGenerate(preset.topic)}
                 disabled={isGenerating}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-sm text-white/60 hover:text-white/90 hover:border-purple-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-surface text-sm text-white/60 hover:text-white/90 hover:border-cyan-500/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Icon className="h-3.5 w-3.5" />
                 {preset.label}
@@ -139,13 +139,13 @@ export function InteractiveDemo() {
             onChange={(e) => setTopic(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
             placeholder="Or type any topic... (e.g., 'Introduction to Quantum Computing')"
-            className="flex-1 h-12 px-4 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/25 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/30 transition-all text-sm"
+            className="flex-1 h-12 px-4 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/25 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 transition-all text-sm"
             disabled={isGenerating}
           />
           <Button
             onClick={() => handleGenerate()}
             disabled={isGenerating || !topic.trim()}
-            className="h-12 px-6 rounded-xl bg-purple-600 hover:bg-purple-500 text-white border-0 disabled:opacity-40 group"
+            className="h-12 px-6 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white border-0 disabled:opacity-40 group"
           >
             <Play className="h-4 w-4 mr-2" />
             Generate
@@ -177,7 +177,7 @@ export function InteractiveDemo() {
           >
             {output.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-white/20">
-                <Sparkles className="h-8 w-8 mb-3 text-purple-500/40" />
+                <Sparkles className="h-8 w-8 mb-3 text-cyan-500/40" />
                 <p>Select a topic or type your own to see the magic</p>
                 <p className="text-xs mt-1 text-white/10">
                   AI generates a complete course outline in seconds
@@ -192,7 +192,7 @@ export function InteractiveDemo() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.15 }}
                     className={`${line.startsWith("Module")
-                        ? "text-purple-300 font-semibold"
+                        ? "text-cyan-300 font-semibold"
                         : line.startsWith("  →")
                           ? "text-white/50 pl-2"
                           : line.startsWith("✅")
@@ -208,7 +208,7 @@ export function InteractiveDemo() {
                   </motion.div>
                 ))}
                 {isGenerating && (
-                  <span className="inline-block w-2 h-4 bg-purple-400 animate-pulse ml-1" />
+                  <span className="inline-block w-2 h-4 bg-cyan-400 animate-pulse ml-1" />
                 )}
               </div>
             )}

@@ -604,7 +604,7 @@ function CourseDetailContent() {
                             {chapter.slides.map((slide: any, slideIndex: number) => (
                               <div
                                 key={slide.slideId || slideIndex}
-                                className="p-3 rounded bg-white/5 border border-white/5 hover:border-purple-500/30 transition-colors group"
+                                className="p-3 rounded bg-white/5 border border-white/5 hover:border-cyan-500/30 transition-colors group"
                               >
                                 <div className="flex items-center justify-between">
                                   <div className="flex-1">

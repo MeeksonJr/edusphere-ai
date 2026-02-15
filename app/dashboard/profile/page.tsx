@@ -336,7 +336,7 @@ function ProfileContent() {
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             <span className="text-white">Your</span>{" "}
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
               Profile
             </span>
           </h1>
@@ -348,28 +348,28 @@ function ProfileContent() {
         <TabsList className="glass-surface border-white/20 p-1">
           <TabsTrigger
             value="profile"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <User className="h-4 w-4 mr-2" aria-hidden="true" />
             Profile
           </TabsTrigger>
           <TabsTrigger
             value="stats"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <Sparkles className="h-4 w-4 mr-2" aria-hidden="true" />
             Stats
           </TabsTrigger>
           <TabsTrigger
             value="subscription"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <CreditCard className="h-4 w-4 mr-2" aria-hidden="true" />
             Subscription
           </TabsTrigger>
           <TabsTrigger
             value="security"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <Key className="h-4 w-4 mr-2" aria-hidden="true" />
             Security
@@ -383,14 +383,14 @@ function ProfileContent() {
               <h2 className="text-xl font-bold text-white mb-6">Personal Information</h2>
               <div className="flex flex-col md:flex-row gap-8">
                 <div className="flex flex-col items-center space-y-4">
-                  <Avatar className="h-32 w-32 border-4 border-purple-500/30">
+                  <Avatar className="h-32 w-32 border-4 border-cyan-500/30">
                     <AvatarImage src={avatarPreview || profile.avatar_url} alt={profile.full_name || "User"} />
-                    <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-3xl">
+                    <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-pink-500 text-white text-3xl">
                       {profile.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                     </AvatarFallback>
                   </Avatar>
                   <label htmlFor="avatar-upload" className="cursor-pointer">
-                    <div className="flex items-center space-x-2 px-4 py-2 rounded-lg glass-surface border-white/20 hover:border-purple-500/50 transition-all">
+                    <div className="flex items-center space-x-2 px-4 py-2 rounded-lg glass-surface border-white/20 hover:border-cyan-500/50 transition-all">
                       <Upload className="h-4 w-4" aria-hidden="true" />
                       <span className="text-sm text-white">Upload Photo</span>
                     </div>
@@ -448,7 +448,7 @@ function ProfileContent() {
                     <Button
                       onClick={handleUpdateProfile}
                       disabled={updating}
-                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                     >
                       {updating ? (
                         <>
@@ -475,8 +475,8 @@ function ProfileContent() {
                   <h2 className="text-xl font-bold text-white mb-6">Learning Progress</h2>
                   <div className="space-y-6">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-3 flex-shrink-0">
-                        <CheckSquare className="h-full w-full text-purple-400" aria-hidden="true" />
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/20 to-pink-500/20 p-3 flex-shrink-0">
+                        <CheckSquare className="h-full w-full text-cyan-400" aria-hidden="true" />
                       </div>
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center justify-between">
@@ -565,7 +565,7 @@ function ProfileContent() {
                     </div>
 
                     {user?.profile?.subscription_tier === "free" && (
-                      <GlassSurface className="p-4 border-purple-500/30">
+                      <GlassSurface className="p-4 border-cyan-500/30">
                         <p className="text-sm text-white/80 mb-4">
                           Upgrade to Pro or Ultimate plan for unlimited AI requests and premium features.
                         </p>
@@ -589,7 +589,7 @@ function ProfileContent() {
           <ScrollReveal direction="up">
             <GlassSurface className="p-6 lg:p-8">
               <h2 className="text-xl font-bold text-white mb-6">Subscription Plan</h2>
-              <div className="glass-surface border-purple-500/30 p-6 rounded-lg mb-6">
+              <div className="glass-surface border-cyan-500/30 p-6 rounded-lg mb-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-2xl font-bold text-white mb-1">
@@ -782,7 +782,7 @@ function ProfileContent() {
                       />
                     </div>
                     <Button
-                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                       onClick={() => {
                         toast({
                           title: "Password Update",

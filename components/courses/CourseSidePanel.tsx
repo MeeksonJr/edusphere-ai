@@ -283,7 +283,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
             onClick={() => setActiveTab("learn")}
             className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
               activeTab === "learn"
-                ? "text-white border-b-2 border-purple-500 bg-white/5"
+                ? "text-white border-b-2 border-cyan-500 bg-white/5"
                 : "text-white/60 hover:text-white hover:bg-white/5"
             }`}
           >
@@ -294,7 +294,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
             onClick={() => setActiveTab("qa")}
             className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
               activeTab === "qa"
-                ? "text-white border-b-2 border-purple-500 bg-white/5"
+                ? "text-white border-b-2 border-cyan-500 bg-white/5"
                 : "text-white/60 hover:text-white hover:bg-white/5"
             }`}
           >
@@ -305,7 +305,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
             onClick={() => setActiveTab("read")}
             className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
               activeTab === "read"
-                ? "text-white border-b-2 border-purple-500 bg-white/5"
+                ? "text-white border-b-2 border-cyan-500 bg-white/5"
                 : "text-white/60 hover:text-white hover:bg-white/5"
             }`}
           >
@@ -321,7 +321,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
               <GlassSurface className="p-6">
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 text-purple-400 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-cyan-400 animate-spin" />
                     <span className="ml-3 text-white/70">Generating detailed content...</span>
                   </div>
                 ) : (
@@ -335,11 +335,11 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
 
               {/* Read Aloud Controls for Learn More Content */}
               {learnMoreContent && !loading && (
-                <GlassSurface className="p-6 border-purple-500/30">
+                <GlassSurface className="p-6 border-cyan-500/30">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-white font-semibold flex items-center">
-                        <Volume2 className="h-5 w-5 mr-2 text-purple-400" />
+                        <Volume2 className="h-5 w-5 mr-2 text-cyan-400" />
                         Read Aloud
                       </h3>
                     </div>
@@ -354,7 +354,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
                         onChange={(e) => setSelectedVoice(e.target.value)}
                         disabled={isReading}
                         aria-label="Voice selection"
-                        className="w-full glass-surface border border-white/20 text-white bg-white/5 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                        className="w-full glass-surface border border-white/20 text-white bg-white/5 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50"
                       >
                         {availableVoices.length === 0 ? (
                           <option value="">Loading voices...</option>
@@ -382,7 +382,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
                           value={speechRate}
                           onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
                           disabled={isReading}
-                          className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 disabled:opacity-50"
+                          className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-500 disabled:opacity-50"
                         />
                       </div>
                       <div>
@@ -397,7 +397,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
                           value={speechPitch}
                           onChange={(e) => setSpeechPitch(parseFloat(e.target.value))}
                           disabled={isReading}
-                          className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 disabled:opacity-50"
+                          className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-500 disabled:opacity-50"
                         />
                       </div>
                     </div>
@@ -456,7 +456,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
                             ? "bg-yellow-500 hover:bg-yellow-600"
                             : isPaused
                             ? "bg-green-500 hover:bg-green-600"
-                            : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                            : "bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600"
                         } text-white border-0`}
                       >
                         {isReading && !isPaused ? (
@@ -524,7 +524,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
                 <Button
                   onClick={handleAskQuestion}
                   disabled={answering || !question.trim()}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                  className="w-full bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white"
                 >
                   {answering ? (
                     <>
@@ -555,7 +555,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
             <GlassSurface className="p-6">
               <div className="space-y-6">
                 <div className="text-center">
-                  <Volume2 className="h-12 w-12 text-purple-400 mx-auto mb-3" />
+                  <Volume2 className="h-12 w-12 text-cyan-400 mx-auto mb-3" />
                   <p className="text-white/70 mb-6">
                     {slide
                       ? "Listen to this slide's content read aloud"
@@ -573,7 +573,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
                     onChange={(e) => setSelectedVoice(e.target.value)}
                     disabled={isReading}
                     aria-label="Voice selection"
-                    className="w-full glass-surface border border-white/20 text-white bg-white/5 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+                    className="w-full glass-surface border border-white/20 text-white bg-white/5 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50"
                   >
                     {availableVoices.length === 0 ? (
                       <option value="">Loading voices...</option>
@@ -601,7 +601,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
                     onChange={(e) => setSpeechRate(parseFloat(e.target.value))}
                     disabled={isReading}
                     aria-label="Speech speed control"
-                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 disabled:opacity-50"
+                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-500 disabled:opacity-50"
                   />
                   <div className="flex justify-between text-xs text-white/50 mt-1">
                     <span>0.5x</span>
@@ -624,7 +624,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
                     onChange={(e) => setSpeechPitch(parseFloat(e.target.value))}
                     disabled={isReading}
                     aria-label="Speech pitch control"
-                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 disabled:opacity-50"
+                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-500 disabled:opacity-50"
                   />
                   <div className="flex justify-between text-xs text-white/50 mt-1">
                     <span>Lower</span>
@@ -643,7 +643,7 @@ export const CourseSidePanel: React.FC<CourseSidePanelProps> = ({
                         ? "bg-yellow-500 hover:bg-yellow-600"
                         : isPaused
                         ? "bg-green-500 hover:bg-green-600"
-                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                        : "bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600"
                     } text-white border-0`}
                   >
                     {isReading && !isPaused ? (

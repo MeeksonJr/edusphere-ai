@@ -53,11 +53,11 @@ export function Footer() {
           {/* Brand Column */}
           <div className="col-span-2">
             <Link href="/" className="flex items-center gap-2.5 mb-4 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
                 <Sparkles className="h-5 w-5 text-white" />
               </div>
               <span className="text-lg font-bold font-display text-white">
-                EduSphere<span className="text-purple-400"> AI</span>
+                EduSphere<span className="text-cyan-400"> AI</span>
               </span>
             </Link>
             <p className="text-sm text-white/40 leading-relaxed mb-6 max-w-xs">

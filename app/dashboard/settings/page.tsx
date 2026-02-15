@@ -146,35 +146,35 @@ export default function SettingsPage() {
         <TabsList className="glass-surface border-white/20 p-1">
           <TabsTrigger
             value="appearance"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <Palette className="h-4 w-4 mr-2" aria-hidden="true" />
             Appearance
           </TabsTrigger>
           <TabsTrigger
             value="notifications"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <Bell className="h-4 w-4 mr-2" aria-hidden="true" />
             Notifications
           </TabsTrigger>
           <TabsTrigger
             value="calendar"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <Globe className="h-4 w-4 mr-2" aria-hidden="true" />
             Calendar
           </TabsTrigger>
           <TabsTrigger
             value="billing"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <CreditCard className="h-4 w-4 mr-2" aria-hidden="true" />
             Billing
           </TabsTrigger>
           <TabsTrigger
             value="privacy"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white"
           >
             <Shield className="h-4 w-4 mr-2" aria-hidden="true" />
             Privacy
@@ -193,7 +193,7 @@ export default function SettingsPage() {
                     <AnimatedCard
                       variant="3d"
                       className={`cursor-pointer transition-all ${
-                        localSettings.theme === "dark" ? "border-purple-500/50" : ""
+                        localSettings.theme === "dark" ? "border-cyan-500/50" : ""
                       }`}
                       onClick={() => handleThemeChange("dark")}
                     >
@@ -204,7 +204,7 @@ export default function SettingsPage() {
                             <span className="text-white font-medium">Dark</span>
                           </div>
                           {localSettings.theme === "dark" && (
-                            <CheckCircle className="h-5 w-5 text-purple-400" aria-hidden="true" />
+                            <CheckCircle className="h-5 w-5 text-cyan-400" aria-hidden="true" />
                           )}
                         </div>
                         <div className="h-24 bg-gradient-to-br from-gray-900 to-black rounded-md border border-white/10"></div>
@@ -215,7 +215,7 @@ export default function SettingsPage() {
                       variant="3d"
                       delay={0.1}
                       className={`cursor-pointer transition-all ${
-                        localSettings.theme === "light" ? "border-purple-500/50" : ""
+                        localSettings.theme === "light" ? "border-cyan-500/50" : ""
                       }`}
                       onClick={() => handleThemeChange("light")}
                     >
@@ -226,7 +226,7 @@ export default function SettingsPage() {
                             <span className="text-white font-medium">Light</span>
                           </div>
                           {localSettings.theme === "light" && (
-                            <CheckCircle className="h-5 w-5 text-purple-400" aria-hidden="true" />
+                            <CheckCircle className="h-5 w-5 text-cyan-400" aria-hidden="true" />
                           )}
                         </div>
                         <div className="h-24 bg-gradient-to-br from-gray-100 to-white rounded-md border border-gray-300"></div>
@@ -239,7 +239,7 @@ export default function SettingsPage() {
                   <h3 className="text-lg font-semibold text-white mb-4">Accent Color</h3>
                   <div className="grid grid-cols-3 md:grid-cols-5 gap-4">
                     {[
-                      { value: "purple", color: "from-purple-500 to-purple-600" },
+                      { value: "purple", color: "from-cyan-500 to-cyan-600" },
                       { value: "blue", color: "from-blue-500 to-blue-600" },
                       { value: "green", color: "from-green-500 to-green-600" },
                       { value: "pink", color: "from-pink-500 to-pink-600" },
@@ -250,7 +250,7 @@ export default function SettingsPage() {
                         variant="3d"
                         delay={0.05 * index}
                         className={`cursor-pointer transition-all ${
-                          localSettings.accentColor === color.value ? "border-purple-500/50 scale-105" : ""
+                          localSettings.accentColor === color.value ? "border-cyan-500/50 scale-105" : ""
                         }`}
                         onClick={() => handleAccentColorChange(color.value as AccentColorType)}
                       >
@@ -258,7 +258,7 @@ export default function SettingsPage() {
                           <div className={`h-12 w-12 rounded-full bg-gradient-to-br ${color.color} mx-auto mb-2`}></div>
                           <span className="text-sm text-white capitalize">{color.value}</span>
                           {localSettings.accentColor === color.value && (
-                            <CheckCircle className="h-4 w-4 text-purple-400 mx-auto mt-2" aria-hidden="true" />
+                            <CheckCircle className="h-4 w-4 text-cyan-400 mx-auto mt-2" aria-hidden="true" />
                           )}
                         </div>
                       </AnimatedCard>
@@ -445,7 +445,7 @@ export default function SettingsPage() {
             <GlassSurface className="p-6 lg:p-8">
               <h2 className="text-xl font-bold text-white mb-6">Billing Information</h2>
               <div className="space-y-6">
-                <div className="glass-surface border-purple-500/30 p-6 rounded-lg">
+                <div className="glass-surface border-cyan-500/30 p-6 rounded-lg">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-white">Current Plan</h3>
                     <Badge
@@ -560,7 +560,7 @@ export default function SettingsPage() {
           <Button
             onClick={handleSaveSettings}
             disabled={saving}
-            className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+            className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
           >
             {saving ? (
               <>

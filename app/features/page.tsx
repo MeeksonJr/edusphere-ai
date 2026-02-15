@@ -14,7 +14,7 @@ const useCases = [
     description:
       "Create engaging supplementary materials, flipped classroom content, and comprehensive course packages.",
     icon: Play,
-    gradient: "from-purple-500 to-purple-600",
+    gradient: "from-cyan-500 to-cyan-600",
   },
   {
     title: "For Corporate Trainers",
@@ -38,7 +38,7 @@ export default function FeaturesPage() {
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
@@ -46,7 +46,7 @@ export default function FeaturesPage() {
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
                   <span className="text-white">Powerful Features for</span>
                   <br />
-                  <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Modern Learning
                   </span>
                 </h1>
@@ -58,7 +58,7 @@ export default function FeaturesPage() {
                   <Link href="/signup">
                     <Button
                       size="lg"
-                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-8"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8"
                     >
                       Start Creating
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -68,7 +68,7 @@ export default function FeaturesPage() {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="glass-surface border-white/20 hover:border-purple-500/50 text-white px-8"
+                      className="glass-surface border-white/20 hover:border-cyan-500/50 text-white px-8"
                     >
                       Watch Demo
                     </Button>
@@ -89,7 +89,7 @@ export default function FeaturesPage() {
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
                   <span className="text-white">Perfect for</span>{" "}
-                  <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Every Use Case
                   </span>
                 </h2>
@@ -142,7 +142,7 @@ export default function FeaturesPage() {
                 <Link href="/signup">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-10"
+                    className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-10"
                   >
                     Start Creating Free
                     <ArrowRight className="ml-2 h-5 w-5" />

@@ -269,7 +269,7 @@ The future of education will likely be a blend of human expertise and AI capabil
       <header className="border-b border-gray-800 py-4 sticky top-0 z-50 bg-black/80 backdrop-blur-md">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Link href="/" className="flex items-center">
-            <div className="mr-2 bg-purple-600 rounded-lg p-1.5">
+            <div className="mr-2 bg-cyan-600 rounded-lg p-1.5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -469,7 +469,7 @@ The future of education will likely be a blend of human expertise and AI capabil
         </section>
       </main>
 
-      <footer className="bg-black/80 border-t border-purple-900/50 mt-20">
+      <footer className="bg-black/80 border-t border-cyan-900/50 mt-20">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Logo & Description */}
@@ -479,10 +479,10 @@ The future of education will likely be a blend of human expertise and AI capabil
                 className="flex items-center gap-2 mb-4"
                 aria-label="EduSphere AI Home"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-600 to-pink-600 flex items-center justify-center">
                   <span className="text-white font-bold text-xl">E</span>
                 </div>
-                <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+                <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-pink-500">
                   EduSphere AI
                 </span>
               </a>
@@ -493,7 +493,7 @@ The future of education will likely be a blend of human expertise and AI capabil
               <div className="flex gap-4">
                 <a
                   href="https://www.facebook.com/profile.php?id=100011003917426"
-                  className="text-gray-400 hover:text-purple-400 transition"
+                  className="text-gray-400 hover:text-cyan-400 transition"
                   aria-label="Facebook"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -514,7 +514,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 </a>
                 <a
                   href="https://twitter.com"
-                  className="text-gray-400 hover:text-purple-400 transition"
+                  className="text-gray-400 hover:text-cyan-400 transition"
                   aria-label="Twitter"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -531,7 +531,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 </a>
                 <a
                   href="https://github.com/MeeksonJr"
-                  className="text-gray-400 hover:text-purple-400 transition"
+                  className="text-gray-400 hover:text-cyan-400 transition"
                   aria-label="GitHub"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -552,7 +552,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 </a>
                 <a
                   href="https://www.linkedin.com/in/mohamed-datt-b60907296"
-                  className="text-gray-400 hover:text-purple-400 transition"
+                  className="text-gray-400 hover:text-cyan-400 transition"
                   aria-label="LinkedIn"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -572,14 +572,14 @@ The future of education will likely be a blend of human expertise and AI capabil
 
             {/* Company Links */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">
+              <h3 className="text-lg font-semibold mb-4 text-cyan-400">
                 Company
               </h3>
               <ul className="space-y-2">
                 <li>
                   <a
                     href="/about"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     About Us
                   </a>
@@ -587,7 +587,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 <li>
                   <a
                     href="/careers"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Careers
                   </a>
@@ -595,7 +595,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 <li>
                   <a
                     href="/blog"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Blog
                   </a>
@@ -603,7 +603,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 <li>
                   <a
                     href="/contact"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Contact
                   </a>
@@ -613,14 +613,14 @@ The future of education will likely be a blend of human expertise and AI capabil
 
             {/* Resources Links */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">
+              <h3 className="text-lg font-semibold mb-4 text-cyan-400">
                 Resources
               </h3>
               <ul className="space-y-2">
                 <li>
                   <a
                     href="/documentation"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Documentation
                   </a>
@@ -628,7 +628,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 <li>
                   <a
                     href="/support"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Support
                   </a>
@@ -636,7 +636,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 <li>
                   <a
                     href="/roadmap"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Roadmap
                   </a>
@@ -644,7 +644,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 <li>
                   <a
                     href="/features"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Features
                   </a>
@@ -654,14 +654,14 @@ The future of education will likely be a blend of human expertise and AI capabil
 
             {/* Legal Links */}
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-purple-400">
+              <h3 className="text-lg font-semibold mb-4 text-cyan-400">
                 Legal
               </h3>
               <ul className="space-y-2">
                 <li>
                   <a
                     href="/terms"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Terms of Service
                   </a>
@@ -669,7 +669,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 <li>
                   <a
                     href="/privacy"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Privacy Policy
                   </a>
@@ -677,7 +677,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 <li>
                   <a
                     href="/cookies"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Cookie Policy
                   </a>
@@ -685,7 +685,7 @@ The future of education will likely be a blend of human expertise and AI capabil
                 <li>
                   <a
                     href="/licenses"
-                    className="text-gray-400 hover:text-purple-400 transition"
+                    className="text-gray-400 hover:text-cyan-400 transition"
                   >
                     Licenses
                   </a>
@@ -695,7 +695,7 @@ The future of education will likely be a blend of human expertise and AI capabil
           </div>
 
           {/* Bottom Text */}
-          <div className="border-t border-purple-900/50 mt-12 pt-8 text-center text-gray-400">
+          <div className="border-t border-cyan-900/50 mt-12 pt-8 text-center text-gray-400">
             <p>
               © {new Date().getFullYear()} EduSphere AI. All rights reserved.
             </p>

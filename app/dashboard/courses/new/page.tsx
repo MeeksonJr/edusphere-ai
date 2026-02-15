@@ -111,12 +111,12 @@ export default function NewCoursePage() {
       {/* Header */}
       <ScrollReveal direction="up">
         <div className="mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-4">
             <Sparkles className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             <span className="text-white">Create New </span>
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
               Course
             </span>
           </h1>
@@ -237,7 +237,7 @@ export default function NewCoursePage() {
               <Button
                 type="submit"
                 disabled={loading || !formData.topic.trim()}
-                className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                className="flex-1 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
               >
                 {loading ? (
                   <>

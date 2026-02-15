@@ -45,7 +45,7 @@ const values = [
     title: "Community",
     description:
       "We build strong communities of educators, creators, and learners who support and inspire each other.",
-    gradient: "from-purple-500 to-indigo-500",
+    gradient: "from-cyan-500 to-indigo-500",
   },
 ];
 
@@ -73,17 +73,17 @@ export default function AboutPage() {
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
               <div className="max-w-4xl mx-auto text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-6">
                   <Sparkles className="h-8 w-8 text-white" />
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
                   <span className="text-white">About</span>{" "}
-                  <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     EduSphere AI
                   </span>
                 </h1>
@@ -103,7 +103,7 @@ export default function AboutPage() {
               <ScrollReveal direction="up">
                 <GlassSurface className="p-8 md:p-12">
                   <div className="text-center mb-8">
-                    <GraduationCap className="h-12 w-12 text-purple-400 mx-auto mb-4" />
+                    <GraduationCap className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                       Our Mission
                     </h2>
@@ -131,7 +131,7 @@ export default function AboutPage() {
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
                   <span className="text-white">Our</span>{" "}
-                  <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Values
                   </span>
                 </h2>
@@ -179,7 +179,7 @@ export default function AboutPage() {
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
                   <span className="text-white">Our</span>{" "}
-                  <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Journey
                   </span>
                 </h2>
@@ -195,7 +195,7 @@ export default function AboutPage() {
                 >
                   <GlassSurface className="p-6 mb-6 relative">
                     <div className="flex items-start space-x-4">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                         {milestone.year}
                       </div>
                       <div className="flex-1">
@@ -217,7 +217,7 @@ export default function AboutPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollReveal direction="up">
               <GlassSurface className="p-8 md:p-12 text-center max-w-3xl mx-auto">
-                <Award className="h-16 w-16 text-purple-400 mx-auto mb-6" />
+                <Award className="h-16 w-16 text-cyan-400 mx-auto mb-6" />
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                   Join Us on This Journey
                 </h2>
@@ -229,7 +229,7 @@ export default function AboutPage() {
                   <Link href="/signup">
                     <Button
                       size="lg"
-                      className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-8"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8"
                     >
                       Get Started Free
                       <ArrowRight className="ml-2 h-5 w-5" />
@@ -239,7 +239,7 @@ export default function AboutPage() {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="glass-surface border-white/20 hover:border-purple-500/50 text-white px-8"
+                      className="glass-surface border-white/20 hover:border-cyan-500/50 text-white px-8"
                     >
                       Contact Us
                     </Button>

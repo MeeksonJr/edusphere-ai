@@ -18,7 +18,7 @@ export function GlassSurface({
 }: GlassSurfaceProps) {
   const variants = {
     default: "glass-surface",
-    elevated: "glass-surface shadow-lg shadow-purple-500/10",
+    elevated: "glass-surface shadow-lg shadow-cyan-500/10",
     subtle: "glass-surface bg-black/20 backdrop-blur-sm",
   };
 

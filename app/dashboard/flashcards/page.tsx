@@ -407,7 +407,7 @@ export default function FlashcardsPage() {
               </Select>
 
               <Button
-                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                 onClick={() => router.push("/dashboard/flashcards/new")}
               >
                 <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -440,7 +440,7 @@ export default function FlashcardsPage() {
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-white mb-1 truncate group-hover:text-purple-400 transition-colors">
+                      <h3 className="text-lg font-bold text-white mb-1 truncate group-hover:text-cyan-400 transition-colors">
                         {set.title}
                       </h3>
                       <p className="text-sm text-white/60 truncate">{set.subject}</p>
@@ -466,7 +466,7 @@ export default function FlashcardsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                      className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
                       onClick={() => handleStudySet(set)}
                     >
                       <BrainCircuit className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -509,7 +509,7 @@ export default function FlashcardsPage() {
                 : "Start by creating your first flashcard set."}
             </p>
             <Button
-              className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+              className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
               onClick={() => router.push("/dashboard/flashcards/new")}
             >
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -614,7 +614,7 @@ export default function FlashcardsPage() {
                 <Button
                   type="button"
                   onClick={handleAddCard}
-                  className="w-full glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                  className="w-full glass-surface border-white/20 hover:border-cyan-500/50 text-white"
                 >
                   <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
                   Add Card
@@ -659,7 +659,7 @@ export default function FlashcardsPage() {
                   type="button"
                   onClick={handleGenerateFlashcards}
                   disabled={generatingFlashcards || !flashcardTopic}
-                  className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white disabled:opacity-50"
                 >
                   {generatingFlashcards ? (
                     <>
@@ -721,7 +721,7 @@ export default function FlashcardsPage() {
               </Button>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
                 disabled={newSet.cards.length === 0}
               >
                 Create Flashcard Set
@@ -787,7 +787,7 @@ export default function FlashcardsPage() {
                 <div className="glass-surface border-white/20 rounded-xl p-8 md:p-12 min-h-[400px] flex flex-col justify-center items-center text-center">
                   <div className="w-full space-y-6">
                     <div>
-                      <p className="text-sm font-medium text-purple-400 mb-4 uppercase tracking-wide">Question</p>
+                      <p className="text-sm font-medium text-cyan-400 mb-4 uppercase tracking-wide">Question</p>
                       <p className="text-white text-xl md:text-2xl leading-relaxed font-medium">
                         {currentSet.cards[currentCardIndex]?.question}
                       </p>
@@ -825,7 +825,7 @@ export default function FlashcardsPage() {
                   className={
                     showAnswer
                       ? "glass-surface border-white/20 text-white hover:bg-white/10 flex-1"
-                      : "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white flex-1"
+                      : "bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white flex-1"
                   }
                   onClick={() => setShowAnswer(!showAnswer)}
                 >

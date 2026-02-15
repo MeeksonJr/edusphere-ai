@@ -21,9 +21,9 @@ const features = [
     title: "AI Course Generation",
     description:
       "Transform any topic into a structured, multi-module course with outlines, scripts, slides, and quizzes — all generated in seconds.",
-    gradient: "from-purple-500/20 to-purple-600/5",
-    border: "hover:border-purple-500/30",
-    iconColor: "text-purple-400",
+    gradient: "from-cyan-500/20 to-cyan-600/5",
+    border: "hover:border-cyan-500/30",
+    iconColor: "text-cyan-400",
     size: "bento-large",
   },
   {

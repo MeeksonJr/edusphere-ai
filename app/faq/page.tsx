@@ -169,13 +169,13 @@ export default function FAQPage() {
           {/* Header */}
           <ScrollReveal direction="up">
             <div className="text-center mb-12 max-w-3xl mx-auto">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-6">
                 <HelpCircle className="h-8 w-8 text-white" />
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
                 <span className="text-white">Frequently Asked</span>
                 <br />
-                <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                   Questions
                 </span>
               </h1>
@@ -230,7 +230,7 @@ export default function FAQPage() {
                         value={`${category.title}-${index}`}
                         className="border-white/10"
                       >
-                        <AccordionTrigger className="text-left text-white hover:text-purple-400 transition-colors">
+                        <AccordionTrigger className="text-left text-white hover:text-cyan-400 transition-colors">
                           {item.question}
                         </AccordionTrigger>
                         <AccordionContent className="text-white/70 leading-relaxed pt-2">
@@ -257,13 +257,13 @@ export default function FAQPage() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a
                     href="/contact"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg transition-all"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white rounded-lg transition-all"
                   >
                     Contact Support
                   </a>
                   <a
                     href="/support"
-                    className="inline-flex items-center justify-center px-6 py-3 glass-surface border-white/20 hover:border-purple-500/50 text-white rounded-lg transition-all"
+                    className="inline-flex items-center justify-center px-6 py-3 glass-surface border-white/20 hover:border-cyan-500/50 text-white rounded-lg transition-all"
                   >
                     Visit Help Center
                   </a>

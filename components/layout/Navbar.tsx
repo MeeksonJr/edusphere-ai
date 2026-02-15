@@ -77,11 +77,11 @@ export function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:shadow-cyan-500/40 transition-shadow">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
             <span className="text-lg font-bold font-display text-white">
-              EduSphere<span className="text-purple-400"> AI</span>
+              EduSphere<span className="text-cyan-400"> AI</span>
             </span>
           </Link>
 
@@ -100,7 +100,7 @@ export function Navbar() {
                 {pathname === link.href && (
                   <motion.div
                     layoutId="navbar-indicator"
-                    className="absolute bottom-0 left-3 right-3 h-[2px] bg-purple-500 rounded-full"
+                    className="absolute bottom-0 left-3 right-3 h-[2px] bg-cyan-500 rounded-full"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
@@ -138,7 +138,7 @@ export function Navbar() {
                   </Button>
                 </Link>
                 <Link href="/signup">
-                  <Button className="bg-purple-600 hover:bg-purple-500 text-white border-0 rounded-xl px-5 glow-button shadow-lg shadow-purple-500/15">
+                  <Button className="bg-cyan-600 hover:bg-cyan-500 text-white border-0 rounded-xl px-5 glow-button shadow-lg shadow-cyan-500/15">
                     Get Started
                   </Button>
                 </Link>
@@ -217,7 +217,7 @@ export function Navbar() {
                       </Button>
                     </Link>
                     <Link href="/signup" className="block">
-                      <Button className="w-full bg-purple-600 hover:bg-purple-500 text-white border-0 py-6 glow-button">
+                      <Button className="w-full bg-cyan-600 hover:bg-cyan-500 text-white border-0 py-6 glow-button">
                         Get Started Free
                       </Button>
                     </Link>

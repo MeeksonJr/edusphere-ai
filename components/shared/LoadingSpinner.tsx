@@ -30,7 +30,7 @@ export function LoadingSpinner({
           ease: "linear",
         }}
       >
-        <Loader2 className={`${sizes[size]} text-purple-400`} aria-hidden="true" />
+        <Loader2 className={`${sizes[size]} text-cyan-400`} aria-hidden="true" />
       </motion.div>
       {text && (
         <p className="mt-4 text-white/70 text-sm" role="status" aria-live="polite">

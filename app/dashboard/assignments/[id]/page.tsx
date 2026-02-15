@@ -136,9 +136,9 @@ export default function AssignmentDetailPage() {
 
           {assignment.ai_summary && (
             <ScrollReveal direction="up" delay={0.2}>
-              <GlassSurface className="p-6 lg:p-8 border-purple-500/30">
+              <GlassSurface className="p-6 lg:p-8 border-cyan-500/30">
                 <div className="flex items-center space-x-2 mb-4">
-                  <Sparkles className="h-5 w-5 text-purple-400" aria-hidden="true" />
+                  <Sparkles className="h-5 w-5 text-cyan-400" aria-hidden="true" />
                   <h2 className="text-xl font-bold text-white">AI-Generated Approach</h2>
                 </div>
                 <p className="text-white/80 whitespace-pre-wrap leading-relaxed">{assignment.ai_summary}</p>

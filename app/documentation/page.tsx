@@ -51,7 +51,7 @@ const docSections = [
       { title: "Course Generation API", slug: "api/course-generation" },
       { title: "Webhooks", slug: "api/webhooks" },
     ],
-    gradient: "from-purple-500 to-pink-500",
+    gradient: "from-cyan-500 to-pink-500",
   },
   {
     icon: Settings,
@@ -74,12 +74,12 @@ export default function DocumentationPage() {
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
               <div className="max-w-3xl mx-auto text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-6">
                   <Book className="h-8 w-8 text-white" />
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
@@ -167,9 +167,9 @@ export default function DocumentationPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Link
                     href="/faq"
-                    className="p-4 glass-surface rounded-lg border border-white/10 hover:border-purple-500/30 transition-colors group"
+                    className="p-4 glass-surface rounded-lg border border-white/10 hover:border-cyan-500/30 transition-colors group"
                   >
-                    <FileText className="h-6 w-6 text-purple-400 mb-2 group-hover:scale-110 transition-transform" />
+                    <FileText className="h-6 w-6 text-cyan-400 mb-2 group-hover:scale-110 transition-transform" />
                     <h3 className="font-semibold text-white mb-1">FAQ</h3>
                     <p className="text-white/60 text-sm">
                       Find answers to common questions
@@ -177,9 +177,9 @@ export default function DocumentationPage() {
                   </Link>
                   <Link
                     href="/support"
-                    className="p-4 glass-surface rounded-lg border border-white/10 hover:border-purple-500/30 transition-colors group"
+                    className="p-4 glass-surface rounded-lg border border-white/10 hover:border-cyan-500/30 transition-colors group"
                   >
-                    <Sparkles className="h-6 w-6 text-purple-400 mb-2 group-hover:scale-110 transition-transform" />
+                    <Sparkles className="h-6 w-6 text-cyan-400 mb-2 group-hover:scale-110 transition-transform" />
                     <h3 className="font-semibold text-white mb-1">Support</h3>
                     <p className="text-white/60 text-sm">
                       Get help from our support team
@@ -187,9 +187,9 @@ export default function DocumentationPage() {
                   </Link>
                   <Link
                     href="/contact"
-                    className="p-4 glass-surface rounded-lg border border-white/10 hover:border-purple-500/30 transition-colors group"
+                    className="p-4 glass-surface rounded-lg border border-white/10 hover:border-cyan-500/30 transition-colors group"
                   >
-                    <Code className="h-6 w-6 text-purple-400 mb-2 group-hover:scale-110 transition-transform" />
+                    <Code className="h-6 w-6 text-cyan-400 mb-2 group-hover:scale-110 transition-transform" />
                     <h3 className="font-semibold text-white mb-1">Contact</h3>
                     <p className="text-white/60 text-sm">
                       Reach out directly

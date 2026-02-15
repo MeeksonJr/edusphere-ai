@@ -87,7 +87,7 @@ export default function LicensesPage() {
                     <span className="text-sm text-white/50">v{license.version}</span>
                   </div>
                   <p className="text-white/60 mb-3">{license.description}</p>
-                  <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                  <Badge className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
                     {license.license}
                   </Badge>
                 </div>

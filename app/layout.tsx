@@ -84,11 +84,11 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </head>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans bg-black text-white antialiased`}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans bg-background text-foreground antialiased`}>
         <SkipLink />
         <SupabaseProvider>
           <SettingsProvider>
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
               <div id="main-content">
                 {children}
               </div>

@@ -10,13 +10,13 @@ export function HeroSection() {
     <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden pt-20 lg:pt-24 pb-16">
       {/* Mesh Gradient Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black" />
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
         <div className="absolute inset-0 mesh-gradient-bg" />
         <div className="absolute inset-0 grid-pattern-dense opacity-40" />
       </div>
 
       {/* Animated Gradient Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-purple-600/10 blur-[120px] animate-float-slow" />
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-cyan-600/10 blur-[120px] animate-float-slow" />
       <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-cyan-500/8 blur-[100px] animate-float-gentle" />
       <div className="absolute top-1/2 right-1/3 w-[300px] h-[300px] rounded-full bg-pink-500/6 blur-[80px] animate-float-slow" style={{ animationDelay: "3s" }} />
 
@@ -43,7 +43,7 @@ export function HeroSection() {
             transition={{ duration: 0.7, delay: 0.1 }}
           >
             <span className="text-white block">Create Courses</span>
-            <span className="text-gradient-purple block mt-2">
+            <span className="text-gradient-brand block mt-2">
               10x Faster with AI
             </span>
           </motion.h1>
@@ -69,7 +69,7 @@ export function HeroSection() {
             <Link href="/signup">
               <Button
                 size="lg"
-                className="glow-button group bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white border-0 shadow-lg shadow-purple-500/20 px-8 py-7 text-lg rounded-xl"
+                className="glow-button group bg-gradient-to-r from-cyan-600 to-cyan-500 hover:from-cyan-500 hover:to-cyan-400 text-white border-0 shadow-lg shadow-cyan-500/20 px-8 py-7 text-lg rounded-xl"
               >
                 Start Creating Free
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -81,7 +81,7 @@ export function HeroSection() {
                 variant="outline"
                 className="glass-surface border-white/15 hover:border-white/30 text-white px-8 py-7 text-lg rounded-xl backdrop-blur-md group"
               >
-                <Play className="mr-2 h-5 w-5 text-purple-400 group-hover:text-purple-300 transition-colors" />
+                <Play className="mr-2 h-5 w-5 text-cyan-400 group-hover:text-cyan-300 transition-colors" />
                 Watch Demo
               </Button>
             </Link>
@@ -115,7 +115,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-purple-500/10">
+            <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl shadow-cyan-500/10">
               {/* Browser Chrome */}
               <div className="bg-white/[0.03] border-b border-white/10 px-4 py-3 flex items-center gap-2">
                 <div className="flex gap-1.5">
@@ -138,7 +138,7 @@ export function HeroSection() {
                     <div className="text-xs text-white/40 mb-3 font-medium uppercase tracking-wider">Course Outline</div>
                     {["Introduction to AI", "Neural Networks Basics", "Deep Learning", "Practical Applications"].map((item, i) => (
                       <div key={item} className="flex items-center gap-2 py-2 border-b border-white/5 last:border-0">
-                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? 'bg-purple-500 text-white' : 'bg-white/10 text-white/40'}`}>
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? 'bg-cyan-500 text-white' : 'bg-white/10 text-white/40'}`}>
                           {i + 1}
                         </div>
                         <span className={`text-sm ${i === 0 ? 'text-white' : 'text-white/50'}`}>{item}</span>
@@ -155,12 +155,12 @@ export function HeroSection() {
                         <span className="text-xs text-emerald-400/80">Generating...</span>
                       </div>
                     </div>
-                    <div className="aspect-video rounded-lg bg-gradient-to-br from-purple-600/20 via-black to-cyan-600/10 flex items-center justify-center border border-white/5">
+                    <div className="aspect-video rounded-lg bg-gradient-to-br from-cyan-600/20 via-black to-cyan-600/10 flex items-center justify-center border border-white/5">
                       <div className="text-center">
                         <div className="text-2xl md:text-3xl font-display font-bold text-white mb-2">Introduction to AI</div>
                         <div className="text-sm text-white/50">Module 1 of 4</div>
                         <div className="mt-4 flex items-center justify-center gap-2">
-                          <div className="h-1 w-16 rounded-full bg-purple-500" />
+                          <div className="h-1 w-16 rounded-full bg-cyan-500" />
                           <div className="h-1 w-16 rounded-full bg-white/10" />
                           <div className="h-1 w-16 rounded-full bg-white/10" />
                           <div className="h-1 w-16 rounded-full bg-white/10" />
@@ -173,7 +173,7 @@ export function HeroSection() {
             </div>
 
             {/* Glow effect under mockup */}
-            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-20 bg-purple-500/20 blur-[60px] rounded-full" />
+            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-3/4 h-20 bg-cyan-500/20 blur-[60px] rounded-full" />
           </motion.div>
         </div>
       </div>

@@ -17,7 +17,7 @@ export function SectionContainer({
 }: SectionContainerProps) {
     const bgClasses = {
         default: "",
-        gradient: "bg-gradient-to-b from-transparent via-purple-500/[0.03] to-transparent",
+        gradient: "bg-gradient-to-b from-transparent via-cyan-500/[0.03] to-transparent",
         mesh: "mesh-gradient-bg",
         pattern: "grid-pattern",
         subtle: "bg-surface-1/30",

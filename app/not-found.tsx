@@ -21,15 +21,15 @@ export default function NotFound() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, type: "spring" }}
             >
-              <h1 className="text-9xl md:text-[12rem] font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent mb-4">
+              <h1 className="text-9xl md:text-[12rem] font-bold bg-gradient-to-r from-cyan-400 via-pink-400 to-cyan-600 bg-clip-text text-transparent mb-4">
                 404
               </h1>
               <div className="flex items-center justify-center space-x-2 mb-6">
-                <Sparkles className="h-6 w-6 text-purple-400 animate-pulse" />
+                <Sparkles className="h-6 w-6 text-cyan-400 animate-pulse" />
                 <p className="text-2xl md:text-3xl font-semibold text-white">
                   Page Not Found
                 </p>
-                <Sparkles className="h-6 w-6 text-purple-400 animate-pulse" />
+                <Sparkles className="h-6 w-6 text-cyan-400 animate-pulse" />
               </div>
             </motion.div>
           </ScrollReveal>
@@ -52,7 +52,7 @@ export default function NotFound() {
               <Link href="/">
                 <Button
                   size="lg"
-                  className="w-full glass-surface border-white/20 hover:border-purple-500/50 text-white group"
+                  className="w-full glass-surface border-white/20 hover:border-cyan-500/50 text-white group"
                 >
                   <Home className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   Go Home
@@ -62,7 +62,7 @@ export default function NotFound() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full glass-surface border-white/20 hover:border-purple-500/50 text-white group"
+                  className="w-full glass-surface border-white/20 hover:border-cyan-500/50 text-white group"
                 >
                   <Search className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   Browse Blog

@@ -47,7 +47,7 @@ const plans = [
     limitations: [],
     cta: "Start Free Trial",
     popular: true,
-    gradient: "from-purple-500 to-purple-600",
+    gradient: "from-cyan-500 to-cyan-600",
   },
   {
     name: "Enterprise",
@@ -85,7 +85,7 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               <span className="text-white">Simple, Transparent</span>
               <br />
-              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                 Pricing
               </span>
             </h2>
@@ -104,7 +104,7 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
               onClick={() => setAnnual(false)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 !annual
-                  ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white"
+                  ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
                   : "text-white/60 hover:text-white"
               }`}
             >
@@ -114,7 +114,7 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
               onClick={() => setAnnual(true)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all relative ${
                 annual
-                  ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white"
+                  ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
                   : "text-white/60 hover:text-white"
               }`}
             >
@@ -142,7 +142,7 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
                 {/* Popular Badge */}
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1">
+                    <Badge className="bg-gradient-to-r from-cyan-500 to-pink-500 text-white px-4 py-1">
                       <Sparkles className="h-3 w-3 mr-1" />
                       Most Popular
                     </Badge>
@@ -216,8 +216,8 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
                     size="lg"
                     className={`w-full ${
                       plan.popular
-                        ? "bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white"
-                        : "glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                        ? "bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
+                        : "glass-surface border-white/20 hover:border-cyan-500/50 text-white"
                     }`}
                   >
                     {plan.cta}
@@ -236,7 +236,7 @@ export function PricingSection({ showHeader = true }: PricingSectionProps) {
             Have questions about pricing?
           </p>
           <Link href="/faq">
-            <Button variant="ghost" className="text-purple-400 hover:text-purple-300">
+            <Button variant="ghost" className="text-cyan-400 hover:text-cyan-300">
               View FAQ
             </Button>
           </Link>

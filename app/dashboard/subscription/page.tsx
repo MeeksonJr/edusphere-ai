@@ -110,7 +110,7 @@ export default function SubscriptionPage() {
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             <span className="text-white">Subscription</span>{" "}
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
               Plans
             </span>
           </h1>
@@ -121,7 +121,7 @@ export default function SubscriptionPage() {
       {/* Current Plan */}
       {currentTier !== "free" && (
         <ScrollReveal direction="up" delay={0.1}>
-          <GlassSurface className="p-6 lg:p-8 mb-8 border-purple-500/30">
+          <GlassSurface className="p-6 lg:p-8 mb-8 border-cyan-500/30">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="text-2xl font-bold text-white mb-2">

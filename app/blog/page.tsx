@@ -117,14 +117,14 @@ export default function BlogPage() {
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
               <div className="max-w-3xl mx-auto text-center">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
                   <span className="text-white">Our</span>{" "}
-                  <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Blog
                   </span>
                 </h1>
@@ -163,7 +163,7 @@ export default function BlogPage() {
                     onClick={() => setSelectedCategory(category)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedCategory === category
-                        ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white"
+                        ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white"
                         : "glass-surface border-white/20 text-white/70 hover:text-white hover:border-white/40"
                     }`}
                   >
@@ -183,14 +183,14 @@ export default function BlogPage() {
                 <Link href={`/blog/${featuredPost.slug}`}>
                   <GlassSurface className="overflow-hidden group cursor-pointer">
                     <div className="grid md:grid-cols-2 gap-0">
-                      <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                      <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-cyan-500/20 to-pink-500/20">
                         <Image
                           src={featuredPost.image}
                           alt={featuredPost.title}
                           fill
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <Badge className="absolute top-4 left-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                        <Badge className="absolute top-4 left-4 bg-gradient-to-r from-cyan-500 to-pink-500 text-white">
                           Featured
                         </Badge>
                       </div>
@@ -198,7 +198,7 @@ export default function BlogPage() {
                         <Badge className="w-fit mb-4 glass-surface border-white/20">
                           {featuredPost.category}
                         </Badge>
-                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-purple-400 transition-colors">
+                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">
                           {featuredPost.title}
                         </h2>
                         <p className="text-white/70 mb-6 text-lg leading-relaxed">
@@ -215,7 +215,7 @@ export default function BlogPage() {
                               <span>{featuredPost.date}</span>
                             </div>
                           </div>
-                          <ArrowRight className="h-5 w-5 text-purple-400 group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="h-5 w-5 text-cyan-400 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
                     </div>
@@ -240,7 +240,7 @@ export default function BlogPage() {
                     <Link href={`/blog/${post.slug}`}>
                       <AnimatedCard variant="3d" delay={0.1 * index} className="h-full group cursor-pointer">
                         <div className="p-0 h-full flex flex-col">
-                          <div className="relative h-48 bg-gradient-to-br from-purple-500/20 to-pink-500/20 overflow-hidden">
+                          <div className="relative h-48 bg-gradient-to-br from-cyan-500/20 to-pink-500/20 overflow-hidden">
                             <Image
                               src={post.image}
                               alt={post.title}
@@ -252,7 +252,7 @@ export default function BlogPage() {
                             <Badge className="w-fit mb-3 glass-surface border-white/10">
                               {post.category}
                             </Badge>
-                            <h3 className="text-xl font-bold text-white mb-3 group-hover:text-purple-400 transition-colors line-clamp-2">
+                            <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors line-clamp-2">
                               {post.title}
                             </h3>
                             <p className="text-white/60 text-sm mb-4 flex-grow line-clamp-3">
@@ -269,7 +269,7 @@ export default function BlogPage() {
                                   <span>{post.date}</span>
                                 </div>
                               </div>
-                              <ArrowRight className="h-4 w-4 text-purple-400 group-hover:translate-x-1 transition-transform" />
+                              <ArrowRight className="h-4 w-4 text-cyan-400 group-hover:translate-x-1 transition-transform" />
                             </div>
                           </div>
                         </div>

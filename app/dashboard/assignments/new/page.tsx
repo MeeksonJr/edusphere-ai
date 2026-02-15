@@ -229,7 +229,7 @@ export default function NewAssignmentPage() {
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             <span className="text-white">Create New</span>{" "}
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
               Assignment
             </span>
           </h1>
@@ -324,7 +324,7 @@ export default function NewAssignmentPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      className="w-full justify-start text-left font-normal glass-surface border-white/20 text-white hover:border-purple-500/50"
+                      className="w-full justify-start text-left font-normal glass-surface border-white/20 text-white hover:border-cyan-500/50"
                     >
                       <CalendarIcon className="mr-2 h-4 w-4 text-white/60" aria-hidden="true" />
                       {date ? format(date, "PPP") : <span className="text-white/60">Pick a date</span>}
@@ -342,9 +342,9 @@ export default function NewAssignmentPage() {
         {/* AI Summary */}
         {formData.ai_summary && (
           <ScrollReveal direction="up" delay={0.2}>
-            <GlassSurface className="p-6 lg:p-8 border-purple-500/30">
+            <GlassSurface className="p-6 lg:p-8 border-cyan-500/30">
               <div className="flex items-center space-x-2 mb-4">
-                <Sparkles className="h-5 w-5 text-purple-400" aria-hidden="true" />
+                <Sparkles className="h-5 w-5 text-cyan-400" aria-hidden="true" />
                 <h2 className="text-xl font-bold text-white">AI-Generated Approach</h2>
               </div>
               <div className="prose prose-invert max-w-none">
@@ -369,7 +369,7 @@ export default function NewAssignmentPage() {
               variant="outline"
               onClick={generateAiSummary}
               disabled={aiLoading || !formData.title || !formData.description}
-              className="glass-surface border-white/20 hover:border-purple-500/50 text-white w-full sm:w-auto"
+              className="glass-surface border-white/20 hover:border-cyan-500/50 text-white w-full sm:w-auto"
             >
               {aiLoading ? (
                 <>
@@ -393,7 +393,7 @@ export default function NewAssignmentPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white flex-1 sm:flex-initial"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white flex-1 sm:flex-initial"
               >
                 {loading ? (
                   <>

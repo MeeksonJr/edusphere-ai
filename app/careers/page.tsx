@@ -23,7 +23,7 @@ const cultureValues = [
     title: "Innovation First",
     description:
       "We're constantly pushing the boundaries of what's possible in EdTech.",
-    gradient: "from-purple-500 to-purple-600",
+    gradient: "from-cyan-500 to-cyan-600",
   },
   {
     icon: Globe,
@@ -83,17 +83,17 @@ export default function CareersPage() {
       <div className="min-h-screen">
         {/* Hero */}
         <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-black" />
+          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-black to-black" />
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
               <div className="max-w-3xl mx-auto text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-6">
                   <Briefcase className="h-8 w-8 text-white" />
                 </div>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
                   <span className="text-white">Join Our</span>{" "}
-                  <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Team
                   </span>
                 </h1>
@@ -191,11 +191,11 @@ export default function CareersPage() {
                   direction="up"
                   delay={0.1 * index}
                 >
-                  <GlassSurface className="p-6 hover:border-purple-500/30 transition-colors group cursor-pointer">
+                  <GlassSurface className="p-6 hover:border-cyan-500/30 transition-colors group cursor-pointer">
                     <Link href={`/careers/${position.title.toLowerCase().replace(/\s+/g, '-')}`}>
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">
+                          <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
                             {position.title}
                           </h3>
                           <div className="flex items-center space-x-4 text-sm text-white/60">
@@ -206,7 +206,7 @@ export default function CareersPage() {
                             <span>{position.type}</span>
                           </div>
                         </div>
-                        <ArrowRight className="h-5 w-5 text-white/40 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
+                        <ArrowRight className="h-5 w-5 text-white/40 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
                       </div>
                     </Link>
                   </GlassSurface>
@@ -223,7 +223,7 @@ export default function CareersPage() {
                   <Link href="/contact">
                     <Button
                       variant="outline"
-                      className="glass-surface border-white/20 hover:border-purple-500/50 text-white"
+                      className="glass-surface border-white/20 hover:border-cyan-500/50 text-white"
                     >
                       Get in Touch
                     </Button>
@@ -239,7 +239,7 @@ export default function CareersPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollReveal direction="up">
               <GlassSurface className="p-8 md:p-12 text-center max-w-3xl mx-auto">
-                <Heart className="h-16 w-16 text-purple-400 mx-auto mb-6" />
+                <Heart className="h-16 w-16 text-cyan-400 mx-auto mb-6" />
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                   Don't See a Role That Fits?
                 </h2>
@@ -250,7 +250,7 @@ export default function CareersPage() {
                 <Link href="/contact">
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-8"
+                    className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8"
                   >
                     Send Your Resume
                     <ArrowRight className="ml-2 h-5 w-5" />

@@ -82,7 +82,7 @@ export default async function AssignmentsPage({
             <p className="text-white/70">Manage your academic tasks and deadlines</p>
           </div>
           <Link href="/dashboard/assignments/new" className="mt-4 md:mt-0">
-            <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+            <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
               New Assignment
             </Button>
@@ -117,7 +117,7 @@ export default async function AssignmentsPage({
                     <Badge
                       className={`inline-flex items-center px-3 py-1.5 text-sm font-medium transition-all ${
                         isActive
-                          ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-500/30"
+                          ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white border-cyan-500/30"
                           : "glass-surface border-white/20 text-white/70 hover:text-white hover:border-white/40"
                       }`}
                     >
@@ -140,7 +140,7 @@ export default async function AssignmentsPage({
                 href={`/dashboard/assignments?status=${status}&subject=all&sort=${sort}`}
                 className={`text-sm px-2 py-1 rounded ${
                   subject === "all"
-                    ? "text-purple-400 font-medium"
+                    ? "text-cyan-400 font-medium"
                     : "text-white/70 hover:text-white"
                 }`}
               >
@@ -152,7 +152,7 @@ export default async function AssignmentsPage({
                   href={`/dashboard/assignments?status=${status}&subject=${subj}&sort=${sort}`}
                   className={`text-sm px-2 py-1 rounded ${
                     subject === subj
-                      ? "text-purple-400 font-medium"
+                      ? "text-cyan-400 font-medium"
                       : "text-white/70 hover:text-white"
                   }`}
                 >
@@ -168,7 +168,7 @@ export default async function AssignmentsPage({
                 href={`/dashboard/assignments?status=${status}&subject=${subject}&sort=due_date-asc`}
                 className={`p-1.5 rounded ${
                   sort === "due_date-asc"
-                    ? "bg-purple-500/20 text-purple-400"
+                    ? "bg-cyan-500/20 text-cyan-400"
                     : "text-white/60 hover:text-white"
                 }`}
                 aria-label="Sort by due date ascending"
@@ -179,7 +179,7 @@ export default async function AssignmentsPage({
                 href={`/dashboard/assignments?status=${status}&subject=${subject}&sort=due_date-desc`}
                 className={`p-1.5 rounded ${
                   sort === "due_date-desc"
-                    ? "bg-purple-500/20 text-purple-400"
+                    ? "bg-cyan-500/20 text-cyan-400"
                     : "text-white/60 hover:text-white"
                 }`}
                 aria-label="Sort by due date descending"
@@ -204,18 +204,18 @@ export default async function AssignmentsPage({
                         className={`w-12 h-12 rounded-xl p-3 flex-shrink-0 ${
                           assignment.status === "completed"
                             ? "bg-gradient-to-br from-green-500/20 to-emerald-500/20"
-                            : "bg-gradient-to-br from-purple-500/20 to-pink-500/20"
+                            : "bg-gradient-to-br from-cyan-500/20 to-pink-500/20"
                         }`}
                       >
                         {assignment.status === "completed" ? (
                           <CheckCircle2 className="h-full w-full text-green-400" aria-hidden="true" />
                         ) : (
-                          <CheckSquare className="h-full w-full text-purple-400" aria-hidden="true" />
+                          <CheckSquare className="h-full w-full text-cyan-400" aria-hidden="true" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-2">
-                          <h3 className="text-lg font-semibold text-white group-hover:text-purple-400 transition-colors">
+                          <h3 className="text-lg font-semibold text-white group-hover:text-cyan-400 transition-colors">
                             {assignment.title}
                           </h3>
                           <div className="flex items-center text-sm text-white/60 ml-4 flex-shrink-0">
@@ -277,7 +277,7 @@ export default async function AssignmentsPage({
                   : "Get started by creating your first assignment."}
               </p>
               <Link href="/dashboard/assignments/new">
-                <Button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+                <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
                   <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
                   Create Assignment
                 </Button>
