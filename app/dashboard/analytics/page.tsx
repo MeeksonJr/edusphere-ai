@@ -1,45 +1,33 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+import dynamic from "next/dynamic"
 import {
-    AreaChart,
-    Area,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    BarChart,
-    Bar,
-    PieChart,
-    Pie,
-    Cell,
-    RadarChart,
-    Radar,
-    PolarGrid,
-    PolarAngleAxis,
-    PolarRadiusAxis,
-    Legend,
-} from "recharts"
-import {
-    BookOpen,
     Trophy,
     Flame,
     Clock,
     Target,
-    TrendingUp,
     Award,
-    Calendar,
-    Zap,
 } from "lucide-react"
 import { GlassSurface } from "@/components/shared/GlassSurface"
-import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { AmbientBackground } from "@/components/shared/AmbientBackground"
-import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
+
+// Lazy load Recharts components
+const ActivityChart = dynamic(() => import("@/components/dashboard/analytics/ActivityChart"), {
+    loading: () => <div className="h-[300px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
+    ssr: false,
+})
+const ProgressChart = dynamic(() => import("@/components/dashboard/analytics/ProgressChart"), {
+    loading: () => <div className="h-[300px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
+    ssr: false,
+})
+const MasteryChart = dynamic(() => import("@/components/dashboard/analytics/MasteryChart"), {
+    loading: () => <div className="h-[300px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
+    ssr: false,
+})
 
 // --- Mock Data ---
 
@@ -127,136 +115,17 @@ export default function AnalyticsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 {/* Activity Chart */}
                 <ScrollReveal direction="up" delay={0.2} className="col-span-1 lg:col-span-2">
-                    <GlassSurface className="p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-semibold text-foreground flex items-center">
-                                <TrendingUp className="mr-2 h-5 w-5 text-cyan-400" />
-                                Activity Trends
-                            </h3>
-                        </div>
-                        <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={activityData}>
-                                    <defs>
-                                        <linearGradient id="colorHours" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.8} />
-                                            <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                                    <XAxis
-                                        dataKey="name"
-                                        stroke="rgba(255,255,255,0.5)"
-                                        fontSize={12}
-                                        tickLine={false}
-                                        axisLine={false}
-                                    />
-                                    <YAxis
-                                        stroke="rgba(255,255,255,0.5)"
-                                        fontSize={12}
-                                        tickLine={false}
-                                        axisLine={false}
-                                        tickFormatter={(value) => `${value}h`}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: "rgba(0,0,0,0.8)",
-                                            border: "1px solid rgba(255,255,255,0.1)",
-                                            borderRadius: "8px",
-                                            color: "#fff"
-                                        }}
-                                        itemStyle={{ color: "#fff" }}
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="hours"
-                                        stroke="#06b6d4"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#colorHours)"
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </GlassSurface>
+                    <ActivityChart data={activityData} />
                 </ScrollReveal>
 
                 {/* Course Progress */}
                 <ScrollReveal direction="up" delay={0.3}>
-                    <GlassSurface className="p-6 h-full">
-                        <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center">
-                            <BookOpen className="mr-2 h-5 w-5 text-purple-400" />
-                            Course Status
-                        </h3>
-                        <div className="h-[300px] flex items-center justify-center">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={courseProgressData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={100}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {courseProgressData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: "rgba(0,0,0,0.8)",
-                                            border: "1px solid rgba(255,255,255,0.1)",
-                                            borderRadius: "8px",
-                                            color: "#fff"
-                                        }}
-                                    />
-                                    <Legend
-                                        verticalAlign="bottom"
-                                        height={36}
-                                        iconType="circle"
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </GlassSurface>
+                    <ProgressChart data={courseProgressData} />
                 </ScrollReveal>
 
                 {/* Subject Mastery */}
                 <ScrollReveal direction="up" delay={0.4}>
-                    <GlassSurface className="p-6 h-full">
-                        <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center">
-                            <Zap className="mr-2 h-5 w-5 text-yellow-400" />
-                            Subject Mastery
-                        </h3>
-                        <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={subjectMasteryData}>
-                                    <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                                    <PolarAngleAxis dataKey="subject" tick={{ fill: "rgba(255,255,255,0.7)", fontSize: 12 }} />
-                                    <PolarRadiusAxis angle={30} domain={[0, 150]} tick={false} axisLine={false} />
-                                    <Radar
-                                        name="Skill Level"
-                                        dataKey="A"
-                                        stroke="#8b5cf6"
-                                        strokeWidth={2}
-                                        fill="#8b5cf6"
-                                        fillOpacity={0.5}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: "rgba(0,0,0,0.8)",
-                                            border: "1px solid rgba(255,255,255,0.1)",
-                                            borderRadius: "8px",
-                                            color: "#fff"
-                                        }}
-                                    />
-                                </RadarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </GlassSurface>
+                    <MasteryChart data={subjectMasteryData} />
                 </ScrollReveal>
             </div>
 

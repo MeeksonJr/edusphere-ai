@@ -7,11 +7,15 @@ import { DashboardNavbar } from "@/components/layout/DashboardNavbar"
 // If ThemeClientWrapper is only in app/dashboard, we might need to move it or just use it in the parent layout
 // For now, we'll assume the parent layout handles the providers, and this component handles the UI structure
 
+import { OnboardingModal } from "@/components/dashboard/OnboardingModal"
+
 export function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
     const [mobileOpen, setMobileOpen] = useState(false)
 
     return (
         <div className="min-h-screen bg-background text-foreground flex">
+            <OnboardingModal />
+
             {/* Sidebar */}
             <DashboardSidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
