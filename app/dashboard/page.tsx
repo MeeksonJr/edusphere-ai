@@ -21,6 +21,7 @@ import {
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { AmbientBackground } from "@/components/shared/AmbientBackground"
+import { RecentActivityList } from "@/components/dashboard/RecentActivityList"
 
 export default async function Dashboard() {
   const supabase = createClient()
@@ -40,7 +41,7 @@ export default async function Dashboard() {
   }
 
   // Get user profile
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single() as { data: any }
 
   // Get upcoming assignments (limit to 3)
   const { data: assignments } = await supabase
@@ -49,7 +50,7 @@ export default async function Dashboard() {
     .eq("user_id", user.id)
     .eq("status", "ongoing")
     .order("due_date", { ascending: true })
-    .limit(3)
+    .limit(3) as { data: any[] | null }
 
   // Get completed assignments count
   const { count: completedCount } = await supabase
@@ -75,7 +76,7 @@ export default async function Dashboard() {
     .select("id,title,created_at,estimated_duration,status,layout")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(3)
+    .limit(3) as { data: any[] | null }
 
   const stats = [
     {
@@ -103,7 +104,7 @@ export default async function Dashboard() {
       label: "Completed Tasks",
       value: completedCount || 0,
       subtitle: "Total finished",
-      icon: col => <TrendingUp className={col} />,
+      icon: TrendingUp,
       color: "text-green-400",
       bg: "bg-green-500/10",
       border: "border-green-500/20",
@@ -164,7 +165,7 @@ export default async function Dashboard() {
                   <div className={`p-4 rounded-2xl glass-surface border ${stat.border} hover:border-opacity-50 transition-all group`}>
                     <div className="flex justify-between items-start mb-2">
                       <div className={`p-2 rounded-lg ${stat.bg}`}>
-                        {typeof stat.icon === 'function' ? stat.icon(`h-5 w-5 ${stat.color}`) : <stat.icon className={`h-5 w-5 ${stat.color}`} />}
+                        <stat.icon className={`h-5 w-5 ${stat.color}`} />
                       </div>
                       {/* Optional sparkline or trend indicator could go here */}
                     </div>
@@ -226,8 +227,19 @@ export default async function Dashboard() {
           {/* Right Column (Sidebar Widgets) */}
           <div className="space-y-8">
 
-            {/* Quick Actions */}
+            {/* Recent Activity */}
             <ScrollReveal direction="left" delay={0.3}>
+              <GlassSurface className="p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-pink-400" />
+                  Recent Activity
+                </h2>
+                <RecentActivityList userId={user.id} />
+              </GlassSurface>
+            </ScrollReveal>
+
+            {/* Quick Actions */}
+            <ScrollReveal direction="left" delay={0.4}>
               <GlassSurface className="p-6">
                 <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                   <Zap className="h-4 w-4 text-amber-400" />
@@ -253,7 +265,7 @@ export default async function Dashboard() {
               <GlassSurface className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-pink-400" />
+                    <Calendar className="h-4 w-4 text-pink-400" />
                     Upcoming
                   </h2>
                   <Link href="/dashboard/assignments" className="text-xs text-foreground/50 hover:text-foreground">
@@ -271,7 +283,7 @@ export default async function Dashboard() {
                             <p className="text-xs text-foreground/50 mt-0.5 mb-1">{assignment.subject}</p>
                           </div>
                           <span className={`text-[10px] px-1.5 py-0.5 rounded border ${assignment.priority === 'high' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                              'bg-green-500/10 text-green-500 border-green-500/20'
+                            'bg-green-500/10 text-green-500 border-green-500/20'
                             }`}>
                             {new Date(assignment.due_date).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
                           </span>

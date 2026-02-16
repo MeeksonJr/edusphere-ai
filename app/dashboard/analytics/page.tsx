@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import {
     Trophy,
@@ -58,6 +58,45 @@ const courseProgressData = [
 
 export default function AnalyticsPage() {
     const [timeRange, setTimeRange] = useState("week")
+    const [loading, setLoading] = useState(true)
+    const [data, setData] = useState<{
+        activityData: any[];
+        courseProgressData: any[];
+        subjectMasteryData: any[];
+        stats: any;
+    } | null>(null)
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await fetch("/api/analytics")
+                if (res.ok) {
+                    const jsonData = await res.json()
+                    setData(jsonData)
+                }
+            } catch (error) {
+                console.error("Failed to fetch analytics:", error)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+            </div>
+        )
+    }
+
+    const { activityData, courseProgressData, subjectMasteryData, stats } = data || {
+        activityData: [],
+        courseProgressData: [],
+        subjectMasteryData: [],
+        stats: { studyTime: "0h", coursesCompleted: "0", streak: "0 Days", focusScore: "0%" }
+    }
 
     return (
         <div className="relative min-h-screen p-6 md:p-8 lg:p-12 pb-32">
@@ -91,10 +130,10 @@ export default function AnalyticsPage() {
             {/* Overview Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {[
-                    { label: "Study Time", value: "24.5h", icon: Clock, color: "text-blue-400", sub: "+12% vs last week" },
-                    { label: "Courses Completed", value: "12", icon: Trophy, color: "text-yellow-400", sub: "2 this week" },
-                    { label: "Current Streak", value: "5 Days", icon: Flame, color: "text-orange-400", sub: "Keep it up!" },
-                    { label: "Focus Score", value: "88%", icon: Target, color: "text-green-400", sub: "Top 10% of users" },
+                    { label: "Study Time", value: stats.studyTime, icon: Clock, color: "text-blue-400", sub: "Calculated from activity" },
+                    { label: "Courses Completed", value: stats.coursesCompleted, icon: Trophy, color: "text-yellow-400", sub: "Total finished" },
+                    { label: "Current Streak", value: stats.streak, icon: Flame, color: "text-orange-400", sub: "Keep it up!" },
+                    { label: "Focus Score", value: stats.focusScore, icon: Target, color: "text-green-400", sub: "Top 10% of users" },
                 ].map((stat, i) => (
                     <ScrollReveal key={stat.label} direction="up" delay={i * 0.05} className="h-full">
                         <GlassSurface className="p-4 flex flex-col justify-between h-full hover:border-cyan-500/30 transition-colors">
