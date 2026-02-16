@@ -27,62 +27,34 @@ import { GlassSurface } from "@/components/shared/GlassSurface";
 import { useSettings } from "@/contexts/settings-context";
 import { cn } from "@/lib/utils";
 
-export function DashboardSidebar() {
+
+export function DashboardSidebar({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen: (open: boolean) => void }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { supabase } = useSupabase();
   const { settings } = useSettings();
-  const [open, setOpen] = useState(true);
   const [collapsed, setCollapsed] = useState(false);
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const [user, setUser] = useState<any>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Hydration fix
   useEffect(() => {
-    const getUser = async () => {
-      if (!supabase) return;
-      try {
-        const { data } = await supabase.auth.getUser();
-        if (data.user) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", data.user.id)
-            .single();
-          setUser({ ...data.user, profile });
-        }
-      } catch (error) {
-        console.error("Error loading user:", error);
-      }
-    };
-    getUser();
-  }, [supabase]);
-
-  useEffect(() => {
-    if (isMobile) {
-      setOpen(false);
-      setCollapsed(false);
-    } else {
-      setOpen(true);
-    }
-  }, [isMobile]);
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     if (!isMobile) {
       document.body.classList.toggle("sidebar-collapsed", collapsed);
-      window.dispatchEvent(new Event("resize"));
     }
   }, [collapsed, isMobile]);
 
-  // Keyboard shortcut: Ctrl+B to toggle sidebar (check settings)
+  // Keyboard shortcut: Ctrl+B to toggle sidebar
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Check if shortcuts are enabled from settings context (default to true)
       const shortcutsEnabled = settings?.keyboardShortcuts?.sidebarToggle !== false;
-      
-      // Also check localStorage as fallback (for instant updates)
-      const localStorageEnabled = localStorage.getItem("keyboardShortcuts") !== "false";
+      const localStorageEnabled = typeof window !== 'undefined' ? localStorage.getItem("keyboardShortcuts") !== "false" : true;
       const enabled = shortcutsEnabled !== false && localStorageEnabled;
-      
+
       if (enabled && (e.ctrlKey || e.metaKey) && e.key === "b") {
         e.preventDefault();
         if (!isMobile) {
@@ -94,21 +66,6 @@ export function DashboardSidebar() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isMobile, settings]);
-
-  const handleSignOut = async () => {
-    if (!supabase) {
-      router.push("/");
-      return;
-    }
-    try {
-      await supabase.auth.signOut();
-      router.push("/");
-      router.refresh();
-    } catch (error) {
-      console.error("Error signing out:", error);
-      router.push("/");
-    }
-  };
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -126,48 +83,34 @@ export function DashboardSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      {isMobile && (
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          className="fixed top-4 left-4 z-50 p-2 rounded-lg glass-surface border-foreground/20 text-white hover:border-cyan-500/50 transition-all"
-          aria-label={open ? "Close menu" : "Open menu"}
-          aria-expanded={open}
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-      )}
-
-      {/* Sidebar */}
       <AnimatePresence>
-        {(open || !isMobile) && (
+        {(mobileOpen || !isMobile) && (
           <motion.aside
             initial={isMobile ? { x: -300 } : false}
-            animate={isMobile ? { x: open ? 0 : -300 } : false}
+            animate={isMobile ? { x: mobileOpen ? 0 : -300 } : false}
             exit={isMobile ? { x: -300 } : false}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn(
-              "fixed left-0 top-0 h-screen z-40 transition-all duration-300",
+              "fixed left-0 top-0 h-screen z-40 transition-all duration-300 border-r border-foreground/5 bg-background/50 backdrop-blur-xl",
               collapsed ? "w-16" : "w-64",
-              isMobile && "w-64"
+              isMobile && "w-64 shadow-2xl"
             )}
             role="navigation"
             aria-label="Dashboard navigation"
           >
-            <GlassSurface className="h-full w-full rounded-none border-r border-foreground/10 flex flex-col">
+            <div className="h-full flex flex-col">
               {/* Logo */}
-              <div className="p-4 border-b border-foreground/10">
+              <div className="h-16 flex items-center px-4 border-b border-foreground/5">
                 <Link
                   href="/dashboard"
-                  className="flex items-center space-x-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black rounded-lg"
+                  className="flex items-center space-x-3 focus:outline-none"
                   aria-label="Dashboard home"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-pink-500 p-2 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="h-6 w-6 text-foreground" aria-hidden="true" />
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                    <Sparkles className="h-5 w-5 text-white" aria-hidden="true" />
                   </div>
                   {!collapsed && (
-                    <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
+                    <span className="text-lg font-bold font-display text-foreground">
                       EduSphere
                     </span>
                   )}
@@ -175,7 +118,7 @@ export function DashboardSidebar() {
               </div>
 
               {/* Navigation Items */}
-              <nav className="flex-1 overflow-y-auto p-4 space-y-2" aria-label="Main navigation">
+              <nav className="flex-1 overflow-y-auto p-3 space-y-1.5 scrollbar-thin scrollbar-thumb-foreground/10" aria-label="Main navigation">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const active = isActive(item.href);
@@ -184,101 +127,66 @@ export function DashboardSidebar() {
                       key={item.href}
                       href={item.href}
                       className={cn(
-                        "flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
-                        "focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-black",
+                        "flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative overflow-hidden",
                         active
-                          ? "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 border border-cyan-500/30 text-foreground"
-                          : "text-foreground/70 hover:text-foreground hover:bg-foreground/5"
+                          ? "bg-cyan-500/10 text-cyan-500 font-medium"
+                          : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
                       )}
-                      aria-current={active ? "page" : undefined}
+                      // Close mobile menu on click
+                      onClick={() => isMobile && setMobileOpen(false)}
                     >
+                      {active && (
+                        <motion.div
+                          layoutId="active-nav"
+                          className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500 rounded-r-full"
+                        />
+                      )}
                       <Icon
                         className={cn(
-                          "h-5 w-5 flex-shrink-0",
-                          active ? "text-cyan-400" : "text-foreground/60 group-hover:text-foreground"
+                          "h-5 w-5 flex-shrink-0 transition-colors",
+                          active ? "text-cyan-500" : "text-foreground/50 group-hover:text-foreground/80"
                         )}
                         aria-hidden="true"
                       />
                       {!collapsed && (
-                        <span className="text-sm font-medium flex-1">{item.name}</span>
+                        <span className="text-sm flex-1">{item.name}</span>
                       )}
                     </Link>
                   );
                 })}
               </nav>
 
-              {/* User Section */}
-              <div className="p-4 border-t border-foreground/10">
-                {user && !collapsed && (
-                  <div className="flex items-center space-x-3 mb-4">
-                    <Avatar className="h-10 w-10 border-2 border-cyan-500/30">
-                      <AvatarImage src={user.profile?.avatar_url} alt={user.email || "User"} />
-                      <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-pink-500 text-foreground">
-                        {user.email?.charAt(0).toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate">
-                        {user.profile?.full_name || user.email?.split("@")[0] || "User"}
-                      </p>
-                      <p className="text-xs text-foreground/60 truncate">{user.email}</p>
-                    </div>
-                  </div>
-                )}
-                {user && collapsed && (
-                  <div className="flex justify-center mb-4">
-                    <Avatar className="h-10 w-10 border-2 border-cyan-500/30">
-                      <AvatarImage src={user.profile?.avatar_url} alt={user.email || "User"} />
-                      <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-pink-500 text-foreground">
-                        {user.email?.charAt(0).toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                )}
-
-                {/* Collapse Toggle (Desktop Only) */}
-                {!isMobile && (
+              {/* Collapse Toggle (Desktop Only) */}
+              {!isMobile && (
+                <div className="p-3 border-t border-foreground/5">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setCollapsed(!collapsed)}
-                    className="w-full justify-start text-foreground/70 hover:text-foreground mb-2"
-                    aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+                    className="w-full justify-start text-foreground/50 hover:text-foreground hover:bg-foreground/5"
                   >
                     <ChevronLeft
                       className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")}
-                      aria-hidden="true"
                     />
-                    {!collapsed && <span className="ml-2 text-sm">Collapse</span>}
+                    {!collapsed && <span className="ml-2">Collapse</span>}
                   </Button>
-                )}
-
-                {/* Sign Out */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                  aria-label="Sign out"
-                >
-                  <LogOut className="h-4 w-4" aria-hidden="true" />
-                  {!collapsed && <span className="ml-2 text-sm">Sign Out</span>}
-                </Button>
-              </div>
-            </GlassSurface>
+                </div>
+              )}
+            </div>
           </motion.aside>
         )}
       </AnimatePresence>
 
       {/* Mobile Overlay */}
-      {isMobile && open && (
+      {isMobile && mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30"
-          onClick={() => setOpen(false)}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
+          onClick={() => setMobileOpen(false)}
           aria-hidden="true"
         />
       )}
     </>
   );
 }
+
 
