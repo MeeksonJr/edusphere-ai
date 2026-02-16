@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export default async function CoursesPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },

@@ -16,7 +16,7 @@ export async function POST(
 ) {
   try {
     console.log("Enhance route called for course:", params.id)
-    const supabase = createClient()
+    const supabase = await createClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()

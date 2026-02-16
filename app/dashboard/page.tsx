@@ -24,7 +24,7 @@ import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { RecentActivityList } from "@/components/dashboard/RecentActivityList"
 
 export default async function Dashboard() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },

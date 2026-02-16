@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
   let body: any = {}
   try {
     console.log("Process route called - starting course generation")
-    const supabase = createClient()
+    const supabase = await createClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
@@ -198,9 +198,9 @@ Return the JSON in this exact format:
             .update({ status: "failed" })
             .eq("id", courseId)
           return NextResponse.json(
-            { 
+            {
               error: "Failed to generate course layout. All AI services are unavailable.",
-              details: lastError?.message 
+              details: lastError?.message
             },
             { status: 500 }
           )
@@ -295,10 +295,10 @@ Return the JSON in this exact format:
     })
   } catch (error: any) {
     console.error("Course processing error:", error)
-    
+
     // Update course status to failed
     try {
-      const supabase = createClient()
+      const supabase = await createClient()
       await supabase
         .from("courses")
         .update({ status: "failed" })

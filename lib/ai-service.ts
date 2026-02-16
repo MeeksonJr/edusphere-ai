@@ -18,7 +18,7 @@ async function getHfClient() {
   if (typeof window !== "undefined" || isBuildContext()) {
     throw new Error("AI service can only be used on the server side at runtime")
   }
-  
+
   if (!hf) {
     try {
       const { HfInference } = await import("@huggingface/inference")
@@ -40,7 +40,7 @@ async function getGeminiModel(modelName?: string) {
   if (typeof window !== "undefined" || isBuildContext()) {
     throw new Error("AI service can only be used on the server side at runtime")
   }
-  
+
   try {
     const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
     if (!apiKey) {
@@ -49,19 +49,19 @@ async function getGeminiModel(modelName?: string) {
     }
     const { GoogleGenerativeAI } = await import("@google/generative-ai")
     const genAI = new GoogleGenerativeAI(apiKey)
-    
+
     // Try the specified model or use fallback chain
-    const modelsToTry = modelName 
+    const modelsToTry = modelName
       ? [modelName]
       : [
-          "gemini-2.5-flash",        // Stable, fast, best price-performance
-          "gemini-3-flash-preview",  // Latest flash model
-          "gemini-2.5-pro",          // Stable pro model
-          "gemini-3-pro-preview",    // Latest pro model
-          "gemini-2.0-flash",        // Previous generation stable
-          "gemini-pro",              // Legacy stable model
-        ]
-    
+        "gemini-2.5-flash",        // Stable, fast, best price-performance
+        "gemini-3-flash-preview",  // Latest flash model
+        "gemini-2.5-pro",          // Stable pro model
+        "gemini-3-pro-preview",    // Latest pro model
+        "gemini-2.0-flash",        // Previous generation stable
+        "gemini-pro",              // Legacy stable model
+      ]
+
     for (const modelId of modelsToTry) {
       try {
         const model = genAI.getGenerativeModel({ model: modelId })
@@ -74,7 +74,7 @@ async function getGeminiModel(modelName?: string) {
         continue // Try next model
       }
     }
-    
+
     throw new Error("All Gemini models failed to initialize")
   } catch (error) {
     console.error("Failed to initialize Gemini model:", error)
@@ -117,15 +117,15 @@ export async function generateAIResponse(options: AIRequestOptions): Promise<AIR
         throw new Error("Gemini model does not have generateContent method. Please check the API version.")
       }
 
-      // Add timeout protection (6 seconds max for Gemini to leave room for fallback)
+      // Add timeout protection (30 seconds max for Gemini to leave room for fallback)
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Gemini request timeout")), 6000)
+        setTimeout(() => reject(new Error("Gemini request timeout")), 30000)
       })
 
       try {
         const generatePromise = geminiModelInstance.generateContent(geminiPrompt)
         const result = await Promise.race([generatePromise, timeoutPromise]) as any
-        
+
         const response = await result.response
         const text = response.text()
 
@@ -205,9 +205,9 @@ async function generateGroqResponse(
 
     for (const modelId of modelsToTry) {
       try {
-        // Add timeout protection (6 seconds max for Groq - it's fast)
+        // Add timeout protection (30 seconds max for Groq)
         const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error("Groq request timeout")), 6000)
+          setTimeout(() => reject(new Error("Groq request timeout")), 30000)
         })
 
         const completionPromise = groq.chat.completions.create({

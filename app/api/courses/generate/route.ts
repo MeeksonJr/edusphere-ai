@@ -32,7 +32,7 @@ interface CourseLayout {
 export async function POST(request: NextRequest) {
   const requestUrl = new URL(request.url)
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
@@ -127,7 +127,7 @@ Return the JSON in this exact format:
         Cookie: request.headers.get("Cookie") || "",
         Authorization: request.headers.get("Authorization") || "",
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         courseId: course.id,
         topic,
         courseType,

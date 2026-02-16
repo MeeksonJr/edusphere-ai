@@ -9,7 +9,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -167,7 +167,7 @@ Return ONLY the JSON object, no markdown formatting.`,
     try {
       const jsonStr = response.text.match(/\{[\s\S]*\}/)?.[0] || "{}"
       newChapter = JSON.parse(jsonStr)
-      
+
       // Ensure chapter has required fields
       if (!newChapter.chapterId) {
         newChapter.chapterId = `chapter-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`

@@ -13,7 +13,7 @@ export default async function AssignmentsPage({
 }: {
   searchParams: { status?: string; subject?: string; sort?: string }
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },
@@ -115,11 +115,10 @@ export default async function AssignmentsPage({
                     href={`/dashboard/assignments?status=${filter.value}&subject=${subject}&sort=${sort}`}
                   >
                     <Badge
-                      className={`inline-flex items-center px-3 py-1.5 text-sm font-medium transition-all ${
-                        isActive
+                      className={`inline-flex items-center px-3 py-1.5 text-sm font-medium transition-all ${isActive
                           ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white border-cyan-500/30"
                           : "glass-surface border-foreground/20 text-foreground/70 hover:text-foreground hover:border-white/40"
-                      }`}
+                        }`}
                     >
                       <Icon className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
                       {filter.label}
@@ -138,11 +137,10 @@ export default async function AssignmentsPage({
               <span className="text-sm text-foreground/60">Subject:</span>
               <Link
                 href={`/dashboard/assignments?status=${status}&subject=all&sort=${sort}`}
-                className={`text-sm px-2 py-1 rounded ${
-                  subject === "all"
+                className={`text-sm px-2 py-1 rounded ${subject === "all"
                     ? "text-cyan-400 font-medium"
                     : "text-foreground/70 hover:text-foreground"
-                }`}
+                  }`}
               >
                 All
               </Link>
@@ -150,11 +148,10 @@ export default async function AssignmentsPage({
                 <Link
                   key={subj}
                   href={`/dashboard/assignments?status=${status}&subject=${subj}&sort=${sort}`}
-                  className={`text-sm px-2 py-1 rounded ${
-                    subject === subj
+                  className={`text-sm px-2 py-1 rounded ${subject === subj
                       ? "text-cyan-400 font-medium"
                       : "text-foreground/70 hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   {subj}
                 </Link>
@@ -166,22 +163,20 @@ export default async function AssignmentsPage({
               <span className="text-sm text-foreground/60">Sort:</span>
               <Link
                 href={`/dashboard/assignments?status=${status}&subject=${subject}&sort=due_date-asc`}
-                className={`p-1.5 rounded ${
-                  sort === "due_date-asc"
+                className={`p-1.5 rounded ${sort === "due_date-asc"
                     ? "bg-cyan-500/20 text-cyan-400"
                     : "text-foreground/60 hover:text-foreground"
-                }`}
+                  }`}
                 aria-label="Sort by due date ascending"
               >
                 <SortAsc className="h-4 w-4" />
               </Link>
               <Link
                 href={`/dashboard/assignments?status=${status}&subject=${subject}&sort=due_date-desc`}
-                className={`p-1.5 rounded ${
-                  sort === "due_date-desc"
+                className={`p-1.5 rounded ${sort === "due_date-desc"
                     ? "bg-cyan-500/20 text-cyan-400"
                     : "text-foreground/60 hover:text-foreground"
-                }`}
+                  }`}
                 aria-label="Sort by due date descending"
               >
                 <SortDesc className="h-4 w-4" />
@@ -201,11 +196,10 @@ export default async function AssignmentsPage({
                   <div className="p-6">
                     <div className="flex items-start space-x-4">
                       <div
-                        className={`w-12 h-12 rounded-xl p-3 flex-shrink-0 ${
-                          assignment.status === "completed"
+                        className={`w-12 h-12 rounded-xl p-3 flex-shrink-0 ${assignment.status === "completed"
                             ? "bg-gradient-to-br from-green-500/20 to-emerald-500/20"
                             : "bg-gradient-to-br from-cyan-500/20 to-pink-500/20"
-                        }`}
+                          }`}
                       >
                         {assignment.status === "completed" ? (
                           <CheckCircle2 className="h-full w-full text-green-400" aria-hidden="true" />

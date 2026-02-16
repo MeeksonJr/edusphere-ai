@@ -199,7 +199,7 @@ export async function createSubscription(
 // Update subscription in database
 export async function updateSubscription(subscriptionId: string, tier: string, userId: string) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { error } = await supabase
       .from("profiles")

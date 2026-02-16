@@ -5,7 +5,7 @@ import { trackAIUsage, answerQuestion } from "@/lib/ai-service"
 
 export async function getExplanationAction(prompt: string) {
     try {
-        const supabase = createClient()
+        const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
 
         if (!user) {

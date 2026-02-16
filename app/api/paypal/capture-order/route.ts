@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     const captureData = await captureResponse.json()
 
     // Update user's subscription in database
-    const supabase = createClient()
+    const supabase = await createClient()
     const { error: updateError } = await supabase
       .from("profiles")
       .update({
