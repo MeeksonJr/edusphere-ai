@@ -44,7 +44,7 @@ import { GlassSurface } from "@/components/shared/GlassSurface"
 import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
-import { trackAIUsage, answerQuestion } from "@/lib/ai-service"
+import { getExplanationAction } from "./actions"
 
 export default function AILabPage() {
   const { supabase } = useSupabase()
@@ -661,8 +661,7 @@ export default function AILabPage() {
   const getFlashcardExplanation = async (question: string, answer: string) => {
     try {
       setLoading(true)
-      if (!user || !supabase) throw new Error("You must be logged in to use the AI Lab")
-      await trackAIUsage(supabase, user.id)
+      if (!user) throw new Error("You must be logged in to use the AI Lab")
 
       const prompt = `Please explain in detail how to arrive at this answer:\n\nQuestion: ${question}\nAnswer: ${answer}\n\nProvide a step-by-step explanation with any relevant formulas, concepts, or reasoning.`
 
@@ -671,8 +670,13 @@ export default function AILabPage() {
         { role: "assistant", content: "Generating detailed explanation..." },
       ])
 
-      const explanation = await answerQuestion(prompt)
-      setChatHistory([{ role: "user", content: prompt }, { role: "assistant", content: explanation }])
+      const result = await getExplanationAction(prompt)
+
+      if (!result.success || !result.explanation) {
+        throw new Error(result.error || "Failed to generate explanation")
+      }
+
+      setChatHistory([{ role: "user", content: prompt }, { role: "assistant", content: result.explanation }])
     } catch (error: any) {
       toast({
         title: "Error",
