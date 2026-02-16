@@ -16,6 +16,7 @@ import { GlassSurface } from "@/components/shared/GlassSurface"
 import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
+import { AmbientBackground } from "@/components/shared/AmbientBackground"
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -29,6 +30,8 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const getUser = async () => {
+      if (!supabase) return
+
       try {
         setLoading(true)
         const { data } = await supabase.auth.getUser()
@@ -95,7 +98,7 @@ export default function SettingsPage() {
     setLocalSettings({ ...localSettings, accentColor })
   }
 
-  const handleNotificationChange = (key: keyof typeof localSettings.notifications, value: boolean) => {
+  const handleNotificationChange = (key: keyof UserSettings["notifications"], value: boolean) => {
     if (!localSettings) return
     setLocalSettings({
       ...localSettings,
@@ -111,7 +114,7 @@ export default function SettingsPage() {
     setLocalSettings({ ...localSettings, language })
   }
 
-  const handleCalendarSettingChange = (key: keyof typeof localSettings.calendar, value: any) => {
+  const handleCalendarSettingChange = (key: keyof UserSettings["calendar"], value: any) => {
     if (!localSettings) return
     setLocalSettings({
       ...localSettings,
@@ -131,10 +134,12 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-6 md:p-8 lg:p-12">
+    <div className="relative min-h-screen p-6 md:p-8 lg:p-12 pb-32">
+      <AmbientBackground />
+
       {/* Header */}
       <ScrollReveal direction="up">
-        <div className="mb-8">
+        <div className="mb-8 relative z-10">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             <span className="text-foreground">Settings</span>
           </h1>
@@ -142,7 +147,7 @@ export default function SettingsPage() {
         </div>
       </ScrollReveal>
 
-      <Tabs defaultValue="appearance" className="space-y-6">
+      <Tabs defaultValue="appearance" className="space-y-6 relative z-10">
         <TabsList className="glass-surface border-foreground/20 p-1">
           <TabsTrigger
             value="appearance"
@@ -192,9 +197,8 @@ export default function SettingsPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <AnimatedCard
                       variant="3d"
-                      className={`cursor-pointer transition-all ${
-                        localSettings.theme === "dark" ? "border-cyan-500/50" : ""
-                      }`}
+                      className={`cursor-pointer transition-all ${localSettings.theme === "dark" ? "border-cyan-500/50" : ""
+                        }`}
                       onClick={() => handleThemeChange("dark")}
                     >
                       <div className="p-4">
@@ -214,9 +218,8 @@ export default function SettingsPage() {
                     <AnimatedCard
                       variant="3d"
                       delay={0.1}
-                      className={`cursor-pointer transition-all ${
-                        localSettings.theme === "light" ? "border-cyan-500/50" : ""
-                      }`}
+                      className={`cursor-pointer transition-all ${localSettings.theme === "light" ? "border-cyan-500/50" : ""
+                        }`}
                       onClick={() => handleThemeChange("light")}
                     >
                       <div className="p-4">
@@ -249,9 +252,8 @@ export default function SettingsPage() {
                         key={color.value}
                         variant="3d"
                         delay={0.05 * index}
-                        className={`cursor-pointer transition-all ${
-                          localSettings.accentColor === color.value ? "border-cyan-500/50 scale-105" : ""
-                        }`}
+                        className={`cursor-pointer transition-all ${localSettings.accentColor === color.value ? "border-cyan-500/50 scale-105" : ""
+                          }`}
                         onClick={() => handleAccentColorChange(color.value as AccentColorType)}
                       >
                         <div className="p-4 text-center">
