@@ -5,11 +5,13 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { AnimatedCard } from "@/components/shared/AnimatedCard";
 import { GlassSurface } from "@/components/shared/GlassSurface";
+import { AmbientBackground } from "@/components/shared/AmbientBackground";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Calendar, User, ArrowRight } from "lucide-react";
+import { Search, Calendar, User, ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 const blogPosts = [
   {
@@ -114,38 +116,45 @@ export default function BlogPage() {
 
   return (
     <PublicLayout>
-      <div className="min-h-screen">
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Ambient Background */}
+        <AmbientBackground />
+
         {/* Hero */}
-        <section className="pt-20 lg:pt-32 pb-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/20 via-background to-background" />
-          
+        <section className="pt-32 lg:pt-48 pb-20 relative">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <ScrollReveal direction="up">
-              <div className="max-w-3xl mx-auto text-center">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+              <div className="max-w-4xl mx-auto text-center">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-pink-500 mb-8 shadow-lg shadow-cyan-500/20"
+                >
+                  <BookOpen className="h-10 w-10 text-white" />
+                </motion.div>
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-8 tracking-tight">
                   <span className="text-foreground">Our</span>{" "}
                   <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                     Blog
                   </span>
                 </h1>
-                <p className="text-xl text-foreground/70 mb-8">
+                <p className="text-xl md:text-2xl text-foreground/70 mb-10 leading-relaxed max-w-3xl mx-auto">
                   Insights, tips, and updates about AI-powered education and course creation
                 </p>
-              </div>
-            </ScrollReveal>
 
-            {/* Search */}
-            <ScrollReveal direction="up" delay={0.2}>
-              <div className="max-w-2xl mx-auto">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
-                  <Input
-                    type="text"
-                    placeholder="Search articles..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-12 h-14 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
-                  />
+                {/* Search */}
+                <div className="max-w-2xl mx-auto relative z-20">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
+                    <Input
+                      type="text"
+                      placeholder="Search articles..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-12 h-14 glass-surface border-foreground/20 text-foreground placeholder:text-foreground/40 text-lg shadow-lg"
+                    />
+                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -153,7 +162,7 @@ export default function BlogPage() {
         </section>
 
         {/* Categories */}
-        <section className="py-8 border-b border-foreground/10">
+        <section className="py-8 border-b border-foreground/5 bg-background/50 backdrop-blur-sm sticky top-[72px] z-30">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <ScrollReveal direction="up">
               <div className="flex flex-wrap gap-3 justify-center">
@@ -161,11 +170,10 @@ export default function BlogPage() {
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedCategory === category
-                        ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-foreground"
-                        : "glass-surface border-foreground/20 text-foreground/70 hover:text-foreground hover:border-white/40"
-                    }`}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === category
+                        ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-md shadow-cyan-500/20"
+                        : "glass-surface border-foreground/10 text-foreground/70 hover:text-foreground hover:border-cyan-500/30 hover:bg-foreground/5"
+                      }`}
                   >
                     {category}
                   </button>
@@ -177,45 +185,53 @@ export default function BlogPage() {
 
         {/* Featured Post */}
         {featuredPost && (
-          <section className="py-12">
+          <section className="py-12 relative z-10">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <ScrollReveal direction="up">
                 <Link href={`/blog/${featuredPost.slug}`}>
-                  <GlassSurface className="overflow-hidden group cursor-pointer">
+                  <GlassSurface className="overflow-hidden group cursor-pointer hover:border-cyan-500/30 transition-all duration-300">
                     <div className="grid md:grid-cols-2 gap-0">
-                      <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-cyan-500/20 to-pink-500/20">
-                        <Image
-                          src={featuredPost.image}
-                          alt={featuredPost.title}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <Badge className="absolute top-4 left-4 bg-gradient-to-r from-cyan-500 to-pink-500 text-foreground">
+                      <div className="relative h-64 md:h-full min-h-[300px] bg-gradient-to-br from-cyan-500/20 to-pink-500/20 overflow-hidden">
+                        {/* Placeholder gradient if image fails/missing */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/40 to-pink-900/40" />
+
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Image
+                            src={featuredPost.image}
+                            alt={featuredPost.title}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+
+                        <Badge className="absolute top-6 left-6 bg-gradient-to-r from-cyan-500 to-pink-500 text-white border-0 px-3 py-1 text-sm shadow-lg">
                           Featured
                         </Badge>
                       </div>
                       <div className="p-8 md:p-12 flex flex-col justify-center">
-                        <Badge className="w-fit mb-4 glass-surface border-foreground/20">
+                        <Badge className="w-fit mb-4 glass-surface border-foreground/20 text-foreground/80 hover:bg-foreground/5 transition-colors">
                           {featuredPost.category}
                         </Badge>
-                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 group-hover:text-cyan-400 transition-colors">
+                        <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 group-hover:text-cyan-400 transition-colors leading-tight">
                           {featuredPost.title}
                         </h2>
                         <p className="text-foreground/70 mb-6 text-lg leading-relaxed">
                           {featuredPost.excerpt}
                         </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4 text-foreground/60 text-sm">
+                        <div className="flex items-center justify-between mt-auto">
+                          <div className="flex items-center space-x-6 text-foreground/60 text-sm">
                             <div className="flex items-center space-x-2">
                               <User className="h-4 w-4" />
-                              <span>{featuredPost.author}</span>
+                              <span className="font-medium">{featuredPost.author}</span>
                             </div>
                             <div className="flex items-center space-x-2">
                               <Calendar className="h-4 w-4" />
                               <span>{featuredPost.date}</span>
                             </div>
                           </div>
-                          <ArrowRight className="h-5 w-5 text-cyan-400 group-hover:translate-x-1 transition-transform" />
+                          <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500 group-hover:text-white transition-all duration-300">
+                            <ArrowRight className="h-5 w-5 text-cyan-400 group-hover:text-white transition-colors" />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -227,10 +243,10 @@ export default function BlogPage() {
         )}
 
         {/* Blog Grid */}
-        <section className="py-12 pb-20">
+        <section className="py-12 pb-24 relative z-10">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             {regularPosts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {regularPosts.map((post, index) => (
                   <ScrollReveal
                     key={post.id}
@@ -240,27 +256,30 @@ export default function BlogPage() {
                     <Link href={`/blog/${post.slug}`}>
                       <AnimatedCard variant="3d" delay={0.1 * index} className="h-full group cursor-pointer">
                         <div className="p-0 h-full flex flex-col">
-                          <div className="relative h-48 bg-gradient-to-br from-cyan-500/20 to-pink-500/20 overflow-hidden">
+                          <div className="relative h-56 bg-gradient-to-br from-cyan-500/20 to-pink-500/20 overflow-hidden rounded-t-xl">
+                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/40 to-pink-900/40" />
                             <Image
                               src={post.image}
                               alt={post.title}
                               fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="object-cover group-hover:scale-105 transition-transform duration-500"
                             />
+                            <div className="absolute top-4 left-4">
+                              <Badge className="glass-surface border-white/20 text-white backdrop-blur-md bg-black/30">
+                                {post.category}
+                              </Badge>
+                            </div>
                           </div>
                           <div className="p-6 flex-grow flex flex-col">
-                            <Badge className="w-fit mb-3 glass-surface border-foreground/10">
-                              {post.category}
-                            </Badge>
-                            <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-cyan-400 transition-colors line-clamp-2">
+                            <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-cyan-400 transition-colors line-clamp-2 leading-snug">
                               {post.title}
                             </h3>
-                            <p className="text-foreground/60 text-sm mb-4 flex-grow line-clamp-3">
+                            <p className="text-foreground/70 text-sm mb-6 flex-grow line-clamp-3 leading-relaxed">
                               {post.excerpt}
                             </p>
-                            <div className="flex items-center justify-between pt-4 border-t border-foreground/10">
-                              <div className="flex items-center space-x-3 text-foreground/50 text-xs">
-                                <div className="flex items-center space-x-1">
+                            <div className="flex items-center justify-between pt-6 border-t border-foreground/5 mt-auto">
+                              <div className="flex flex-col space-y-1 text-foreground/50 text-xs">
+                                <div className="flex items-center space-x-1 font-medium text-foreground/70">
                                   <User className="h-3 w-3" />
                                   <span>{post.author}</span>
                                 </div>
@@ -280,9 +299,13 @@ export default function BlogPage() {
               </div>
             ) : (
               <ScrollReveal direction="up">
-                <GlassSurface className="p-12 text-center">
-                  <p className="text-foreground/70 text-lg">
-                    No posts found. Try a different search or category.
+                <GlassSurface className="p-16 text-center max-w-2xl mx-auto">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cyan-500/10 mb-6">
+                    <Search className="h-8 w-8 text-cyan-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-2">No articles found</h3>
+                  <p className="text-foreground/70">
+                    We couldn't find any articles matching your search. Try different keywords or categories.
                   </p>
                 </GlassSurface>
               </ScrollReveal>

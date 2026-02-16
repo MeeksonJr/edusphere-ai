@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { GlassSurface } from "@/components/shared/GlassSurface";
+import { AmbientBackground } from "@/components/shared/AmbientBackground";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSupabase } from "@/components/supabase-provider";
 import { Sparkles, Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -88,30 +90,38 @@ export default function LoginPage() {
 
   return (
     <PublicLayout navbarVariant="default">
-      <div className="min-h-screen flex items-center justify-center py-20 px-4">
-        <div className="max-w-md w-full">
+      <div className="min-h-screen relative flex items-center justify-center py-20 px-4 overflow-hidden">
+        {/* Ambient Background */}
+        <AmbientBackground variant="subtle" />
+
+        <div className="max-w-md w-full relative z-10">
           <ScrollReveal direction="up">
             {/* Header */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-4">
-                <Sparkles className="h-8 w-8 text-foreground" />
-              </div>
-              <h1 className="text-4xl font-bold mb-2">
+            <div className="text-center mb-10">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-pink-500 mb-6 shadow-lg shadow-cyan-500/20"
+              >
+                <Sparkles className="h-10 w-10 text-white" />
+              </motion.div>
+              <h1 className="text-4xl font-bold mb-3">
                 <span className="text-foreground">Welcome</span>{" "}
                 <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                   Back
                 </span>
               </h1>
-              <p className="text-foreground/70">
+              <p className="text-foreground/70 text-lg">
                 Sign in to continue to your dashboard
               </p>
             </div>
 
             {/* Login Form */}
-            <GlassSurface className="p-8">
+            <GlassSurface className="p-8 md:p-10 shadow-xl backdrop-blur-xl">
               {initializing && (
                 <div className="mb-6 p-4 rounded-lg bg-blue-500/10 border border-blue-500/30">
-                  <p className="text-blue-400 text-sm flex items-center">
+                  <p className="text-blue-400 text-sm flex items-center font-medium">
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Initializing...
                   </p>
@@ -119,13 +129,13 @@ export default function LoginPage() {
               )}
               {error && (
                 <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30">
-                  <p className="text-red-400 text-sm">{error}</p>
+                  <p className="text-red-400 text-sm font-medium">{error}</p>
                 </div>
               )}
 
               <form onSubmit={handleLogin} className="space-y-6">
                 <div>
-                  <Label htmlFor="email" className="text-foreground mb-2 block">
+                  <Label htmlFor="email" className="text-foreground mb-2 block font-medium">
                     Email
                   </Label>
                   <div className="relative">
@@ -137,13 +147,13 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="your@email.com"
-                      className="pl-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
+                      className="pl-10 h-12 glass-surface border-foreground/20 text-foreground placeholder:text-foreground/40"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="password" className="text-foreground mb-2 block">
+                  <Label htmlFor="password" className="text-foreground mb-2 block font-medium">
                     Password
                   </Label>
                   <div className="relative">
@@ -155,7 +165,7 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="pl-10 pr-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
+                      className="pl-10 pr-10 h-12 glass-surface border-foreground/20 text-foreground placeholder:text-foreground/40"
                     />
                     <button
                       type="button"
@@ -172,16 +182,16 @@ export default function LoginPage() {
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center space-x-2 cursor-pointer">
+                  <label className="flex items-center space-x-2 cursor-pointer group">
                     <input
                       type="checkbox"
-                      className="rounded border-foreground/20 bg-transparent"
+                      className="rounded border-foreground/20 bg-transparent text-cyan-500 focus:ring-cyan-500"
                     />
-                    <span className="text-foreground/70">Remember me</span>
+                    <span className="text-foreground/70 group-hover:text-foreground transition-colors">Remember me</span>
                   </label>
                   <Link
                     href="/forgot-password"
-                    className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                    className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
                   >
                     Forgot password?
                   </Link>
@@ -191,7 +201,7 @@ export default function LoginPage() {
                   type="submit"
                   size="lg"
                   disabled={loading || initializing || !supabase}
-                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
+                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-semibold h-12 shadow-lg shadow-cyan-500/20"
                 >
                   {loading ? (
                     <>
@@ -204,12 +214,12 @@ export default function LoginPage() {
                 </Button>
               </form>
 
-              <div className="mt-6 pt-6 border-t border-foreground/10">
-                <p className="text-center text-foreground/70 text-sm">
+              <div className="mt-8 pt-6 border-t border-foreground/10 text-center">
+                <p className="text-foreground/70 text-sm">
                   Don't have an account?{" "}
                   <Link
                     href="/signup"
-                    className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors"
+                    className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors hover:underline"
                   >
                     Sign up
                   </Link>

@@ -2,6 +2,13 @@
 
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import { PublicLayout } from "@/components/layout/PublicLayout"
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
+import { GlassSurface } from "@/components/shared/GlassSurface"
+import { AmbientBackground } from "@/components/shared/AmbientBackground"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, MapPin, Clock, DollarSign, CheckCircle } from "lucide-react"
+import { motion } from "framer-motion"
 
 export const dynamic = 'force-dynamic';
 
@@ -104,168 +111,130 @@ export default function CareerDetailPage() {
 
   if (!job) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">Job Not Found</h1>
-          <p className="mb-6">Sorry, the job position you're looking for doesn't exist.</p>
-          <Link
-            href="/careers"
-            className="px-6 py-3 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition-colors"
-          >
-            Back to Careers
-          </Link>
+      <PublicLayout>
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+          <AmbientBackground />
+          <div className="text-center relative z-10 p-8 glass-surface rounded-2xl max-w-md mx-4">
+            <h1 className="text-3xl font-bold mb-4 text-foreground">Job Not Found</h1>
+            <p className="mb-6 text-foreground/70">Sorry, the job position you're looking for doesn't exist.</p>
+            <Link href="/careers">
+              <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white">
+                Back to Careers
+              </Button>
+            </Link>
+          </div>
         </div>
-      </div>
+      </PublicLayout>
     )
   }
 
   return (
-    <div className="min-h-screen bg-black text-foreground">
-      {/* Header */}
-      <header className="bg-black/50 backdrop-blur-sm border-b border-cyan-900/50 sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <a href="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 text-transparent bg-clip-text">
-              EduSphere AI
-            </span>
-          </a>
-          <nav className="hidden md:flex gap-6">
-            <a href="/" className="hover:text-cyan-400 transition-colors">
-              Home
-            </a>
-            <a href="/careers" className="text-cyan-400 transition-colors">
-              Careers
-            </a>
-          </nav>
-        </div>
-      </header>
+    <PublicLayout>
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Ambient Background */}
+        <AmbientBackground />
 
-      {/* Breadcrumbs */}
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center gap-2 text-sm text-gray-400">
-          <a href="/" className="hover:text-cyan-400 transition-colors">
-            Home
-          </a>
-          <span>/</span>
-          <a href="/careers" className="hover:text-cyan-400 transition-colors">
-            Careers
-          </a>
-          <span>/</span>
-          <span className="text-cyan-400">{job.title}</span>
-        </div>
+        {/* Header */}
+        <section className="pt-32 lg:pt-40 pb-12 relative">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <ScrollReveal direction="up">
+              <div className="max-w-4xl mx-auto">
+                <Link href="/careers" className="inline-flex items-center text-foreground/60 hover:text-cyan-400 transition-colors mb-8 group">
+                  <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                  Back to Careers
+                </Link>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">
+                  <span className="text-foreground">{job.title}</span>
+                </h1>
+
+                <div className="flex flex-wrap gap-4 mb-8">
+                  <span className="inline-flex items-center px-4 py-2 rounded-full glass-surface border-foreground/10 text-foreground/80 text-sm font-medium">
+                    <MapPin className="w-4 h-4 mr-2 text-cyan-400" />
+                    {job.location}
+                  </span>
+                  <span className="inline-flex items-center px-4 py-2 rounded-full glass-surface border-foreground/10 text-foreground/80 text-sm font-medium">
+                    <Clock className="w-4 h-4 mr-2 text-cyan-400" />
+                    {job.type}
+                  </span>
+                  <span className="inline-flex items-center px-4 py-2 rounded-full glass-surface border-foreground/10 text-foreground/80 text-sm font-medium">
+                    <DollarSign className="w-4 h-4 mr-2 text-cyan-400" />
+                    {job.salary}
+                  </span>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* Job Details */}
+        <section className="pb-24 relative z-10">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <ScrollReveal direction="up" delay={0.2}>
+                <GlassSurface className="p-8 md:p-12">
+                  <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/80 prose-li:text-foreground/80 prose-strong:text-foreground">
+                    <p className="text-xl leading-relaxed mb-12">{job.description}</p>
+
+                    <h2 className="text-2xl font-bold mb-6 flex items-center">
+                      <span className="bg-cyan-500/10 p-2 rounded-lg mr-4">
+                        <CheckCircle className="w-6 h-6 text-cyan-500" />
+                      </span>
+                      Key Responsibilities
+                    </h2>
+                    <ul className="space-y-4 mb-12 list-none pl-0">
+                      {job.responsibilities.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="w-2 h-2 rounded-full bg-cyan-400 mt-2.5 mr-4 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <h2 className="text-2xl font-bold mb-6 flex items-center">
+                      <span className="bg-purple-500/10 p-2 rounded-lg mr-4">
+                        <CheckCircle className="w-6 h-6 text-purple-500" />
+                      </span>
+                      Requirements
+                    </h2>
+                    <ul className="space-y-4 mb-12 list-none pl-0">
+                      {job.requirements.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="w-2 h-2 rounded-full bg-purple-400 mt-2.5 mr-4 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <h2 className="text-2xl font-bold mb-6 flex items-center">
+                      <span className="bg-green-500/10 p-2 rounded-lg mr-4">
+                        <CheckCircle className="w-6 h-6 text-green-500" />
+                      </span>
+                      Benefits
+                    </h2>
+                    <ul className="space-y-4 mb-12 list-none pl-0">
+                      {job.benefits.map((item, index) => (
+                        <li key={index} className="flex items-start">
+                          <span className="w-2 h-2 rounded-full bg-green-400 mt-2.5 mr-4 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="mt-16 pt-8 border-t border-foreground/10 flex justify-center">
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-12 py-6 text-lg shadow-lg shadow-cyan-500/20 w-full sm:w-auto"
+                    >
+                      Apply for this Position
+                    </Button>
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
+            </div>
+          </div>
+        </section>
       </div>
-
-      {/* Job Details */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-transparent bg-clip-text">
-            {job.title}
-          </h1>
-
-          <div className="flex flex-wrap gap-4 mb-8">
-            <div className="flex items-center gap-2 bg-gray-900 px-3 py-1 rounded-full">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-cyan-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              <span>{job.location}</span>
-            </div>
-            <div className="flex items-center gap-2 bg-gray-900 px-3 py-1 rounded-full">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-cyan-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>{job.type}</span>
-            </div>
-            <div className="flex items-center gap-2 bg-gray-900 px-3 py-1 rounded-full">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 text-cyan-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>{job.salary}</span>
-            </div>
-          </div>
-
-          <div className="prose prose-invert max-w-none">
-            <p className="text-lg mb-8">{job.description}</p>
-
-            <h2 className="text-xl font-semibold text-cyan-400 mt-8 mb-4">Key Responsibilities</h2>
-            <ul className="list-disc pl-5 space-y-2">
-              {job.responsibilities.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-
-            <h2 className="text-xl font-semibold text-cyan-400 mt-8 mb-4">Requirements</h2>
-            <ul className="list-disc pl-5 space-y-2">
-              {job.requirements.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-
-            <h2 className="text-xl font-semibold text-cyan-400 mt-8 mb-4">Benefits</h2>
-            <ul className="list-disc pl-5 space-y-2">
-              {job.benefits.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="mt-12">
-            <Link
-              href={`/careers/${id}/apply`}
-              className="inline-block px-8 py-4 rounded-md bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 transition-colors text-lg font-semibold"
-            >
-              Apply for this Position
-            </Link>
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-black/50 backdrop-blur-sm border-t border-cyan-900/50 mt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center text-gray-400">
-            <p>© {new Date().getFullYear()} EduSphere AI. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </PublicLayout>
   )
 }

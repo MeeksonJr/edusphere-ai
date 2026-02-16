@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { GlassSurface } from "@/components/shared/GlassSurface";
+import { AmbientBackground } from "@/components/shared/AmbientBackground";
 import {
   Accordion,
   AccordionContent,
@@ -14,6 +15,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Search, HelpCircle } from "lucide-react";
 import { useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const faqCategories = [
   {
@@ -164,116 +168,133 @@ export default function FAQPage() {
 
   return (
     <PublicLayout>
-      <div className="min-h-screen py-20 lg:py-32">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <ScrollReveal direction="up">
-            <div className="text-center mb-12 max-w-3xl mx-auto">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-6">
-                <HelpCircle className="h-8 w-8 text-foreground" />
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-                <span className="text-foreground">Frequently Asked</span>
-                <br />
-                <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
-                  Questions
-                </span>
-              </h1>
-              <p className="text-xl text-foreground/70">
-                Find answers to common questions about EduSphere AI
-              </p>
-            </div>
-          </ScrollReveal>
+      <div className="min-h-screen relative overflow-hidden">
+        {/* Ambient Background */}
+        <AmbientBackground />
 
-          {/* Search Bar */}
-          <ScrollReveal direction="up" delay={0.2}>
-            <div className="max-w-2xl mx-auto mb-12">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
-                <Input
-                  type="text"
-                  placeholder="Search for answers..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-14 glass-surface border-foreground/20 text-white placeholder:text-foreground/40 text-lg"
-                />
-              </div>
-            </div>
-          </ScrollReveal>
-
-          {/* FAQ Categories */}
-          <div className="max-w-4xl mx-auto space-y-8">
-            {filteredCategories.map((category, categoryIndex) => (
-              <ScrollReveal
-                key={category.title}
-                direction="up"
-                delay={0.1 * categoryIndex}
-              >
-                <GlassSurface className="p-6 md:p-8">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <span className="text-3xl">{category.icon}</span>
-                    <h2 className="text-2xl font-bold text-foreground">
-                      {category.title}
-                    </h2>
-                  </div>
-
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="space-y-4"
-                    value={selectedCategory || undefined}
-                    onValueChange={setSelectedCategory}
-                  >
-                    {category.questions.map((item, index) => (
-                      <AccordionItem
-                        key={index}
-                        value={`${category.title}-${index}`}
-                        className="border-foreground/10"
-                      >
-                        <AccordionTrigger className="text-left text-white hover:text-cyan-400 transition-colors">
-                          {item.question}
-                        </AccordionTrigger>
-                        <AccordionContent className="text-foreground/70 leading-relaxed pt-2">
-                          {item.answer}
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </GlassSurface>
-              </ScrollReveal>
-            ))}
-          </div>
-
-          {/* Still Have Questions */}
-          <ScrollReveal direction="up" delay={0.5}>
-            <div className="max-w-2xl mx-auto mt-16">
-              <GlassSurface className="p-8 text-center">
-                <h3 className="text-2xl font-bold text-foreground mb-4">
-                  Still have questions?
-                </h3>
-                <p className="text-foreground/70 mb-6">
-                  Can't find what you're looking for? Our support team is here to help.
+        {/* Hero */}
+        <section className="pt-32 lg:pt-48 pb-20 relative">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            {/* Header */}
+            <ScrollReveal direction="up">
+              <div className="text-center mb-12 max-w-3xl mx-auto">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-pink-500 mb-8 shadow-lg shadow-cyan-500/20"
+                >
+                  <HelpCircle className="h-10 w-10 text-white" />
+                </motion.div>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8">
+                  <span className="text-foreground">Frequently Asked</span>
+                  <br />
+                  <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
+                    Questions
+                  </span>
+                </h1>
+                <p className="text-xl md:text-2xl text-foreground/70 mb-10">
+                  Find answers to common questions about EduSphere AI
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <a
-                    href="/contact"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white rounded-lg transition-all"
-                  >
-                    Contact Support
-                  </a>
-                  <a
-                    href="/support"
-                    className="inline-flex items-center justify-center px-6 py-3 glass-surface border-foreground/20 hover:border-cyan-500/50 text-white rounded-lg transition-all"
-                  >
-                    Visit Help Center
-                  </a>
+
+                {/* Search Bar */}
+                <div className="max-w-2xl mx-auto mb-12 relative z-20">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/40" />
+                    <Input
+                      type="text"
+                      placeholder="Search for answers..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-12 h-14 glass-surface border-foreground/20 text-foreground placeholder:text-foreground/40 text-lg shadow-lg"
+                    />
+                  </div>
                 </div>
-              </GlassSurface>
+              </div>
+            </ScrollReveal>
+
+            {/* FAQ Categories */}
+            <div className="max-w-4xl mx-auto space-y-8">
+              {filteredCategories.map((category, categoryIndex) => (
+                <ScrollReveal
+                  key={category.title}
+                  direction="up"
+                  delay={0.1 * categoryIndex}
+                >
+                  <GlassSurface className="p-6 md:p-8">
+                    <div className="flex items-center space-x-3 mb-6">
+                      <span className="text-3xl">{category.icon}</span>
+                      <h2 className="text-2xl font-bold text-foreground">
+                        {category.title}
+                      </h2>
+                    </div>
+
+                    <Accordion
+                      type="single"
+                      collapsible
+                      className="space-y-4"
+                      value={selectedCategory || undefined}
+                      onValueChange={setSelectedCategory}
+                    >
+                      {category.questions.map((item, index) => (
+                        <AccordionItem
+                          key={index}
+                          value={`${category.title}-${index}`}
+                          className="border-foreground/10"
+                        >
+                          <AccordionTrigger className="text-left text-foreground hover:text-cyan-400 transition-colors text-lg font-medium">
+                            {item.question}
+                          </AccordionTrigger>
+                          <AccordionContent className="text-foreground/70 leading-relaxed pt-2 text-base">
+                            {item.answer}
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </GlassSurface>
+                </ScrollReveal>
+              ))}
             </div>
-          </ScrollReveal>
-        </div>
+
+            {/* Still Have Questions */}
+            <ScrollReveal direction="up" delay={0.5}>
+              <div className="max-w-3xl mx-auto mt-20">
+                <GlassSurface className="p-12 text-center relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl -mr-32 -mt-32" />
+
+                  <div className="relative z-10">
+                    <h3 className="text-3xl font-bold text-foreground mb-4">
+                      Still have questions?
+                    </h3>
+                    <p className="text-xl text-foreground/70 mb-8">
+                      Can't find what you're looking for? Our support team is here to help.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Link href="/contact">
+                        <Button
+                          size="lg"
+                          className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white px-8 py-6 text-lg shadow-lg shadow-cyan-500/20"
+                        >
+                          Contact Support
+                        </Button>
+                      </Link>
+                      <Link href="/support">
+                        <Button
+                          size="lg"
+                          variant="outline"
+                          className="glass-surface border-foreground/20 hover:border-cyan-500/50 text-foreground px-8 py-6 text-lg hover:bg-foreground/5"
+                        >
+                          Visit Help Center
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </GlassSurface>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
       </div>
     </PublicLayout>
   );
 }
-

@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ScrollReveal } from "@/components/shared/ScrollReveal";
 import { GlassSurface } from "@/components/shared/GlassSurface";
+import { AmbientBackground } from "@/components/shared/AmbientBackground";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSupabase } from "@/components/supabase-provider";
 import { Sparkles, Mail, Lock, User, Loader2, Eye, EyeOff, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -123,36 +125,44 @@ export default function SignupPage() {
 
   return (
     <PublicLayout navbarVariant="default">
-      <div className="min-h-screen flex items-center justify-center py-20 px-4">
-        <div className="max-w-md w-full">
+      <div className="min-h-screen relative flex items-center justify-center py-20 px-4 overflow-hidden">
+        {/* Ambient Background */}
+        <AmbientBackground variant="subtle" />
+
+        <div className="max-w-md w-full relative z-10">
           <ScrollReveal direction="up">
             {/* Header */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-pink-500 mb-4">
-                <Sparkles className="h-8 w-8 text-foreground" />
-              </div>
-              <h1 className="text-4xl font-bold mb-2">
+            <div className="text-center mb-10">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-pink-500 mb-6 shadow-lg shadow-cyan-500/20"
+              >
+                <Sparkles className="h-10 w-10 text-white" />
+              </motion.div>
+              <h1 className="text-4xl font-bold mb-3">
                 <span className="text-foreground">Create Your</span>{" "}
                 <span className="bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
                   Account
                 </span>
               </h1>
-              <p className="text-foreground/70">
+              <p className="text-foreground/70 text-lg">
                 Start creating amazing courses in minutes
               </p>
             </div>
 
             {/* Signup Form */}
-            <GlassSurface className="p-8">
+            <GlassSurface className="p-8 md:p-10 shadow-xl backdrop-blur-xl">
               {error && (
                 <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30">
-                  <p className="text-red-400 text-sm">{error}</p>
+                  <p className="text-red-400 text-sm font-medium">{error}</p>
                 </div>
               )}
 
-              <form onSubmit={handleSignup} className="space-y-5">
+              <form onSubmit={handleSignup} className="space-y-6">
                 <div>
-                  <Label htmlFor="name" className="text-foreground mb-2 block">
+                  <Label htmlFor="name" className="text-foreground mb-2 block font-medium">
                     Full Name
                   </Label>
                   <div className="relative">
@@ -165,13 +175,13 @@ export default function SignupPage() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="John Doe"
-                      className="pl-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
+                      className="pl-10 h-12 glass-surface border-foreground/20 text-foreground placeholder:text-foreground/40"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="email" className="text-foreground mb-2 block">
+                  <Label htmlFor="email" className="text-foreground mb-2 block font-medium">
                     Email
                   </Label>
                   <div className="relative">
@@ -184,13 +194,13 @@ export default function SignupPage() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="your@email.com"
-                      className="pl-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
+                      className="pl-10 h-12 glass-surface border-foreground/20 text-foreground placeholder:text-foreground/40"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="password" className="text-foreground mb-2 block">
+                  <Label htmlFor="password" className="text-foreground mb-2 block font-medium">
                     Password
                   </Label>
                   <div className="relative">
@@ -203,7 +213,7 @@ export default function SignupPage() {
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="Create a strong password"
-                      className="pl-10 pr-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
+                      className="pl-10 pr-10 h-12 glass-surface border-foreground/20 text-foreground placeholder:text-foreground/40"
                     />
                     <button
                       type="button"
@@ -218,20 +228,19 @@ export default function SignupPage() {
                     </button>
                   </div>
                   {formData.password && (
-                    <div className="mt-2 space-y-1">
+                    <div className="mt-3 space-y-2 p-3 rounded-lg bg-foreground/5">
                       {passwordRequirements.map((req, idx) => (
                         <div
                           key={idx}
                           className="flex items-center space-x-2 text-xs"
                         >
                           <CheckCircle
-                            className={`h-3 w-3 ${
-                              req.met ? "text-green-400" : "text-foreground/20"
-                            }`}
+                            className={`h-3 w-3 ${req.met ? "text-cyan-400" : "text-foreground/20"
+                              }`}
                           />
                           <span
                             className={
-                              req.met ? "text-green-400" : "text-foreground/40"
+                              req.met ? "text-cyan-400 font-medium" : "text-foreground/50"
                             }
                           >
                             {req.text}
@@ -245,7 +254,7 @@ export default function SignupPage() {
                 <div>
                   <Label
                     htmlFor="confirmPassword"
-                    className="text-foreground mb-2 block"
+                    className="text-foreground mb-2 block font-medium"
                   >
                     Confirm Password
                   </Label>
@@ -259,7 +268,7 @@ export default function SignupPage() {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       placeholder="Confirm your password"
-                      className="pl-10 pr-10 glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
+                      className="pl-10 pr-10 h-12 glass-surface border-foreground/20 text-foreground placeholder:text-foreground/40"
                     />
                     <button
                       type="button"
@@ -277,29 +286,29 @@ export default function SignupPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start space-x-3">
+                <div className="flex items-start space-x-3 pt-2">
                   <input
                     type="checkbox"
                     id="terms"
                     checked={agreedToTerms}
                     onChange={(e) => setAgreedToTerms(e.target.checked)}
-                    className="mt-1 rounded border-foreground/20 bg-transparent"
+                    className="mt-1 rounded border-foreground/20 bg-transparent text-cyan-500 focus:ring-cyan-500"
                   />
                   <label
                     htmlFor="terms"
-                    className="text-sm text-foreground/70 cursor-pointer"
+                    className="text-sm text-foreground/70 cursor-pointer leading-relaxed"
                   >
                     I agree to the{" "}
                     <Link
                       href="/terms"
-                      className="text-cyan-400 hover:text-cyan-300 underline"
+                      className="text-cyan-400 hover:text-cyan-300 underline font-medium"
                     >
                       Terms of Service
                     </Link>{" "}
                     and{" "}
                     <Link
                       href="/privacy"
-                      className="text-cyan-400 hover:text-cyan-300 underline"
+                      className="text-cyan-400 hover:text-cyan-300 underline font-medium"
                     >
                       Privacy Policy
                     </Link>
@@ -310,7 +319,7 @@ export default function SignupPage() {
                   type="submit"
                   size="lg"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-foreground"
+                  className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-semibold h-12 shadow-lg shadow-cyan-500/20"
                 >
                   {loading ? (
                     <>
@@ -323,12 +332,12 @@ export default function SignupPage() {
                 </Button>
               </form>
 
-              <div className="mt-6 pt-6 border-t border-foreground/10">
-                <p className="text-center text-foreground/70 text-sm">
+              <div className="mt-8 pt-6 border-t border-foreground/10 text-center">
+                <p className="text-foreground/70 text-sm">
                   Already have an account?{" "}
                   <Link
                     href="/login"
-                    className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors"
+                    className="text-cyan-400 hover:text-cyan-300 font-semibold transition-colors hover:underline"
                   >
                     Sign in
                   </Link>
