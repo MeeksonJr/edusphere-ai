@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback, type ReactNode } from "react"
 
 export type ToastProps = {
-  id: string
+  id?: string
   title?: string
   description?: string
   action?: ReactNode
