@@ -44,6 +44,7 @@ import { GlassSurface } from "@/components/shared/GlassSurface"
 import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
+import { trackAIUsage, answerQuestion } from "@/lib/ai-service"
 
 export default function AILabPage() {
   const { supabase } = useSupabase()
@@ -89,10 +90,11 @@ export default function AILabPage() {
 
       const { data } = await supabase.auth.getUser()
       if (data.user) {
-        const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
+        // cast supabase to any to avoid type errors with missing table definitions
+        const { data: profile } = await (supabase as any).from("profiles").select("*").eq("id", data.user.id).single()
         setUser({ ...data.user, profile })
 
-        const { data: chats } = await supabase
+        const { data: chats } = await (supabase as any)
           .from("ai_chats")
           .select("*")
           .eq("user_id", data.user.id)
@@ -100,7 +102,7 @@ export default function AILabPage() {
 
         if (chats) {
           setSavedChats(
-            chats.map((chat) => ({
+            chats.map((chat: any) => ({
               id: chat.id,
               title: chat.title,
               messages: chat.messages,
@@ -108,7 +110,7 @@ export default function AILabPage() {
           )
         }
 
-        const { data: flashcardSets } = await supabase
+        const { data: flashcardSets } = await (supabase as any)
           .from("flashcard_sets")
           .select("*")
           .eq("user_id", data.user.id)
@@ -116,7 +118,7 @@ export default function AILabPage() {
 
         if (flashcardSets) {
           setSavedFlashcards(
-            flashcardSets.map((set) => ({
+            flashcardSets.map((set: any) => ({
               id: set.id,
               title: set.title,
               cards: set.cards,
@@ -124,7 +126,7 @@ export default function AILabPage() {
           )
         }
 
-        const { data: studyPlans } = await supabase
+        const { data: studyPlans } = await (supabase as any)
           .from("study_guides")
           .select("*")
           .eq("user_id", data.user.id)
@@ -132,7 +134,7 @@ export default function AILabPage() {
 
         if (studyPlans) {
           setSavedStudyPlans(
-            studyPlans.map((plan) => ({
+            studyPlans.map((plan: any) => ({
               id: plan.id,
               title: plan.title,
               content: plan.content,
@@ -221,9 +223,11 @@ export default function AILabPage() {
     }
 
     try {
+      if (!supabase) throw new Error("Supabase client is not available")
+
       const title = chatHistory[0].content.substring(0, 50) + (chatHistory[0].content.length > 50 ? "..." : "")
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("ai_chats")
         .insert([
           {
@@ -269,7 +273,8 @@ export default function AILabPage() {
 
   const deleteSavedChat = async (chatId: string) => {
     try {
-      const { error } = await supabase.from("ai_chats").delete().eq("id", chatId)
+      if (!supabase) throw new Error("Supabase client is not available")
+      const { error } = await (supabase as any).from("ai_chats").delete().eq("id", chatId)
       if (error) throw error
       setSavedChats((prev) => prev.filter((chat) => chat.id !== chatId))
       toast({
@@ -381,7 +386,9 @@ export default function AILabPage() {
     }
 
     try {
-      const { data, error } = await supabase
+      if (!supabase) throw new Error("Supabase client is not available")
+
+      const { data, error } = await (supabase as any)
         .from("study_guides")
         .insert([
           {
@@ -437,7 +444,8 @@ export default function AILabPage() {
 
   const deleteSavedStudyPlan = async (planId: string) => {
     try {
-      const { error } = await supabase.from("study_guides").delete().eq("id", planId)
+      if (!supabase) throw new Error("Supabase client is not available")
+      const { error } = await (supabase as any).from("study_guides").delete().eq("id", planId)
       if (error) throw error
       setSavedStudyPlans((prev) => prev.filter((plan) => plan.id !== planId))
       toast({
@@ -518,7 +526,9 @@ export default function AILabPage() {
     }
 
     try {
-      const { data, error } = await supabase
+      if (!supabase) throw new Error("Supabase client is not available")
+
+      const { data, error } = await (supabase as any)
         .from("flashcard_sets")
         .insert([
           {
@@ -567,7 +577,8 @@ export default function AILabPage() {
 
   const deleteSavedFlashcardSet = async (setId: string) => {
     try {
-      const { error } = await supabase.from("flashcard_sets").delete().eq("id", setId)
+      if (!supabase) throw new Error("Supabase client is not available")
+      const { error } = await (supabase as any).from("flashcard_sets").delete().eq("id", setId)
       if (error) throw error
       setSavedFlashcards((prev) => prev.filter((set) => set.id !== setId))
       toast({
@@ -650,7 +661,7 @@ export default function AILabPage() {
   const getFlashcardExplanation = async (question: string, answer: string) => {
     try {
       setLoading(true)
-      if (!user) throw new Error("You must be logged in to use the AI Lab")
+      if (!user || !supabase) throw new Error("You must be logged in to use the AI Lab")
       await trackAIUsage(supabase, user.id)
 
       const prompt = `Please explain in detail how to arrive at this answer:\n\nQuestion: ${question}\nAnswer: ${answer}\n\nProvide a step-by-step explanation with any relevant formulas, concepts, or reasoning.`
@@ -824,11 +835,10 @@ export default function AILabPage() {
                           className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                         >
                           <div
-                            className={`max-w-[80%] rounded-lg p-4 ${
-                              message.role === "user"
-                                ? "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 border border-cyan-500/30"
-                                : "glass-surface border-foreground/10"
-                            }`}
+                            className={`max-w-[80%] rounded-lg p-4 ${message.role === "user"
+                              ? "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 border border-cyan-500/30"
+                              : "glass-surface border-foreground/10"
+                              }`}
                           >
                             <div className="flex items-start mb-2">
                               {message.role === "assistant" && (
@@ -1362,7 +1372,7 @@ export default function AILabPage() {
                         </div>
                       </div>
 
-                      <div className="flashcard mb-4">
+                      <div className="flashcard mb-4 h-[320px] w-full">
                         <div className={`flashcard-inner ${showAnswer ? "flipped" : ""}`}>
                           <div className="flashcard-front glass-surface border-foreground/10 rounded-lg p-8 min-h-[250px] flex items-center justify-center">
                             <div>
