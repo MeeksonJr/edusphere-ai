@@ -279,6 +279,9 @@ function AITutorContent() {
                             },
                         },
                     },
+                    // Enable transcription of user's speech input and AI audio output
+                    inputAudioTranscription: {},
+                    outputAudioTranscription: {},
                 },
                 callbacks: {
                     onopen: () => {
@@ -334,12 +337,29 @@ function AITutorContent() {
                             return
                         }
 
+                        // Handle user input transcription
+                        if ((message as any).serverContent?.inputTranscription?.text) {
+                            const userText = (message as any).serverContent.inputTranscription.text.trim()
+                            if (userText) {
+                                addTranscript('user', userText)
+                            }
+                        }
+
+                        // Handle AI output transcription (from audio)
+                        if ((message as any).serverContent?.outputTranscription?.text) {
+                            const aiText = (message as any).serverContent.outputTranscription.text.trim()
+                            if (aiText) {
+                                addTranscript('ai', aiText)
+                            }
+                        }
+
                         // Handle AI audio/text response
                         if (message.serverContent?.modelTurn?.parts) {
                             for (const part of message.serverContent.modelTurn.parts) {
                                 if (part.inlineData?.data) {
                                     queueAudioData(part.inlineData.data)
                                 }
+                                // Text parts from model turn (may be redundant with outputTranscription)
                                 if (part.text) {
                                     addTranscript('ai', part.text)
                                 }

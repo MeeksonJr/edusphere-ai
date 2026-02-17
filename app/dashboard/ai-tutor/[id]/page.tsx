@@ -69,17 +69,26 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
         load()
     }, [sessionId])
 
+    const [analysisError, setAnalysisError] = useState<string | null>(null)
+
     const generateAnalysis = useCallback(async () => {
         if (!sessionId || analyzing) return
         setAnalyzing(true)
+        setAnalysisError(null)
         try {
             const res = await fetch(`/api/ai/live/${sessionId}`, { method: 'POST' })
             if (res.ok) {
                 const { feedback, xp_earned } = await res.json()
                 setSession((prev: any) => ({ ...prev, feedback, xp_earned }))
+            } else if (res.status === 429) {
+                setAnalysisError('AI analysis is temporarily unavailable due to rate limits. Please try again in a few minutes.')
+            } else {
+                const data = await res.json().catch(() => ({}))
+                setAnalysisError(data.error || 'Failed to generate analysis. Please try again.')
             }
         } catch (e) {
             console.error('Analysis error:', e)
+            setAnalysisError('Network error. Please check your connection and try again.')
         }
         setAnalyzing(false)
     }, [sessionId, analyzing])
@@ -190,6 +199,21 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                         </Button>
                     )}
                 </div>
+
+                {/* Analysis error */}
+                {analysisError && (
+                    <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                        <span className="text-sm text-amber-400">{analysisError}</span>
+                        <Button
+                            onClick={generateAnalysis}
+                            disabled={analyzing}
+                            size="sm"
+                            className="ml-auto bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30 text-xs"
+                        >
+                            Retry
+                        </Button>
+                    </div>
+                )}
 
                 {/* AI Summary */}
                 {hasFeedback && (

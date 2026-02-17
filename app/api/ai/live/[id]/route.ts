@@ -144,7 +144,38 @@ ${transcriptText}
 
 Respond ONLY with valid JSON, no markdown formatting.`
 
-        const result = await model.generateContent(prompt)
+        // Generate with retry logic for rate limits
+        let result: any
+        let lastError: any
+        for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+                result = await model.generateContent(prompt)
+                break
+            } catch (err: any) {
+                lastError = err
+                // Check if it's a rate limit error
+                if (err.message?.includes('429') || err.message?.includes('quota') || err.message?.includes('Too Many Requests')) {
+                    const waitTime = Math.pow(2, attempt + 1) * 10 // 20s, 40s, 80s
+                    console.log(`[Session Analysis] Rate limited, retrying in ${waitTime}s (attempt ${attempt + 1}/3)`)
+                    await new Promise(resolve => setTimeout(resolve, waitTime * 1000))
+                    continue
+                }
+                throw err
+            }
+        }
+
+        if (!result) {
+            // All retries exhausted
+            const isRateLimit = lastError?.message?.includes('429') || lastError?.message?.includes('quota')
+            if (isRateLimit) {
+                return Response.json({
+                    error: 'AI analysis is temporarily unavailable due to rate limits. Please try again in a few minutes.',
+                    retryable: true,
+                }, { status: 429 })
+            }
+            throw lastError
+        }
+
         const responseText = result.response.text().trim()
 
         let feedback: any
