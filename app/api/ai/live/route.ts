@@ -1,11 +1,14 @@
 import { createClient } from '@/utils/supabase/server'
+import { GoogleGenAI } from '@google/genai'
 
 export const runtime = 'nodejs'
 
+const LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-12-2025'
+// gemini-2.5-flash-native-audio-preview-12-2025
 /**
- * POST /api/ai/live/token
+ * POST /api/ai/live
  * Generates an ephemeral token for client-side Gemini Live API access.
- * This keeps the API key server-side while allowing WebSocket connections from the browser.
+ * The API key stays server-side; clients connect with a short-lived token.
  */
 export async function POST(request: Request) {
     try {
@@ -16,7 +19,7 @@ export async function POST(request: Request) {
             return new Response('Unauthorized', { status: 401 })
         }
 
-        // Check subscription tier for live session limits
+        // Check subscription tier for rate limits
         const { data: profile } = await supabase
             .from('profiles')
             .select('subscription_tier, ai_requests_count')
@@ -45,7 +48,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json()
-        const { sessionType, skillId, courseId, topic } = body
+        const { sessionType, topic } = body
 
         // Get user context for system instructions
         const { data: userSkills } = await supabase
@@ -57,52 +60,62 @@ export async function POST(request: Request) {
 
         const skillContext = userSkills?.map((s: any) => `${s.skills?.name}: Level ${s.level}`).join(', ')
 
-        // Build session-type-specific system instruction
+        // Build system instruction based on session type
         const systemInstructions: Record<string, string> = {
-            tutor: `You are an expert AI tutor for EduSphere. Your student is studying${topic ? ` "${topic}"` : ''}. Adapt your teaching to their level. ${skillContext ? `Their skills: ${skillContext}` : ''}. Be patient, encouraging, and use the Socratic method to guide understanding. Ask questions to check comprehension. Provide examples and analogies.`,
-            quiz_practice: `You are a quiz master. Test the student on${topic ? ` "${topic}"` : ' their knowledge'}. Ask one question at a time. Wait for their answer before revealing if it's correct. Provide explanations for wrong answers. Keep score and provide encouragement.`,
-            language: `You are a language practice partner. Help the student practice${topic ? ` ${topic}` : ' conversational skills'}. Speak naturally, correct mistakes gently, and introduce new vocabulary in context. Mix between the target language and English based on their level.`,
-            explainer: `You are a concept explainer. The student wants to understand${topic ? ` "${topic}"` : ' a concept'}. Break down complex ideas into simple, digestible parts. Use analogies, examples, and step-by-step explanations. Check understanding along the way.`,
-            study_buddy: `You are a friendly study buddy helping the student with${topic ? ` "${topic}"` : ' their studies'}. Be casual and encouraging. Help them brainstorm, organize ideas, and work through problems together.`,
-            interview_prep: `You are an interview coach. Help the student prepare for${topic ? ` "${topic}"` : ' technical interviews'}. Conduct mock interviews, provide feedback on answers, and suggest improvements. Be realistic but supportive.`,
+            tutor: `You are an expert AI tutor for EduSphere. Your student is studying${topic ? ` "${topic}"` : ''}. Adapt your teaching to their level. ${skillContext ? `Their skills: ${skillContext}` : ''}. Be patient, encouraging, and use the Socratic method. Ask questions to check understanding. Provide examples and analogies.`,
+            quiz_practice: `You are a quiz master. Test the student on${topic ? ` "${topic}"` : ' their knowledge'}. Ask one question at a time. Wait for their answer. Provide explanations for wrong answers. Keep score.`,
+            language: `You are a language practice partner. Help the student practice${topic ? ` ${topic}` : ' conversational skills'}. Speak naturally, correct mistakes gently. Mix languages based on their level.`,
+            explainer: `You are a concept explainer. Break down${topic ? ` "${topic}"` : ' complex ideas'} into simple, digestible parts. Use analogies and step-by-step explanations.`,
+            study_buddy: `You are a friendly study buddy helping with${topic ? ` "${topic}"` : ' studies'}. Be casual and encouraging. Help brainstorm and work through problems.`,
+            interview_prep: `You are an interview coach preparing the student for${topic ? ` "${topic}"` : ' technical interviews'}. Conduct mock interviews, give feedback. Be realistic but supportive.`,
         }
 
         const systemInstruction = systemInstructions[sessionType] || systemInstructions.tutor
 
-        // Create live session record
-        const { data: session } = await supabase
+        // Generate ephemeral token using the Gemini SDK
+        const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
+        if (!apiKey) {
+            return new Response(JSON.stringify({ error: 'GEMINI_API_KEY not configured' }), {
+                status: 500, headers: { 'Content-Type': 'application/json' },
+            })
+        }
+
+        const ai = new GoogleGenAI({ apiKey })
+
+        const expireTime = new Date(Date.now() + 30 * 60 * 1000).toISOString()
+        const newSessionExpireTime = new Date(Date.now() + 2 * 60 * 1000).toISOString()
+
+        const token = await ai.authTokens.create({
+            config: {
+                uses: 1,
+                expireTime,
+                newSessionExpireTime,
+                httpOptions: { apiVersion: 'v1alpha' },
+            },
+        })
+
+        // Log session
+        await supabase
             .from('live_sessions')
             .insert({
                 user_id: user.id,
                 session_type: sessionType || 'tutor',
-                skill_id: skillId || null,
-                course_id: courseId || null,
                 topic: topic || 'General',
                 status: 'active',
             })
-            .select()
-            .single()
 
         return new Response(JSON.stringify({
-            apiKey: process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-            model: 'gemini-live-2.5-flash-native-audio',
+            token: token.name,
+            model: LIVE_MODEL,
             systemInstruction,
-            sessionId: session?.id,
-            config: {
-                responseModalities: ['AUDIO'],
-                speechConfig: {
-                    voiceConfig: {
-                        prebuiltVoiceConfig: {
-                            voiceName: 'Kore',
-                        },
-                    },
-                },
-            },
         }), {
             headers: { 'Content-Type': 'application/json' },
         })
     } catch (error: any) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        console.error('[Live API] Token creation error:', error)
+        return new Response(JSON.stringify({
+            error: error.message || 'Failed to create session token',
+        }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         })

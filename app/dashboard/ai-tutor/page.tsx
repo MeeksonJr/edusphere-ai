@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { GoogleGenAI, Modality, type Session, type LiveServerMessage } from '@google/genai'
 import { Button } from '@/components/ui/button'
 import {
     Mic,
@@ -37,40 +38,29 @@ const SESSION_TYPES = [
     { id: 'interview_prep' as SessionType, name: 'Interview Prep', icon: Briefcase, desc: 'Mock interviews with AI feedback', color: 'from-indigo-500 to-violet-500' },
 ]
 
-// Helper: convert Int16 PCM buffer to base64 without stack overflow
-function pcmToBase64(pcm16: Int16Array): string {
-    const bytes = new Uint8Array(pcm16.buffer)
-    let binary = ''
-    const chunkSize = 8192
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-        const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length))
-        binary += String.fromCharCode(...chunk)
-    }
-    return btoa(binary)
-}
-
 export default function AITutorPage() {
     const [connectionState, setConnectionState] = useState<ConnectionState>('idle')
     const [selectedType, setSelectedType] = useState<SessionType | null>(null)
     const [topic, setTopic] = useState('')
     const [transcript, setTranscript] = useState<TranscriptEntry[]>([])
-    const [sessionId, setSessionId] = useState<string | null>(null)
     const [duration, setDuration] = useState(0)
     const [audioLevel, setAudioLevel] = useState(0)
     const [error, setError] = useState<string | null>(null)
     const [isAISpeaking, setIsAISpeaking] = useState(false)
     const [statusMessage, setStatusMessage] = useState('')
 
-    // Use refs for values accessed inside callbacks to avoid stale closures
+    // Refs to avoid stale closures
     const isMutedRef = useRef(false)
     const [isMuted, setIsMuted] = useState(false)
-    const wsRef = useRef<WebSocket | null>(null)
+    const sessionRef = useRef<Session | null>(null)
     const audioContextRef = useRef<AudioContext | null>(null)
     const mediaStreamRef = useRef<MediaStream | null>(null)
     const processorRef = useRef<ScriptProcessorNode | null>(null)
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
     const transcriptEndRef = useRef<HTMLDivElement>(null)
-    const audioQueueRef = useRef<AudioBuffer[]>([])
+
+    // Audio playback
+    const audioQueueRef = useRef<ArrayBuffer[]>([])
     const isPlayingRef = useRef(false)
     const playbackContextRef = useRef<AudioContext | null>(null)
 
@@ -97,79 +87,76 @@ export default function AITutorPage() {
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
     }
 
-    const addTranscript = (role: TranscriptEntry['role'], text: string) => {
+    const addTranscript = useCallback((role: TranscriptEntry['role'], text: string) => {
         setTranscript(prev => [...prev, { role, text, timestamp: new Date() }])
-    }
+    }, [])
 
-    // Audio playback queue to prevent overlapping
+    // --- Audio Playback Queue ---
     const playNextAudio = useCallback(async () => {
         if (isPlayingRef.current || audioQueueRef.current.length === 0) return
         isPlayingRef.current = true
 
-        const buffer = audioQueueRef.current.shift()!
+        const rawPcm = audioQueueRef.current.shift()!
         try {
             if (!playbackContextRef.current || playbackContextRef.current.state === 'closed') {
                 playbackContextRef.current = new AudioContext({ sampleRate: 24000 })
             }
-            const source = playbackContextRef.current.createBufferSource()
-            source.buffer = buffer
-            source.connect(playbackContextRef.current.destination)
-            source.onended = () => {
-                isPlayingRef.current = false
-                playNextAudio()
-            }
-            source.start()
-        } catch (e) {
-            console.error('Audio playback error:', e)
-            isPlayingRef.current = false
-            playNextAudio()
-        }
-    }, [])
+            const ctx = playbackContextRef.current
 
-    const queueAudioChunk = useCallback((base64Data: string) => {
-        try {
-            const binaryString = atob(base64Data)
-            const bytes = new Uint8Array(binaryString.length)
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i)
-            }
-
-            // Convert int16 PCM to float32
-            const int16 = new Int16Array(bytes.buffer)
+            // Convert PCM int16 → float32
+            const int16 = new Int16Array(rawPcm)
             const float32 = new Float32Array(int16.length)
             for (let i = 0; i < int16.length; i++) {
                 float32[i] = int16[i] / 32768.0
             }
 
-            if (!playbackContextRef.current || playbackContextRef.current.state === 'closed') {
-                playbackContextRef.current = new AudioContext({ sampleRate: 24000 })
-            }
-            const buffer = playbackContextRef.current.createBuffer(1, float32.length, 24000)
+            const buffer = ctx.createBuffer(1, float32.length, 24000)
             buffer.copyToChannel(float32, 0)
 
-            audioQueueRef.current.push(buffer)
+            const source = ctx.createBufferSource()
+            source.buffer = buffer
+            source.connect(ctx.destination)
+            source.onended = () => {
+                isPlayingRef.current = false
+                if (audioQueueRef.current.length > 0) playNextAudio()
+                else setIsAISpeaking(false)
+            }
+            source.start()
+        } catch (e) {
+            console.error('[Playback] Error:', e)
+            isPlayingRef.current = false
+            if (audioQueueRef.current.length > 0) playNextAudio()
+        }
+    }, [])
+
+    const queueAudioData = useCallback((base64Data: string) => {
+        try {
+            const binaryStr = atob(base64Data)
+            const bytes = new Uint8Array(binaryStr.length)
+            for (let i = 0; i < binaryStr.length; i++) {
+                bytes[i] = binaryStr.charCodeAt(i)
+            }
+            audioQueueRef.current.push(bytes.buffer)
+            setIsAISpeaking(true)
             playNextAudio()
         } catch (e) {
-            console.error('Audio decode error:', e)
+            console.error('[Audio] Decode error:', e)
         }
     }, [playNextAudio])
 
+    // --- Start Session ---
     const startSession = useCallback(async () => {
         if (!selectedType) return
         setError(null)
         setConnectionState('connecting')
-        setStatusMessage('Requesting session...')
+        setStatusMessage('Requesting session token...')
 
         try {
-            // 1. Get session config from server
-            setStatusMessage('Getting session config...')
+            // 1. Get ephemeral token from our server
             const res = await fetch('/api/ai/live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    sessionType: selectedType,
-                    topic: topic || undefined,
-                }),
+                body: JSON.stringify({ sessionType: selectedType, topic: topic || undefined }),
             })
 
             if (!res.ok) {
@@ -177,10 +164,9 @@ export default function AITutorPage() {
                 throw new Error(err.error || `Server error: ${res.status}`)
             }
 
-            const config = await res.json()
-            setSessionId(config.sessionId)
+            const { token, model, systemInstruction } = await res.json()
 
-            // 2. Get microphone access
+            // 2. Request microphone
             setStatusMessage('Requesting microphone access...')
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: {
@@ -192,102 +178,92 @@ export default function AITutorPage() {
             })
             mediaStreamRef.current = stream
 
-            // 3. Set up audio context for processing
+            // 3. Set up audio processing
             setStatusMessage('Setting up audio...')
             const audioContext = new AudioContext({ sampleRate: 16000 })
             audioContextRef.current = audioContext
-
             const source = audioContext.createMediaStreamSource(stream)
             const processor = audioContext.createScriptProcessor(4096, 1, 1)
             processorRef.current = processor
-
             source.connect(processor)
             processor.connect(audioContext.destination)
 
-            // 4. Connect to Gemini Live API via WebSocket
+            // 4. Connect to Gemini Live API via SDK
             setStatusMessage('Connecting to Gemini Live API...')
-            const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${config.apiKey}`
-            const ws = new WebSocket(wsUrl)
-            wsRef.current = ws
+            const ai = new GoogleGenAI({ apiKey: token, httpOptions: { apiVersion: 'v1alpha' } })
 
-            ws.onopen = () => {
-                setStatusMessage('Sending setup...')
-                // Send setup message
-                const setupMsg = {
-                    setup: {
-                        model: `models/${config.model}`,
-                        generationConfig: {
-                            responseModalities: ['AUDIO'],
-                            speechConfig: config.config?.speechConfig,
-                        },
-                        systemInstruction: {
-                            parts: [{ text: config.systemInstruction }],
+            const session = await ai.live.connect({
+                model: model,
+                config: {
+                    responseModalities: [Modality.AUDIO],
+                    systemInstruction: systemInstruction,
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: {
+                                voiceName: 'Kore',
+                            },
                         },
                     },
-                }
-                console.log('[Live API] Sending setup:', JSON.stringify(setupMsg).slice(0, 200))
-                ws.send(JSON.stringify(setupMsg))
-            }
-
-            ws.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data)
-                    console.log('[Live API] Received:', Object.keys(data))
-
-                    // Setup complete
-                    if (data.setupComplete !== undefined) {
-                        console.log('[Live API] Setup complete!')
+                },
+                callbacks: {
+                    onopen: () => {
+                        console.log('[Live API] Connected!')
                         setConnectionState('connected')
                         setStatusMessage('')
                         addTranscript('system', '🎙️ Connected! Start speaking...')
 
-                        // Start sending audio data
+                        // Start sending microphone audio
                         processor.onaudioprocess = (e) => {
-                            // Use ref instead of state to avoid stale closure
-                            if (isMutedRef.current || ws.readyState !== WebSocket.OPEN) return
+                            if (isMutedRef.current) return
+                            if (!sessionRef.current) return
 
                             const inputData = e.inputBuffer.getChannelData(0)
 
-                            // Calculate audio level for visualizer
+                            // Audio level for visualizer
                             let sum = 0
                             for (let i = 0; i < inputData.length; i++) {
                                 sum += inputData[i] * inputData[i]
                             }
                             setAudioLevel(Math.sqrt(sum / inputData.length) * 100)
 
-                            // Convert float32 to int16 PCM
+                            // Convert float32 → int16 PCM
                             const pcm16 = new Int16Array(inputData.length)
                             for (let i = 0; i < inputData.length; i++) {
                                 pcm16[i] = Math.max(-32768, Math.min(32767, Math.floor(inputData[i] * 32768)))
                             }
 
-                            // Send as base64
-                            const base64 = pcmToBase64(pcm16)
-                            ws.send(JSON.stringify({
-                                realtimeInput: {
-                                    mediaChunks: [{
-                                        data: base64,
-                                        mimeType: 'audio/pcm;rate=16000',
-                                    }],
-                                },
-                            }))
-                        }
-                        return
-                    }
+                            // Convert to base64
+                            const bytes = new Uint8Array(pcm16.buffer)
+                            let binary = ''
+                            const chunkSize = 8192
+                            for (let i = 0; i < bytes.length; i += chunkSize) {
+                                const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length))
+                                binary += String.fromCharCode(...chunk)
+                            }
+                            const base64 = btoa(binary)
 
-                    // Server content (AI response)
-                    if (data.serverContent) {
-                        if (data.serverContent.interrupted) {
+                            // Send via SDK
+                            sessionRef.current.sendRealtimeInput({
+                                audio: {
+                                    data: base64,
+                                    mimeType: 'audio/pcm;rate=16000',
+                                },
+                            })
+                        }
+                    },
+                    onmessage: (message: LiveServerMessage) => {
+                        // Handle interruption
+                        if (message.serverContent?.interrupted) {
                             setIsAISpeaking(false)
-                            audioQueueRef.current = [] // Clear audio queue on interruption
+                            audioQueueRef.current = []
                             return
                         }
 
-                        if (data.serverContent.modelTurn?.parts) {
-                            setIsAISpeaking(true)
-                            for (const part of data.serverContent.modelTurn.parts) {
+                        // Handle AI audio/text response
+                        if (message.serverContent?.modelTurn?.parts) {
+                            for (const part of message.serverContent.modelTurn.parts) {
                                 if (part.inlineData?.data) {
-                                    queueAudioChunk(part.inlineData.data)
+                                    queueAudioData(part.inlineData.data)
                                 }
                                 if (part.text) {
                                     addTranscript('ai', part.text)
@@ -295,50 +271,53 @@ export default function AITutorPage() {
                             }
                         }
 
-                        if (data.serverContent.turnComplete) {
-                            setIsAISpeaking(false)
+                        // Turn complete
+                        if (message.serverContent?.turnComplete) {
+                            // Playback will set isAISpeaking to false when queue drains
                         }
-                    }
-                } catch (e) {
-                    console.error('[Live API] Message parse error:', e)
-                }
-            }
+                    },
+                    onerror: (e: ErrorEvent) => {
+                        console.error('[Live API] Error:', e.message)
+                        setError(`Connection error: ${e.message}`)
+                        setConnectionState('error')
+                    },
+                    onclose: (e: CloseEvent) => {
+                        console.log('[Live API] Closed:', e.code, e.reason)
+                        if (e.code !== 1000) {
+                            setError(`Session closed: ${e.reason || `code ${e.code}`}`)
+                            setConnectionState('error')
+                        } else {
+                            setConnectionState('idle')
+                        }
+                        setIsAISpeaking(false)
+                        setStatusMessage('')
+                    },
+                },
+            })
 
-            ws.onerror = (e) => {
-                console.error('[Live API] WebSocket error:', e)
-                setError('WebSocket connection error. Check console for details.')
-                setConnectionState('error')
-            }
-
-            ws.onclose = (e) => {
-                console.log('[Live API] WebSocket closed:', e.code, e.reason)
-                if (connectionState !== 'error') {
-                    setConnectionState('idle')
-                }
-                setIsAISpeaking(false)
-                setStatusMessage('')
-            }
+            sessionRef.current = session
         } catch (err: any) {
-            console.error('[Live API] Session start error:', err)
+            console.error('[Live API] Start error:', err)
             setError(err.message || 'Failed to start session')
             setConnectionState('error')
+            // Clean up on error
+            if (mediaStreamRef.current) {
+                mediaStreamRef.current.getTracks().forEach(t => t.stop())
+                mediaStreamRef.current = null
+            }
         }
-    }, [selectedType, topic, queueAudioChunk, connectionState])
+    }, [selectedType, topic, addTranscript, queueAudioData])
 
+    // --- End Session ---
     const endSession = useCallback(async () => {
-        // Close WebSocket
-        if (wsRef.current) {
-            wsRef.current.close()
-            wsRef.current = null
+        if (sessionRef.current) {
+            sessionRef.current.close()
+            sessionRef.current = null
         }
-
-        // Stop microphone
         if (mediaStreamRef.current) {
             mediaStreamRef.current.getTracks().forEach(t => t.stop())
             mediaStreamRef.current = null
         }
-
-        // Close audio context
         if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
             await audioContextRef.current.close().catch(() => { })
             audioContextRef.current = null
@@ -347,7 +326,6 @@ export default function AITutorPage() {
             await playbackContextRef.current.close().catch(() => { })
             playbackContextRef.current = null
         }
-
         audioQueueRef.current = []
         isPlayingRef.current = false
         setConnectionState('idle')
@@ -357,10 +335,11 @@ export default function AITutorPage() {
         setDuration(0)
     }, [])
 
+    // --- Mute Toggle ---
     const toggleMute = () => {
         const newMuted = !isMuted
         setIsMuted(newMuted)
-        isMutedRef.current = newMuted // Keep ref in sync for audio callback
+        isMutedRef.current = newMuted
         if (mediaStreamRef.current) {
             mediaStreamRef.current.getAudioTracks().forEach(t => {
                 t.enabled = !newMuted
@@ -368,7 +347,7 @@ export default function AITutorPage() {
         }
     }
 
-    // Session type selection view
+    // --- Session Type Selection ---
     if (!selectedType) {
         return (
             <div className="relative min-h-[calc(100vh-4rem)]">
@@ -403,7 +382,7 @@ export default function AITutorPage() {
         )
     }
 
-    // Active session / pre-session view
+    // --- Active / Pre-Session View ---
     const selectedConfig = SESSION_TYPES.find(t => t.id === selectedType)!
 
     return (
@@ -415,7 +394,11 @@ export default function AITutorPage() {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={() => { if (connectionState === 'idle' || connectionState === 'error') { setSelectedType(null); setTopic(''); setError(null); setTranscript([]) } }}
+                            onClick={() => {
+                                if (connectionState === 'idle' || connectionState === 'error') {
+                                    setSelectedType(null); setTopic(''); setError(null); setTranscript([])
+                                }
+                            }}
                             className="text-foreground/50 hover:text-foreground transition-colors"
                             disabled={isConnected || connectionState === 'connecting'}
                         >
@@ -497,31 +480,24 @@ export default function AITutorPage() {
                 {/* Active session: Audio visualizer + controls */}
                 {isConnected && (
                     <>
-                        {/* Audio Visualizer */}
                         <GlassSurface className="p-8 flex flex-col items-center justify-center">
                             <div className="relative w-32 h-32 mb-4">
-                                {/* Outer pulse ring */}
                                 <div
                                     className={`absolute inset-0 rounded-full transition-all duration-150 ${isAISpeaking ? 'bg-cyan-500/10' : 'bg-white/5'
                                         }`}
-                                    style={{
-                                        transform: `scale(${1 + (isAISpeaking ? 0.3 : audioLevel * 0.02)})`,
-                                    }}
+                                    style={{ transform: `scale(${1 + (isAISpeaking ? 0.3 : audioLevel * 0.02)})` }}
                                 />
                                 {isAISpeaking && (
                                     <div className="absolute inset-0 rounded-full bg-cyan-500/10 animate-ping" />
                                 )}
-                                {/* Inner circle */}
                                 <div
                                     className={`absolute inset-2 rounded-full flex items-center justify-center transition-all duration-150 ${isAISpeaking
-                                            ? 'bg-gradient-to-br from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50'
-                                            : isMuted
-                                                ? 'bg-red-500/10 border-2 border-red-500/30'
-                                                : 'bg-white/5 border-2 border-white/10'
+                                        ? 'bg-gradient-to-br from-cyan-500/30 to-blue-500/30 border-2 border-cyan-400/50'
+                                        : isMuted
+                                            ? 'bg-red-500/10 border-2 border-red-500/30'
+                                            : 'bg-white/5 border-2 border-white/10'
                                         }`}
-                                    style={{
-                                        transform: `scale(${1 + audioLevel * 0.01})`,
-                                    }}
+                                    style={{ transform: `scale(${1 + audioLevel * 0.01})` }}
                                 >
                                     {isAISpeaking ? (
                                         <Volume2 className="h-12 w-12 text-cyan-400 animate-pulse" />
@@ -531,7 +507,6 @@ export default function AITutorPage() {
                                         <Mic className="h-12 w-12 text-foreground/60" />
                                     )}
                                 </div>
-                                {/* Audio level bars */}
                                 {!isMuted && !isAISpeaking && audioLevel > 0 && (
                                     <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-1">
                                         {Array.from({ length: 5 }, (_, i) => (
@@ -552,15 +527,14 @@ export default function AITutorPage() {
                                 {isAISpeaking ? '🔊 AI is speaking...' : isMuted ? '🔇 Microphone muted' : '🎤 Listening...'}
                             </p>
 
-                            {/* Controls */}
                             <div className="flex items-center gap-4 mt-6">
                                 <Button
                                     onClick={toggleMute}
                                     variant="outline"
                                     size="lg"
                                     className={`rounded-full w-14 h-14 p-0 ${isMuted
-                                            ? 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20'
-                                            : 'bg-white/5 border-white/10 text-foreground hover:bg-white/10'
+                                        ? 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20'
+                                        : 'bg-white/5 border-white/10 text-foreground hover:bg-white/10'
                                         }`}
                                 >
                                     {isMuted ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
@@ -591,10 +565,10 @@ export default function AITutorPage() {
                                             </div>
                                         )}
                                         <div className={`max-w-[80%] px-3 py-2 rounded-xl text-sm ${entry.role === 'ai'
-                                                ? 'bg-white/5 text-foreground/80'
-                                                : entry.role === 'system'
-                                                    ? 'bg-amber-500/5 text-amber-300/80 italic'
-                                                    : 'bg-cyan-500/10 text-foreground/80'
+                                            ? 'bg-white/5 text-foreground/80'
+                                            : entry.role === 'system'
+                                                ? 'bg-amber-500/5 text-amber-300/80 italic'
+                                                : 'bg-cyan-500/10 text-foreground/80'
                                             }`}>
                                             {entry.text}
                                         </div>
