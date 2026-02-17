@@ -85,7 +85,7 @@ export async function POST(request: Request) {
 
         return new Response(JSON.stringify({
             apiKey: process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY,
-            model: 'gemini-2.5-flash-preview-native-audio-dialog',
+            model: 'gemini-live-2.5-flash-native-audio',
             systemInstruction,
             sessionId: session?.id,
             config: {

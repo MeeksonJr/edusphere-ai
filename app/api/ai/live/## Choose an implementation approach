@@ -1,0 +1,54 @@
+## Choose an implementation approach
+When integrating with Live API, you'll need to choose one of the following implementation approaches:
+- Server-to-server: Your backend connects to the Live API using
+[WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API). Typically, your client sends stream data (audio, video,
+text) to your server, which then forwards it to the Live API.
+- Client-to-server: Your frontend code connects directly to the Live API
+using [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) to stream data, bypassing your backend.
+[WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+[WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+[ephemeral tokens](https://ai.google.dev/gemini-api/docs/ephemeral-tokens)
+
+## Partner integrations
+To streamline the development of real-time audio and video apps, you can use a third-party integration that supports the Gemini Live API over WebRTC or WebSockets.
+[Pipecat by Daily
+
+
+        Create a real-time AI chatbot using Gemini Live and Pipecat.](https://docs.pipecat.ai/guides/features/gemini-live)
+Pipecat by Daily
+Create a real-time AI chatbot using Gemini Live and Pipecat.
+[LiveKit
+
+
+        Use the Gemini Live API with LiveKit Agents.](https://docs.livekit.io/agents/models/realtime/plugins/gemini/)
+LiveKit
+Use the Gemini Live API with LiveKit Agents.
+[Fishjam by Software Mansion
+
+
+        Create live video and audio streaming applications with Fishjam.](https://docs.fishjam.io/tutorials/gemini-live-integration)
+Fishjam by Software Mansion
+Create live video and audio streaming applications with Fishjam.
+[Agent Development Kit (ADK)
+
+
+        Implement the Live API with Agent Development Kit (ADK).](https://google.github.io/adk-docs/streaming/)
+Agent Development Kit (ADK)
+Implement the Live API with Agent Development Kit (ADK).
+[Vision Agents by Stream
+
+
+        Build real-time voice and video AI applications with Vision Agents.](https://visionagents.ai/integrations/gemini)
+Vision Agents by Stream
+Build real-time voice and video AI applications with Vision Agents.
+[Voximplant
+
+
+        Connect inbound and outbound calls to Live API with Voximplant.](https://voximplant.com/products/gemini-client)
+Voximplant
+Connect inbound and outbound calls to Live API with Voximplant.
+
+## Get started
+Microphone stream Audio file stream
+This server-side example streams audio from the microphone and plays the returned audio. For complete end-to-end examples including a client application, see [Example applications](https://ai.google.dev/gemini-api/docs/live#example-applications).
+The input audio format should be in 16-bit PCM, 16kHz, mono format, and the received audio uses a sample rate of 24kHz.

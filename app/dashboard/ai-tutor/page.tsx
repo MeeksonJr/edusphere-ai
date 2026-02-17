@@ -5,26 +5,25 @@ import { Button } from '@/components/ui/button'
 import {
     Mic,
     MicOff,
-    Phone,
     PhoneOff,
     Volume2,
-    VolumeX,
     MessageSquare,
     Sparkles,
     BookOpen,
     Brain,
     Languages,
-    Code,
     GraduationCap,
     Briefcase,
+    Loader2,
 } from 'lucide-react'
 import { GlassSurface } from '@/components/shared/GlassSurface'
 import { AmbientBackground } from '@/components/shared/AmbientBackground'
 
 type SessionType = 'tutor' | 'quiz_practice' | 'language' | 'explainer' | 'study_buddy' | 'interview_prep'
+type ConnectionState = 'idle' | 'connecting' | 'connected' | 'error'
 
 interface TranscriptEntry {
-    role: 'user' | 'ai'
+    role: 'user' | 'ai' | 'system'
     text: string
     timestamp: Date
 }
@@ -38,10 +37,20 @@ const SESSION_TYPES = [
     { id: 'interview_prep' as SessionType, name: 'Interview Prep', icon: Briefcase, desc: 'Mock interviews with AI feedback', color: 'from-indigo-500 to-violet-500' },
 ]
 
+// Helper: convert Int16 PCM buffer to base64 without stack overflow
+function pcmToBase64(pcm16: Int16Array): string {
+    const bytes = new Uint8Array(pcm16.buffer)
+    let binary = ''
+    const chunkSize = 8192
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length))
+        binary += String.fromCharCode(...chunk)
+    }
+    return btoa(binary)
+}
+
 export default function AITutorPage() {
-    const [isConnected, setIsConnected] = useState(false)
-    const [isMuted, setIsMuted] = useState(false)
-    const [isAISpeaking, setIsAISpeaking] = useState(false)
+    const [connectionState, setConnectionState] = useState<ConnectionState>('idle')
     const [selectedType, setSelectedType] = useState<SessionType | null>(null)
     const [topic, setTopic] = useState('')
     const [transcript, setTranscript] = useState<TranscriptEntry[]>([])
@@ -49,13 +58,23 @@ export default function AITutorPage() {
     const [duration, setDuration] = useState(0)
     const [audioLevel, setAudioLevel] = useState(0)
     const [error, setError] = useState<string | null>(null)
+    const [isAISpeaking, setIsAISpeaking] = useState(false)
+    const [statusMessage, setStatusMessage] = useState('')
 
+    // Use refs for values accessed inside callbacks to avoid stale closures
+    const isMutedRef = useRef(false)
+    const [isMuted, setIsMuted] = useState(false)
     const wsRef = useRef<WebSocket | null>(null)
     const audioContextRef = useRef<AudioContext | null>(null)
     const mediaStreamRef = useRef<MediaStream | null>(null)
     const processorRef = useRef<ScriptProcessorNode | null>(null)
-    const timerRef = useRef<NodeJS.Timeout | null>(null)
+    const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
     const transcriptEndRef = useRef<HTMLDivElement>(null)
+    const audioQueueRef = useRef<AudioBuffer[]>([])
+    const isPlayingRef = useRef(false)
+    const playbackContextRef = useRef<AudioContext | null>(null)
+
+    const isConnected = connectionState === 'connected'
 
     // Auto-scroll transcript
     useEffect(() => {
@@ -78,12 +97,72 @@ export default function AITutorPage() {
         return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
     }
 
+    const addTranscript = (role: TranscriptEntry['role'], text: string) => {
+        setTranscript(prev => [...prev, { role, text, timestamp: new Date() }])
+    }
+
+    // Audio playback queue to prevent overlapping
+    const playNextAudio = useCallback(async () => {
+        if (isPlayingRef.current || audioQueueRef.current.length === 0) return
+        isPlayingRef.current = true
+
+        const buffer = audioQueueRef.current.shift()!
+        try {
+            if (!playbackContextRef.current || playbackContextRef.current.state === 'closed') {
+                playbackContextRef.current = new AudioContext({ sampleRate: 24000 })
+            }
+            const source = playbackContextRef.current.createBufferSource()
+            source.buffer = buffer
+            source.connect(playbackContextRef.current.destination)
+            source.onended = () => {
+                isPlayingRef.current = false
+                playNextAudio()
+            }
+            source.start()
+        } catch (e) {
+            console.error('Audio playback error:', e)
+            isPlayingRef.current = false
+            playNextAudio()
+        }
+    }, [])
+
+    const queueAudioChunk = useCallback((base64Data: string) => {
+        try {
+            const binaryString = atob(base64Data)
+            const bytes = new Uint8Array(binaryString.length)
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i)
+            }
+
+            // Convert int16 PCM to float32
+            const int16 = new Int16Array(bytes.buffer)
+            const float32 = new Float32Array(int16.length)
+            for (let i = 0; i < int16.length; i++) {
+                float32[i] = int16[i] / 32768.0
+            }
+
+            if (!playbackContextRef.current || playbackContextRef.current.state === 'closed') {
+                playbackContextRef.current = new AudioContext({ sampleRate: 24000 })
+            }
+            const buffer = playbackContextRef.current.createBuffer(1, float32.length, 24000)
+            buffer.copyToChannel(float32, 0)
+
+            audioQueueRef.current.push(buffer)
+            playNextAudio()
+        } catch (e) {
+            console.error('Audio decode error:', e)
+        }
+    }, [playNextAudio])
+
     const startSession = useCallback(async () => {
         if (!selectedType) return
         setError(null)
+        setConnectionState('connecting')
+        setStatusMessage('Requesting session...')
 
         try {
             // 1. Get session config from server
+            setStatusMessage('Getting session config...')
             const res = await fetch('/api/ai/live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -95,13 +174,14 @@ export default function AITutorPage() {
 
             if (!res.ok) {
                 const err = await res.json()
-                throw new Error(err.error || 'Failed to start session')
+                throw new Error(err.error || `Server error: ${res.status}`)
             }
 
             const config = await res.json()
             setSessionId(config.sessionId)
 
             // 2. Get microphone access
+            setStatusMessage('Requesting microphone access...')
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: {
                     sampleRate: 16000,
@@ -113,6 +193,7 @@ export default function AITutorPage() {
             mediaStreamRef.current = stream
 
             // 3. Set up audio context for processing
+            setStatusMessage('Setting up audio...')
             const audioContext = new AudioContext({ sampleRate: 16000 })
             audioContextRef.current = audioContext
 
@@ -124,13 +205,15 @@ export default function AITutorPage() {
             processor.connect(audioContext.destination)
 
             // 4. Connect to Gemini Live API via WebSocket
+            setStatusMessage('Connecting to Gemini Live API...')
             const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${config.apiKey}`
             const ws = new WebSocket(wsUrl)
             wsRef.current = ws
 
             ws.onopen = () => {
+                setStatusMessage('Sending setup...')
                 // Send setup message
-                ws.send(JSON.stringify({
+                const setupMsg = {
                     setup: {
                         model: `models/${config.model}`,
                         generationConfig: {
@@ -141,24 +224,27 @@ export default function AITutorPage() {
                             parts: [{ text: config.systemInstruction }],
                         },
                     },
-                }))
+                }
+                console.log('[Live API] Sending setup:', JSON.stringify(setupMsg).slice(0, 200))
+                ws.send(JSON.stringify(setupMsg))
             }
 
             ws.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data)
+                    console.log('[Live API] Received:', Object.keys(data))
 
-                    if (data.setupComplete) {
-                        setIsConnected(true)
-                        setTranscript(prev => [...prev, {
-                            role: 'ai',
-                            text: '🎙️ Connected! I\'m ready to help. Start speaking...',
-                            timestamp: new Date(),
-                        }])
+                    // Setup complete
+                    if (data.setupComplete !== undefined) {
+                        console.log('[Live API] Setup complete!')
+                        setConnectionState('connected')
+                        setStatusMessage('')
+                        addTranscript('system', '🎙️ Connected! Start speaking...')
 
-                        // Start sending audio
+                        // Start sending audio data
                         processor.onaudioprocess = (e) => {
-                            if (isMuted || ws.readyState !== WebSocket.OPEN) return
+                            // Use ref instead of state to avoid stale closure
+                            if (isMutedRef.current || ws.readyState !== WebSocket.OPEN) return
 
                             const inputData = e.inputBuffer.getChannelData(0)
 
@@ -176,7 +262,7 @@ export default function AITutorPage() {
                             }
 
                             // Send as base64
-                            const base64 = btoa(String.fromCharCode(...new Uint8Array(pcm16.buffer)))
+                            const base64 = pcmToBase64(pcm16)
                             ws.send(JSON.stringify({
                                 realtimeInput: {
                                     mediaChunks: [{
@@ -186,11 +272,14 @@ export default function AITutorPage() {
                                 },
                             }))
                         }
+                        return
                     }
 
+                    // Server content (AI response)
                     if (data.serverContent) {
                         if (data.serverContent.interrupted) {
                             setIsAISpeaking(false)
+                            audioQueueRef.current = [] // Clear audio queue on interruption
                             return
                         }
 
@@ -198,15 +287,10 @@ export default function AITutorPage() {
                             setIsAISpeaking(true)
                             for (const part of data.serverContent.modelTurn.parts) {
                                 if (part.inlineData?.data) {
-                                    // Play audio response
-                                    playAudioChunk(part.inlineData.data)
+                                    queueAudioChunk(part.inlineData.data)
                                 }
                                 if (part.text) {
-                                    setTranscript(prev => [...prev, {
-                                        role: 'ai',
-                                        text: part.text,
-                                        timestamp: new Date(),
-                                    }])
+                                    addTranscript('ai', part.text)
                                 }
                             }
                         }
@@ -216,53 +300,30 @@ export default function AITutorPage() {
                         }
                     }
                 } catch (e) {
-                    console.error('WebSocket message parse error:', e)
+                    console.error('[Live API] Message parse error:', e)
                 }
             }
 
             ws.onerror = (e) => {
-                console.error('WebSocket error:', e)
-                setError('Connection error. Please try again.')
-                endSession()
+                console.error('[Live API] WebSocket error:', e)
+                setError('WebSocket connection error. Check console for details.')
+                setConnectionState('error')
             }
 
-            ws.onclose = () => {
-                setIsConnected(false)
+            ws.onclose = (e) => {
+                console.log('[Live API] WebSocket closed:', e.code, e.reason)
+                if (connectionState !== 'error') {
+                    setConnectionState('idle')
+                }
                 setIsAISpeaking(false)
+                setStatusMessage('')
             }
         } catch (err: any) {
-            console.error('Session start error:', err)
+            console.error('[Live API] Session start error:', err)
             setError(err.message || 'Failed to start session')
+            setConnectionState('error')
         }
-    }, [selectedType, topic, isMuted])
-
-    const playAudioChunk = async (base64Data: string) => {
-        try {
-            const playbackContext = new AudioContext({ sampleRate: 24000 })
-            const binaryString = atob(base64Data)
-            const bytes = new Uint8Array(binaryString.length)
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i)
-            }
-
-            // Convert int16 PCM to float32
-            const int16 = new Int16Array(bytes.buffer)
-            const float32 = new Float32Array(int16.length)
-            for (let i = 0; i < int16.length; i++) {
-                float32[i] = int16[i] / 32768.0
-            }
-
-            const buffer = playbackContext.createBuffer(1, float32.length, 24000)
-            buffer.copyToChannel(float32, 0)
-
-            const source = playbackContext.createBufferSource()
-            source.buffer = buffer
-            source.connect(playbackContext.destination)
-            source.start()
-        } catch (e) {
-            console.error('Audio playback error:', e)
-        }
-    }
+    }, [selectedType, topic, queueAudioChunk, connectionState])
 
     const endSession = useCallback(async () => {
         // Close WebSocket
@@ -278,39 +339,31 @@ export default function AITutorPage() {
         }
 
         // Close audio context
-        if (audioContextRef.current) {
-            await audioContextRef.current.close()
+        if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+            await audioContextRef.current.close().catch(() => { })
             audioContextRef.current = null
         }
-
-        // Save session data
-        if (sessionId && duration > 0) {
-            try {
-                await fetch('/api/ai/live', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sessionId,
-                        duration,
-                        transcript: transcript.map(t => ({ role: t.role, text: t.text })),
-                        status: 'completed',
-                    }),
-                })
-            } catch (e) {
-                console.error('Failed to save session:', e)
-            }
+        if (playbackContextRef.current && playbackContextRef.current.state !== 'closed') {
+            await playbackContextRef.current.close().catch(() => { })
+            playbackContextRef.current = null
         }
 
-        setIsConnected(false)
+        audioQueueRef.current = []
+        isPlayingRef.current = false
+        setConnectionState('idle')
         setIsAISpeaking(false)
         setAudioLevel(0)
-    }, [sessionId, duration, transcript])
+        setStatusMessage('')
+        setDuration(0)
+    }, [])
 
     const toggleMute = () => {
-        setIsMuted(prev => !prev)
+        const newMuted = !isMuted
+        setIsMuted(newMuted)
+        isMutedRef.current = newMuted // Keep ref in sync for audio callback
         if (mediaStreamRef.current) {
             mediaStreamRef.current.getAudioTracks().forEach(t => {
-                t.enabled = isMuted // Toggle the opposite since state hasn't updated yet
+                t.enabled = !newMuted
             })
         }
     }
@@ -362,9 +415,9 @@ export default function AITutorPage() {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={() => { if (!isConnected) { setSelectedType(null); setTopic('') } }}
+                            onClick={() => { if (connectionState === 'idle' || connectionState === 'error') { setSelectedType(null); setTopic(''); setError(null); setTranscript([]) } }}
                             className="text-foreground/50 hover:text-foreground transition-colors"
-                            disabled={isConnected}
+                            disabled={isConnected || connectionState === 'connecting'}
                         >
                             ← Back
                         </button>
@@ -379,9 +432,15 @@ export default function AITutorPage() {
                                     Live • {formatDuration(duration)}
                                 </div>
                             )}
+                            {connectionState === 'connecting' && (
+                                <div className="flex items-center gap-2 text-xs text-amber-400">
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                    {statusMessage || 'Connecting...'}
+                                </div>
+                            )}
                         </div>
                     </div>
-                    {isConnected && (
+                    {(isConnected || connectionState === 'connecting') && (
                         <Button
                             onClick={endSession}
                             variant="destructive"
@@ -389,13 +448,13 @@ export default function AITutorPage() {
                             className="bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30"
                         >
                             <PhoneOff className="h-4 w-4 mr-2" />
-                            End Session
+                            End
                         </Button>
                     )}
                 </div>
 
                 {/* Pre-session: Topic input */}
-                {!isConnected && (
+                {(connectionState === 'idle' || connectionState === 'error') && (
                     <GlassSurface className="p-6">
                         <label className="block text-sm font-medium text-foreground mb-2">
                             What would you like to discuss? (optional)
@@ -412,7 +471,9 @@ export default function AITutorPage() {
                             className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 text-foreground placeholder:text-foreground/30 transition-colors"
                         />
                         {error && (
-                            <p className="text-red-400 text-sm mt-2">{error}</p>
+                            <div className="mt-3 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                                ⚠️ {error}
+                            </div>
                         )}
                         <Button
                             onClick={startSession}
@@ -424,6 +485,15 @@ export default function AITutorPage() {
                     </GlassSurface>
                 )}
 
+                {/* Connecting state */}
+                {connectionState === 'connecting' && (
+                    <GlassSurface className="p-8 flex flex-col items-center justify-center">
+                        <Loader2 className="h-12 w-12 text-cyan-400 animate-spin mb-4" />
+                        <p className="text-foreground/70 font-medium">{statusMessage || 'Connecting...'}</p>
+                        <p className="text-xs text-foreground/40 mt-2">This may take a few seconds</p>
+                    </GlassSurface>
+                )}
+
                 {/* Active session: Audio visualizer + controls */}
                 {isConnected && (
                     <>
@@ -432,12 +502,15 @@ export default function AITutorPage() {
                             <div className="relative w-32 h-32 mb-4">
                                 {/* Outer pulse ring */}
                                 <div
-                                    className={`absolute inset-0 rounded-full transition-all duration-150 ${isAISpeaking ? 'bg-cyan-500/10 animate-ping' : 'bg-white/5'
+                                    className={`absolute inset-0 rounded-full transition-all duration-150 ${isAISpeaking ? 'bg-cyan-500/10' : 'bg-white/5'
                                         }`}
                                     style={{
                                         transform: `scale(${1 + (isAISpeaking ? 0.3 : audioLevel * 0.02)})`,
                                     }}
                                 />
+                                {isAISpeaking && (
+                                    <div className="absolute inset-0 rounded-full bg-cyan-500/10 animate-ping" />
+                                )}
                                 {/* Inner circle */}
                                 <div
                                     className={`absolute inset-2 rounded-full flex items-center justify-center transition-all duration-150 ${isAISpeaking
@@ -505,16 +578,23 @@ export default function AITutorPage() {
                                 {transcript.map((entry, i) => (
                                     <div
                                         key={i}
-                                        className={`flex gap-3 ${entry.role === 'ai' ? '' : 'justify-end'}`}
+                                        className={`flex gap-3 ${entry.role === 'user' ? 'justify-end' : ''}`}
                                     >
                                         {entry.role === 'ai' && (
                                             <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                                                 <Sparkles className="h-3 w-3 text-cyan-400" />
                                             </div>
                                         )}
+                                        {entry.role === 'system' && (
+                                            <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <span className="text-xs">ℹ</span>
+                                            </div>
+                                        )}
                                         <div className={`max-w-[80%] px-3 py-2 rounded-xl text-sm ${entry.role === 'ai'
                                                 ? 'bg-white/5 text-foreground/80'
-                                                : 'bg-cyan-500/10 text-foreground/80'
+                                                : entry.role === 'system'
+                                                    ? 'bg-amber-500/5 text-amber-300/80 italic'
+                                                    : 'bg-cyan-500/10 text-foreground/80'
                                             }`}>
                                             {entry.text}
                                         </div>
