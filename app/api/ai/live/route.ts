@@ -4,6 +4,39 @@ import { GoogleGenAI } from '@google/genai'
 export const runtime = 'nodejs'
 
 const LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-12-2025'
+
+/**
+ * GET /api/ai/live
+ * Lists session history for the authenticated user.
+ */
+export async function GET() {
+    try {
+        const supabase = await createClient() as any
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+        if (authError || !user) {
+            return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+                status: 401, headers: { 'Content-Type': 'application/json' },
+            })
+        }
+
+        const { data, error } = await supabase
+            .from('live_sessions')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(50)
+
+        if (error) throw error
+
+        return new Response(JSON.stringify(data || []), {
+            headers: { 'Content-Type': 'application/json' },
+        })
+    } catch (error: any) {
+        return new Response(JSON.stringify({ error: error.message || 'Failed to fetch sessions' }), {
+            status: 500, headers: { 'Content-Type': 'application/json' },
+        })
+    }
+}
 // gemini-2.5-flash-native-audio-preview-12-2025
 /**
  * POST /api/ai/live
@@ -48,7 +81,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json()
-        const { sessionType, topic } = body
+        const { sessionType, topic, continuedFrom } = body
 
         // Get user context for system instructions
         const { data: userSkills } = await supabase
@@ -60,6 +93,26 @@ export async function POST(request: Request) {
 
         const skillContext = userSkills?.map((s: any) => `${s.skills?.name}: Level ${s.level}`).join(', ')
 
+        // Load past session for continuation
+        let continuationContext = ''
+        if (continuedFrom) {
+            const { data: pastSession } = await supabase
+                .from('live_sessions')
+                .select('topic, session_type, transcript, feedback')
+                .eq('id', continuedFrom)
+                .eq('user_id', user.id)
+                .single()
+
+            if (pastSession) {
+                const pastSummary = pastSession.feedback?.summary || ''
+                const pastTranscript = (pastSession.transcript || [])
+                    .slice(-10) // Last 10 messages for context
+                    .map((t: any) => `${t.role === 'ai' ? 'AI' : 'Student'}: ${t.text}`)
+                    .join('\n')
+                continuationContext = `\n\nIMPORTANT: This is a continuation of a previous session about "${pastSession.topic}".${pastSummary ? ` Previous session summary: ${pastSummary}` : ''}${pastTranscript ? `\n\nRecent conversation from last session:\n${pastTranscript}\n\nPick up naturally from where you left off.` : ''}`
+            }
+        }
+
         // Build system instruction based on session type
         const systemInstructions: Record<string, string> = {
             tutor: `You are an expert AI tutor for EduSphere. Your student is studying${topic ? ` "${topic}"` : ''}. Adapt your teaching to their level. ${skillContext ? `Their skills: ${skillContext}` : ''}. Be patient, encouraging, and use the Socratic method. Ask questions to check understanding. Provide examples and analogies.`,
@@ -70,7 +123,7 @@ export async function POST(request: Request) {
             interview_prep: `You are an interview coach preparing the student for${topic ? ` "${topic}"` : ' technical interviews'}. Conduct mock interviews, give feedback. Be realistic but supportive.`,
         }
 
-        const systemInstruction = systemInstructions[sessionType] || systemInstructions.tutor
+        const systemInstruction = (systemInstructions[sessionType] || systemInstructions.tutor) + continuationContext
 
         // Generate ephemeral token using the Gemini SDK
         const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
@@ -94,20 +147,24 @@ export async function POST(request: Request) {
             },
         })
 
-        // Log session
-        await supabase
+        // Log session with continuation link
+        const { data: session } = await supabase
             .from('live_sessions')
             .insert({
                 user_id: user.id,
                 session_type: sessionType || 'tutor',
                 topic: topic || 'General',
                 status: 'active',
+                feedback: continuedFrom ? { continued_from: continuedFrom } : {},
             })
+            .select('id')
+            .single()
 
         return new Response(JSON.stringify({
             token: token.name,
             model: LIVE_MODEL,
             systemInstruction,
+            sessionId: session?.id,
         }), {
             headers: { 'Content-Type': 'application/json' },
         })

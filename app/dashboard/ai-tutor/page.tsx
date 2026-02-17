@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { GoogleGenAI, Modality, type Session, type LiveServerMessage } from '@google/genai'
+import { useSearchParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import {
     Mic,
@@ -16,6 +18,7 @@ import {
     GraduationCap,
     Briefcase,
     Loader2,
+    History,
 } from 'lucide-react'
 import { GlassSurface } from '@/components/shared/GlassSurface'
 import { AmbientBackground } from '@/components/shared/AmbientBackground'
@@ -39,6 +42,18 @@ const SESSION_TYPES = [
 ]
 
 export default function AITutorPage() {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center min-h-[calc(100vh-4rem)]"><Loader2 className="h-8 w-8 text-cyan-400 animate-spin" /></div>}>
+            <AITutorContent />
+        </Suspense>
+    )
+}
+
+function AITutorContent() {
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const continueFromId = searchParams.get('continue')
+
     const [connectionState, setConnectionState] = useState<ConnectionState>('idle')
     const [selectedType, setSelectedType] = useState<SessionType | null>(null)
     const [topic, setTopic] = useState('')
@@ -48,6 +63,8 @@ export default function AITutorPage() {
     const [error, setError] = useState<string | null>(null)
     const [isAISpeaking, setIsAISpeaking] = useState(false)
     const [statusMessage, setStatusMessage] = useState('')
+    const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
+    const [isSaving, setIsSaving] = useState(false)
 
     // Refs to avoid stale closures
     const isMutedRef = useRef(false)
@@ -58,6 +75,8 @@ export default function AITutorPage() {
     const processorRef = useRef<ScriptProcessorNode | null>(null)
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
     const transcriptEndRef = useRef<HTMLDivElement>(null)
+    const durationRef = useRef(0)
+    const transcriptRef = useRef<TranscriptEntry[]>([])
 
     // Audio playback
     const audioQueueRef = useRef<ArrayBuffer[]>([])
@@ -74,12 +93,18 @@ export default function AITutorPage() {
     // Duration timer
     useEffect(() => {
         if (isConnected) {
-            timerRef.current = setInterval(() => setDuration(d => d + 1), 1000)
+            timerRef.current = setInterval(() => {
+                setDuration(d => {
+                    durationRef.current = d + 1
+                    return d + 1
+                })
+            }, 1000)
         } else {
             if (timerRef.current) clearInterval(timerRef.current)
         }
         return () => { if (timerRef.current) clearInterval(timerRef.current) }
     }, [isConnected])
+
 
     const formatDuration = (seconds: number) => {
         const mins = Math.floor(seconds / 60)
@@ -88,8 +113,32 @@ export default function AITutorPage() {
     }
 
     const addTranscript = useCallback((role: TranscriptEntry['role'], text: string) => {
-        setTranscript(prev => [...prev, { role, text, timestamp: new Date() }])
+        const entry = { role, text, timestamp: new Date() }
+        setTranscript(prev => {
+            const updated = [...prev, entry]
+            transcriptRef.current = updated
+            return updated
+        })
     }, [])
+
+    // Load continuation context
+    useEffect(() => {
+        if (!continueFromId) return
+        async function loadContinuation() {
+            try {
+                const res = await fetch(`/api/ai/live/${continueFromId}`)
+                if (res.ok) {
+                    const session = await res.json()
+                    setSelectedType(session.session_type as SessionType)
+                    setTopic(session.topic || '')
+                    addTranscript('system', `📎 Continuing from previous session: "${session.topic || session.session_type}"`)
+                }
+            } catch (e) {
+                console.error('Failed to load continuation:', e)
+            }
+        }
+        loadContinuation()
+    }, [continueFromId, addTranscript])
 
     // --- Audio Playback Queue ---
     const playNextAudio = useCallback(async () => {
@@ -156,7 +205,11 @@ export default function AITutorPage() {
             const res = await fetch('/api/ai/live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionType: selectedType, topic: topic || undefined }),
+                body: JSON.stringify({
+                    sessionType: selectedType,
+                    topic: topic || undefined,
+                    continuedFrom: continueFromId || undefined,
+                }),
             })
 
             if (!res.ok) {
@@ -164,7 +217,8 @@ export default function AITutorPage() {
                 throw new Error(err.error || `Server error: ${res.status}`)
             }
 
-            const { token, model, systemInstruction } = await res.json()
+            const { token, model, systemInstruction, sessionId } = await res.json()
+            setCurrentSessionId(sessionId)
 
             // 2. Request microphone
             setStatusMessage('Requesting microphone access...')
@@ -306,10 +360,11 @@ export default function AITutorPage() {
                 mediaStreamRef.current = null
             }
         }
-    }, [selectedType, topic, addTranscript, queueAudioData])
+    }, [selectedType, topic, addTranscript, queueAudioData, continueFromId])
 
     // --- End Session ---
     const endSession = useCallback(async () => {
+        // Close live connection
         if (sessionRef.current) {
             sessionRef.current.close()
             sessionRef.current = null
@@ -328,12 +383,47 @@ export default function AITutorPage() {
         }
         audioQueueRef.current = []
         isPlayingRef.current = false
-        setConnectionState('idle')
         setIsAISpeaking(false)
         setAudioLevel(0)
+
+        // Save session data
+        const sessId = currentSessionId
+        const transcriptData = transcriptRef.current.filter(t => t.role !== 'system')
+        const dur = durationRef.current
+
+        if (sessId && transcriptData.length > 0) {
+            setIsSaving(true)
+            setStatusMessage('Saving session...')
+            try {
+                // Save transcript and duration
+                await fetch(`/api/ai/live/${sessId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        transcript: transcriptData,
+                        duration_seconds: dur,
+                        status: 'completed',
+                    }),
+                })
+
+                // Generate AI analysis (fire and forget on the server)
+                fetch(`/api/ai/live/${sessId}`, { method: 'POST' }).catch(() => { })
+
+                // Navigate to session detail page
+                router.push(`/dashboard/ai-tutor/${sessId}`)
+                return
+            } catch (e) {
+                console.error('Failed to save session:', e)
+            } finally {
+                setIsSaving(false)
+            }
+        }
+
+        // Reset if no save/navigation
+        setConnectionState('idle')
         setStatusMessage('')
         setDuration(0)
-    }, [])
+    }, [currentSessionId, router])
 
     // --- Mute Toggle ---
     const toggleMute = () => {
@@ -376,6 +466,17 @@ export default function AITutorPage() {
                                 <p className="text-sm text-foreground/50">{type.desc}</p>
                             </button>
                         ))}
+                    </div>
+
+                    {/* History link */}
+                    <div className="text-center">
+                        <Link
+                            href="/dashboard/ai-tutor/history"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-foreground/50 hover:text-foreground hover:border-cyan-500/30 transition-all text-sm"
+                        >
+                            <History className="h-4 w-4" />
+                            View Session History
+                        </Link>
                     </div>
                 </div>
             </div>
