@@ -777,6 +777,52 @@
 }
 
 /* ═══════════════════════════════════════════
+   GAMIFICATION ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+@keyframes level-up-burst {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+@keyframes confetti {
+  0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-200px) rotate(720deg) scale(0); opacity: 0; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.animate-level-up-burst {
+  animation: level-up-burst 2s ease-out forwards;
+}
+
+.animate-confetti {
+  animation: confetti 1.5s ease-out forwards;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 1.5s ease-in-out infinite;
+}
+
+.transition-all.duration-1500 {
+  transition-duration: 1500ms;
+}
+
+/* ═══════════════════════════════════════════
    PRINT
    ═══════════════════════════════════════════ */
 

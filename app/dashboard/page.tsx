@@ -6,9 +6,7 @@ import {
   Clock,
   Calendar,
   Beaker,
-  ArrowRight,
   BookOpen,
-  BrainCircuit,
   TrendingUp,
   Award,
   Zap,
@@ -16,12 +14,19 @@ import {
   Plus,
   Activity,
   MoreHorizontal,
-  Sparkles
+  Sparkles,
+  Mic,
+  FolderOpen,
+  Trophy,
+  Target,
 } from "lucide-react"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { RecentActivityList } from "@/components/dashboard/RecentActivityList"
+import { XPProgressBar } from "@/components/dashboard/XPProgressBar"
+import { StreakWidget } from "@/components/dashboard/StreakWidget"
+import { DailyGoals } from "@/components/dashboard/DailyGoals"
 
 export default async function Dashboard() {
   const supabase = await createClient()
@@ -42,6 +47,29 @@ export default async function Dashboard() {
 
   // Get user profile
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single() as { data: any }
+
+  // Get gamification data
+  const { data: streakData } = await supabase
+    .from("user_streaks")
+    .select("*")
+    .eq("user_id", user.id)
+    .single() as { data: any }
+
+  // Get recent achievements
+  const { data: recentAchievements } = await supabase
+    .from("user_achievements")
+    .select("*, achievements(*)")
+    .eq("user_id", user.id)
+    .not("unlocked_at", "is", null)
+    .order("unlocked_at", { ascending: false })
+    .limit(3) as { data: any[] | null }
+
+  // Get unread notifications count
+  const { count: unreadNotifications } = await supabase
+    .from("notifications")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .eq("read", false)
 
   // Get upcoming assignments (limit to 3)
   const { data: assignments } = await supabase
@@ -78,15 +106,44 @@ export default async function Dashboard() {
     .order("created_at", { ascending: false })
     .limit(3) as { data: any[] | null }
 
+  // Get user skills count
+  const { count: skillsCount } = await supabase
+    .from("user_skills")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id)
+
+  const totalXP = streakData?.total_xp || profile?.total_xp || 0
+  const level = streakData?.level || profile?.level || 1
+  const currentStreak = streakData?.current_streak || profile?.current_streak || 0
+  const longestStreak = streakData?.longest_streak || profile?.longest_streak || 0
+
   const stats = [
     {
-      label: "Ongoing Assignments",
-      value: assignments?.length || 0,
-      subtitle: `${dueThisWeekCount || 0} due this week`,
-      icon: CheckSquare,
+      label: "Level",
+      value: level,
+      subtitle: `${totalXP.toLocaleString()} total XP`,
+      icon: Trophy,
+      color: "text-amber-400",
+      bg: "bg-amber-500/10",
+      border: "border-amber-500/20",
+    },
+    {
+      label: "Skills",
+      value: skillsCount || 0,
+      subtitle: "Active skills",
+      icon: Target,
       color: "text-cyan-400",
       bg: "bg-cyan-500/10",
       border: "border-cyan-500/20",
+    },
+    {
+      label: "Completed Tasks",
+      value: completedCount || 0,
+      subtitle: `${dueThisWeekCount || 0} due this week`,
+      icon: TrendingUp,
+      color: "text-green-400",
+      bg: "bg-green-500/10",
+      border: "border-green-500/20",
     },
     {
       label: "AI Requests",
@@ -96,24 +153,6 @@ export default async function Dashboard() {
           ? `${Math.max(0, 10 - (profile?.ai_requests_count || 0))} remaining`
           : "Unlimited access",
       icon: Zap,
-      color: "text-amber-400",
-      bg: "bg-amber-500/10",
-      border: "border-amber-500/20",
-    },
-    {
-      label: "Completed Tasks",
-      value: completedCount || 0,
-      subtitle: "Total finished",
-      icon: TrendingUp,
-      color: "text-green-400",
-      bg: "bg-green-500/10",
-      border: "border-green-500/20",
-    },
-    {
-      label: "Current Plan",
-      value: profile?.subscription_tier === "pro" ? "Pro" : "Free",
-      subtitle: profile?.subscription_tier === "free" ? "Upgrade for more" : "All features active",
-      icon: Award,
       color: "text-pink-400",
       bg: "bg-pink-500/10",
       border: "border-pink-500/20",
@@ -123,8 +162,10 @@ export default async function Dashboard() {
   const quickActions = [
     { name: "New Course", href: "/dashboard/courses/new", icon: Plus, desc: "Create with AI" },
     { name: "AI Lab", href: "/dashboard/ai-lab", icon: Beaker, desc: "Experiment" },
+    { name: "AI Tutor", href: "/dashboard/ai-tutor", icon: Mic, desc: "Live Voice" },
+    { name: "Skills", href: "/dashboard/skills", icon: Target, desc: "Track Growth" },
+    { name: "Notes", href: "/dashboard/notes", icon: FolderOpen, desc: "Knowledge Base" },
     { name: "Calendar", href: "/dashboard/calendar", icon: Calendar, desc: "Schedule" },
-    { name: "Resources", href: "/dashboard/resources", icon: BookOpen, desc: "Library" },
   ]
 
   return (
@@ -139,7 +180,12 @@ export default async function Dashboard() {
               <h1 className="text-3xl font-bold font-display tracking-tight text-foreground">
                 Welcome back, {profile?.full_name?.split(' ')[0] || "Student"}
               </h1>
-              <p className="text-foreground/60 mt-1">Here's what's happening with your projects today.</p>
+              <p className="text-foreground/60 mt-1">
+                {currentStreak > 0
+                  ? `🔥 ${currentStreak}-day streak! Keep it up.`
+                  : "Start your learning streak today!"
+                }
+              </p>
             </div>
           </ScrollReveal>
           <div className="flex gap-3">
@@ -152,6 +198,11 @@ export default async function Dashboard() {
           </div>
         </div>
 
+        {/* XP Progress Bar — Full Width */}
+        <ScrollReveal direction="up" delay={0.1}>
+          <XPProgressBar totalXP={totalXP} level={level} />
+        </ScrollReveal>
+
         {/* Main Grid Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -159,7 +210,7 @@ export default async function Dashboard() {
           <div className="lg:col-span-2 space-y-8">
 
             {/* Stats Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {stats.map((stat, i) => (
                 <ScrollReveal key={stat.label} direction="up" delay={i * 0.1}>
                   <div className={`p-4 rounded-2xl glass-surface border ${stat.border} hover:border-opacity-50 transition-all group`}>
@@ -167,7 +218,6 @@ export default async function Dashboard() {
                       <div className={`p-2 rounded-lg ${stat.bg}`}>
                         <stat.icon className={`h-5 w-5 ${stat.color}`} />
                       </div>
-                      {/* Optional sparkline or trend indicator could go here */}
                     </div>
                     <div className="mt-2">
                       <h3 className="text-2xl font-bold text-foreground">{stat.value}</h3>
@@ -222,20 +272,61 @@ export default async function Dashboard() {
                 )}
               </GlassSurface>
             </ScrollReveal>
+
+            {/* Recent Achievements */}
+            {recentAchievements && recentAchievements.length > 0 && (
+              <ScrollReveal direction="up" delay={0.3}>
+                <GlassSurface className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                      <Award className="h-4 w-4 text-amber-400" />
+                      Recent Achievements
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {recentAchievements.map((ua: any) => (
+                      <div
+                        key={ua.id}
+                        className={`p-3 rounded-xl border text-center transition-all hover:scale-105 ${ua.achievements?.rarity === 'legendary'
+                            ? 'border-amber-500/30 bg-amber-500/5'
+                            : ua.achievements?.rarity === 'epic'
+                              ? 'border-purple-500/30 bg-purple-500/5'
+                              : ua.achievements?.rarity === 'rare'
+                                ? 'border-blue-500/30 bg-blue-500/5'
+                                : 'border-white/10 bg-white/5'
+                          }`}
+                      >
+                        <div className="text-2xl mb-1">{ua.achievements?.icon}</div>
+                        <div className="text-xs font-medium text-foreground">{ua.achievements?.name}</div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">
+                          +{ua.achievements?.xp_reward} XP
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
+            )}
           </div>
 
           {/* Right Column (Sidebar Widgets) */}
-          <div className="space-y-8">
+          <div className="space-y-6">
 
-            {/* Recent Activity */}
+            {/* Streak Widget */}
+            <ScrollReveal direction="left" delay={0.2}>
+              <StreakWidget
+                currentStreak={currentStreak}
+                longestStreak={longestStreak}
+                lastActivityDate={streakData?.last_activity_date}
+                weeklyXP={streakData?.weekly_xp || []}
+                dailyXPToday={streakData?.daily_xp_today || 0}
+                dailyGoalXP={streakData?.daily_goal_xp || 100}
+              />
+            </ScrollReveal>
+
+            {/* Daily Goals */}
             <ScrollReveal direction="left" delay={0.3}>
-              <GlassSurface className="p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-pink-400" />
-                  Recent Activity
-                </h2>
-                <RecentActivityList userId={user.id} />
-              </GlassSurface>
+              <DailyGoals />
             </ScrollReveal>
 
             {/* Quick Actions */}
@@ -245,14 +336,14 @@ export default async function Dashboard() {
                   <Zap className="h-4 w-4 text-amber-400" />
                   Quick Actions
                 </h2>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-2">
                   {quickActions.map((action) => (
                     <Link key={action.name} href={action.href}>
                       <div className="p-3 rounded-xl bg-foreground/5 hover:bg-foreground/10 transition-colors border border-foreground/5 hover:border-cyan-500/30 group text-center h-full">
                         <div className="mx-auto w-8 h-8 rounded-full bg-background flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                           <action.icon className="h-4 w-4 text-foreground/80 group-hover:text-cyan-400" />
                         </div>
-                        <span className="block text-xs font-medium text-foreground">{action.name}</span>
+                        <span className="block text-[11px] font-medium text-foreground">{action.name}</span>
                       </div>
                     </Link>
                   ))}
@@ -261,7 +352,7 @@ export default async function Dashboard() {
             </ScrollReveal>
 
             {/* Upcoming Assignments */}
-            <ScrollReveal direction="left" delay={0.4}>
+            <ScrollReveal direction="left" delay={0.5}>
               <GlassSurface className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -306,4 +397,3 @@ export default async function Dashboard() {
     </div>
   )
 }
-
