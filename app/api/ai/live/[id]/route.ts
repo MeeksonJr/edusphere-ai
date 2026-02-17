@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { generateAIResponse } from '@/lib/ai-service'
 import { NextRequest } from 'next/server'
 
 export const runtime = 'nodejs'
@@ -81,6 +81,7 @@ export async function PATCH(
 /**
  * POST /api/ai/live/[id]
  * Generate AI summary/feedback from a session's transcript
+ * Uses Groq first (fast, reliable), falls back to Gemini
  */
 export async function POST(
     _request: NextRequest,
@@ -114,16 +115,7 @@ export async function POST(
             .map((entry: any) => `${entry.role === 'ai' ? 'AI' : entry.role === 'user' ? 'Student' : 'System'}: ${entry.text}`)
             .join('\n')
 
-        // Generate AI analysis
-        const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY
-        if (!apiKey) {
-            return Response.json({ error: 'API key not configured' }, { status: 500 })
-        }
-
-        const genAI = new GoogleGenerativeAI(apiKey)
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
-
-        const prompt = `Analyze this tutoring session transcript and provide a JSON response with the following structure:
+        const analysisPrompt = `Analyze this tutoring session transcript and provide a JSON response with the following structure:
 {
   "summary": "2-3 sentence summary of what was discussed",
   "topics_covered": ["topic1", "topic2"],
@@ -144,39 +136,42 @@ ${transcriptText}
 
 Respond ONLY with valid JSON, no markdown formatting.`
 
-        // Generate with retry logic for rate limits
-        let result: any
-        let lastError: any
-        for (let attempt = 0; attempt < 3; attempt++) {
+        // Try Groq first (fast, reliable), then Gemini as fallback
+        const providersToTry: Array<'groq' | 'gemini'> = []
+        if (process.env.GROQ_API_KEY) providersToTry.push('groq')
+        if (process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY) providersToTry.push('gemini')
+
+        let responseText = ''
+        let lastError: any = null
+
+        for (const provider of providersToTry) {
             try {
-                result = await model.generateContent(prompt)
+                console.log(`[Session Analysis] Trying ${provider}...`)
+                const result = await generateAIResponse({
+                    provider,
+                    prompt: analysisPrompt,
+                    systemPrompt: 'You are an educational AI assistant that analyzes tutoring sessions. Always respond with valid JSON only.',
+                    temperature: 0.3,
+                    maxTokens: 2048,
+                })
+                responseText = result.text.trim()
+                console.log(`[Session Analysis] Success with ${provider} (${result.model})`)
                 break
             } catch (err: any) {
+                console.warn(`[Session Analysis] ${provider} failed:`, err.message)
                 lastError = err
-                // Check if it's a rate limit error
-                if (err.message?.includes('429') || err.message?.includes('quota') || err.message?.includes('Too Many Requests')) {
-                    const waitTime = Math.pow(2, attempt + 1) * 10 // 20s, 40s, 80s
-                    console.log(`[Session Analysis] Rate limited, retrying in ${waitTime}s (attempt ${attempt + 1}/3)`)
-                    await new Promise(resolve => setTimeout(resolve, waitTime * 1000))
-                    continue
-                }
-                throw err
+                continue
             }
         }
 
-        if (!result) {
-            // All retries exhausted
-            const isRateLimit = lastError?.message?.includes('429') || lastError?.message?.includes('quota')
-            if (isRateLimit) {
-                return Response.json({
-                    error: 'AI analysis is temporarily unavailable due to rate limits. Please try again in a few minutes.',
-                    retryable: true,
-                }, { status: 429 })
-            }
-            throw lastError
+        if (!responseText) {
+            const errorMsg = lastError?.message || 'All AI providers failed'
+            console.error('[Session Analysis] All providers failed:', errorMsg)
+            return Response.json({
+                error: 'AI analysis temporarily unavailable. Please try again later.',
+                retryable: true,
+            }, { status: 503 })
         }
-
-        const responseText = result.response.text().trim()
 
         let feedback: any
         try {

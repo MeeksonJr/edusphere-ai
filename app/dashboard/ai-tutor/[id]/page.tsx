@@ -80,8 +80,9 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
             if (res.ok) {
                 const { feedback, xp_earned } = await res.json()
                 setSession((prev: any) => ({ ...prev, feedback, xp_earned }))
-            } else if (res.status === 429) {
-                setAnalysisError('AI analysis is temporarily unavailable due to rate limits. Please try again in a few minutes.')
+            } else if (res.status === 429 || res.status === 503) {
+                const data = await res.json().catch(() => ({}))
+                setAnalysisError(data.error || 'AI analysis is temporarily unavailable. Please try again in a few minutes.')
             } else {
                 const data = await res.json().catch(() => ({}))
                 setAnalysisError(data.error || 'Failed to generate analysis. Please try again.')
@@ -184,7 +185,7 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                         <RefreshCw className="h-4 w-4 mr-2" />
                         Continue This Session
                     </Button>
-                    {!hasFeedback && transcript.length > 0 && (
+                    {transcript.length > 0 && (
                         <Button
                             onClick={generateAnalysis}
                             disabled={analyzing}
@@ -193,6 +194,8 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                         >
                             {analyzing ? (
                                 <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Analyzing...</>
+                            ) : hasFeedback ? (
+                                <><RefreshCw className="h-4 w-4 mr-2" /> Re-analyze</>
                             ) : (
                                 <><Sparkles className="h-4 w-4 mr-2" /> Generate Analysis</>
                             )}
@@ -218,10 +221,23 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                 {/* AI Summary */}
                 {hasFeedback && (
                     <GlassSurface className="p-6 space-y-5">
-                        <h2 className="text-sm font-semibold text-foreground/50 uppercase tracking-wider flex items-center gap-2">
-                            <Sparkles className="h-4 w-4 text-cyan-400" />
-                            AI Session Analysis
-                        </h2>
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-sm font-semibold text-foreground/50 uppercase tracking-wider flex items-center gap-2">
+                                <Sparkles className="h-4 w-4 text-cyan-400" />
+                                AI Session Analysis
+                            </h2>
+                            <button
+                                onClick={generateAnalysis}
+                                disabled={analyzing}
+                                className="text-xs text-foreground/30 hover:text-foreground/60 flex items-center gap-1 transition-colors disabled:opacity-50"
+                            >
+                                {analyzing ? (
+                                    <><Loader2 className="h-3 w-3 animate-spin" /> Regenerating...</>
+                                ) : (
+                                    <><RefreshCw className="h-3 w-3" /> Re-analyze</>
+                                )}
+                            </button>
+                        </div>
 
                         {/* Summary */}
                         <p className="text-foreground/80 leading-relaxed">{feedback.summary}</p>
