@@ -18,6 +18,8 @@ import {
     GraduationCap,
     Briefcase,
     Loader2,
+    AlertTriangle,
+    Timer,
     History,
 } from 'lucide-react'
 import { GlassSurface } from '@/components/shared/GlassSurface'
@@ -40,6 +42,9 @@ const SESSION_TYPES = [
     { id: 'study_buddy' as SessionType, name: 'Study Buddy', icon: Sparkles, desc: 'Casual study companion', color: 'from-pink-500 to-rose-500' },
     { id: 'interview_prep' as SessionType, name: 'Interview Prep', icon: Briefcase, desc: 'Mock interviews with AI feedback', color: 'from-indigo-500 to-violet-500' },
 ]
+
+const SESSION_TIME_LIMIT = 15 * 60 // 15 minutes in seconds
+const WARNING_THRESHOLD = 2 * 60 // Warn at 2 minutes remaining
 
 export default function AITutorPage() {
     return (
@@ -65,6 +70,8 @@ function AITutorContent() {
     const [statusMessage, setStatusMessage] = useState('')
     const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
     const [isSaving, setIsSaving] = useState(false)
+    const [timeRemaining, setTimeRemaining] = useState(SESSION_TIME_LIMIT)
+    const [showTimeWarning, setShowTimeWarning] = useState(false)
 
     // Refs to avoid stale closures
     const isMutedRef = useRef(false)
@@ -77,6 +84,8 @@ function AITutorContent() {
     const transcriptEndRef = useRef<HTMLDivElement>(null)
     const durationRef = useRef(0)
     const transcriptRef = useRef<TranscriptEntry[]>([])
+    const currentSessionIdRef = useRef<string | null>(null)
+    const saveAndNavigateRef = useRef<(() => Promise<void>) | null>(null)
 
     // Audio playback
     const audioQueueRef = useRef<ArrayBuffer[]>([])
@@ -90,13 +99,24 @@ function AITutorContent() {
         transcriptEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [transcript])
 
-    // Duration timer
+    // Duration timer + countdown
     useEffect(() => {
         if (isConnected) {
             timerRef.current = setInterval(() => {
                 setDuration(d => {
                     durationRef.current = d + 1
                     return d + 1
+                })
+                setTimeRemaining(prev => {
+                    const newTime = prev - 1
+                    if (newTime <= WARNING_THRESHOLD && newTime > 0) {
+                        setShowTimeWarning(true)
+                    }
+                    if (newTime <= 0) {
+                        // Auto-end session when time expires
+                        saveAndNavigateRef.current?.()
+                    }
+                    return Math.max(0, newTime)
                 })
             }, 1000)
         } else {
@@ -219,6 +239,7 @@ function AITutorContent() {
 
             const { token, model, systemInstruction, sessionId } = await res.json()
             setCurrentSessionId(sessionId)
+            currentSessionIdRef.current = sessionId
 
             // 2. Request microphone
             setStatusMessage('Requesting microphone access...')
@@ -337,14 +358,18 @@ function AITutorContent() {
                     },
                     onclose: (e: CloseEvent) => {
                         console.log('[Live API] Closed:', e.code, e.reason)
-                        if (e.code !== 1000) {
-                            setError(`Session closed: ${e.reason || `code ${e.code}`}`)
-                            setConnectionState('error')
-                        } else {
-                            setConnectionState('idle')
-                        }
                         setIsAISpeaking(false)
-                        setStatusMessage('')
+                        // Auto-save on any close (including timeout)
+                        if (e.code !== 1000) {
+                            // Show a friendly message instead of raw error
+                            if (e.code === 1011 || e.reason?.includes('Deadline')) {
+                                setError('Session time limit reached. Your session has been saved!')
+                            } else {
+                                setError(`Session ended: ${e.reason || `code ${e.code}`}`)
+                            }
+                        }
+                        // Always save on close
+                        saveAndNavigateRef.current?.()
                     },
                 },
             })
@@ -362,11 +387,15 @@ function AITutorContent() {
         }
     }, [selectedType, topic, addTranscript, queueAudioData, continueFromId])
 
-    // --- End Session ---
-    const endSession = useCallback(async () => {
-        // Close live connection
+    // --- Save session helper (accessible from onclose via ref) ---
+    const saveSessionData = useCallback(async () => {
+        const sessId = currentSessionIdRef.current
+        const transcriptData = transcriptRef.current.filter(t => t.role !== 'system')
+        const dur = durationRef.current
+
+        // Cleanup audio resources
         if (sessionRef.current) {
-            sessionRef.current.close()
+            try { sessionRef.current.close() } catch { }
             sessionRef.current = null
         }
         if (mediaStreamRef.current) {
@@ -386,16 +415,11 @@ function AITutorContent() {
         setIsAISpeaking(false)
         setAudioLevel(0)
 
-        // Save session data
-        const sessId = currentSessionId
-        const transcriptData = transcriptRef.current.filter(t => t.role !== 'system')
-        const dur = durationRef.current
-
         if (sessId && transcriptData.length > 0) {
             setIsSaving(true)
             setStatusMessage('Saving session...')
+            setConnectionState('idle')
             try {
-                // Save transcript and duration
                 await fetch(`/api/ai/live/${sessId}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
@@ -405,11 +429,7 @@ function AITutorContent() {
                         status: 'completed',
                     }),
                 })
-
-                // Generate AI analysis (fire and forget on the server)
                 fetch(`/api/ai/live/${sessId}`, { method: 'POST' }).catch(() => { })
-
-                // Navigate to session detail page
                 router.push(`/dashboard/ai-tutor/${sessId}`)
                 return
             } catch (e) {
@@ -419,11 +439,22 @@ function AITutorContent() {
             }
         }
 
-        // Reset if no save/navigation
         setConnectionState('idle')
         setStatusMessage('')
         setDuration(0)
-    }, [currentSessionId, router])
+        setTimeRemaining(SESSION_TIME_LIMIT)
+        setShowTimeWarning(false)
+    }, [router])
+
+    // Keep the save ref up to date so onclose can use it
+    useEffect(() => {
+        saveAndNavigateRef.current = saveSessionData
+    }, [saveSessionData])
+
+    // --- End Session ---
+    const endSession = useCallback(async () => {
+        await saveSessionData()
+    }, [saveSessionData])
 
     // --- Mute Toggle ---
     const toggleMute = () => {
@@ -514,6 +545,11 @@ function AITutorContent() {
                                 <div className="flex items-center gap-2 text-xs text-foreground/50">
                                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                                     Live • {formatDuration(duration)}
+                                    <span className="text-foreground/30">|</span>
+                                    <span className={`flex items-center gap-1 ${timeRemaining <= WARNING_THRESHOLD ? 'text-amber-400 font-medium' : 'text-foreground/30'}`}>
+                                        <Timer className="h-3 w-3" />
+                                        {formatDuration(timeRemaining)} left
+                                    </span>
                                 </div>
                             )}
                             {connectionState === 'connecting' && (
@@ -537,8 +573,40 @@ function AITutorContent() {
                     )}
                 </div>
 
+                {/* Time Warning Banner */}
+                {showTimeWarning && isConnected && (
+                    <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20 animate-pulse">
+                        <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0" />
+                        <div className="flex-1">
+                            <p className="text-sm font-medium text-amber-400">
+                                {timeRemaining > 0
+                                    ? `⏱️ ${formatDuration(timeRemaining)} remaining — End your session soon to save your progress`
+                                    : '⏱️ Time expired — Saving your session...'}
+                            </p>
+                            <p className="text-xs text-amber-400/60 mt-0.5">
+                                You can always continue this session later from your history
+                            </p>
+                        </div>
+                        <Button
+                            onClick={endSession}
+                            size="sm"
+                            className="bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30 text-xs"
+                        >
+                            End &amp; Save
+                        </Button>
+                    </div>
+                )}
+
+                {/* Saving state */}
+                {isSaving && (
+                    <GlassSurface className="p-4 flex items-center justify-center gap-3">
+                        <Loader2 className="h-5 w-5 text-cyan-400 animate-spin" />
+                        <span className="text-foreground/70">Saving your session...</span>
+                    </GlassSurface>
+                )}
+
                 {/* Pre-session: Topic input */}
-                {(connectionState === 'idle' || connectionState === 'error') && (
+                {(connectionState === 'idle' || connectionState === 'error') && !isSaving && (
                     <GlassSurface className="p-6">
                         <label className="block text-sm font-medium text-foreground mb-2">
                             What would you like to discuss? (optional)
@@ -559,6 +627,10 @@ function AITutorContent() {
                                 ⚠️ {error}
                             </div>
                         )}
+                        <div className="mt-3 flex items-center gap-2 text-xs text-foreground/30">
+                            <Timer className="h-3.5 w-3.5" />
+                            <span>Sessions are limited to {SESSION_TIME_LIMIT / 60} minutes. You can continue any session from your history.</span>
+                        </div>
                         <Button
                             onClick={startSession}
                             className="w-full mt-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20 h-12 text-base"
