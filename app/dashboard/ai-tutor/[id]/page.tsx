@@ -495,12 +495,14 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                                     </span>
                                 )}
                                 {actionResults.generate_flashcards?.success && flashcardPreview.cards.length > 0 && (
-                                    <button
+                                    <span
+                                        role="link"
+                                        tabIndex={0}
                                         onClick={(e) => { e.stopPropagation(); setFlashcardPreview(p => ({ ...p, open: true })) }}
-                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5"
+                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5 cursor-pointer"
                                     >
                                         Preview <ExternalLink className="h-2.5 w-2.5" />
-                                    </button>
+                                    </span>
                                 )}
                             </button>
 
@@ -524,12 +526,14 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                                     </span>
                                 )}
                                 {actionResults.save_notes?.success && notesPreview.content && (
-                                    <button
+                                    <span
+                                        role="link"
+                                        tabIndex={0}
                                         onClick={(e) => { e.stopPropagation(); setNotesPreview(p => ({ ...p, open: true })) }}
-                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5"
+                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5 cursor-pointer"
                                     >
                                         Preview <ExternalLink className="h-2.5 w-2.5" />
-                                    </button>
+                                    </span>
                                 )}
                             </button>
 
