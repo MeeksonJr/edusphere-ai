@@ -98,9 +98,9 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen }: { mobileOpen: bo
       <AnimatePresence>
         {(mobileOpen || !isMobile) && (
           <motion.aside
-            initial={isMobile ? { x: -300 } : false}
-            animate={isMobile ? { x: mobileOpen ? 0 : -300 } : false}
-            exit={isMobile ? { x: -300 } : false}
+            initial={isMobile ? { x: -300 } : undefined}
+            animate={isMobile ? { x: mobileOpen ? 0 : -300 } : undefined}
+            exit={isMobile ? { x: -300 } : undefined}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn(
               "fixed left-0 top-0 h-screen z-40 transition-all duration-300 border-r border-foreground/5 bg-background/50 backdrop-blur-xl",

@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
                 resource_type: "notes",
                 tags: tags || [],
                 ai_generated: false,
-            })
+            } as any)
             .select()
             .single()
 
@@ -113,8 +113,8 @@ export async function PATCH(request: NextRequest) {
         if (updates.subject !== undefined) updateData.subject = updates.subject
         if (updates.tags !== undefined) updateData.tags = updates.tags
 
-        const { data: note, error } = await supabase
-            .from("study_resources")
+        const { data: note, error } = await (supabase
+            .from("study_resources") as any)
             .update(updateData)
             .eq("id", id)
             .eq("user_id", user.id)
