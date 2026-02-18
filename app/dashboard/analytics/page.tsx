@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import dynamic from "next/dynamic"
 import {
     Trophy,
@@ -8,6 +8,13 @@ import {
     Clock,
     Target,
     Award,
+    Zap,
+    GraduationCap,
+    BarChart3,
+    Sparkles,
+    Brain,
+    BookOpen,
+    Layers,
 } from "lucide-react"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
@@ -15,88 +22,183 @@ import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 
-// Lazy load Recharts components
+// Lazy load chart components
 const ActivityChart = dynamic(() => import("@/components/dashboard/analytics/ActivityChart"), {
-    loading: () => <div className="h-[300px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
+    loading: () => <div className="h-[380px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
     ssr: false,
 })
 const ProgressChart = dynamic(() => import("@/components/dashboard/analytics/ProgressChart"), {
-    loading: () => <div className="h-[300px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
+    loading: () => <div className="h-[380px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
     ssr: false,
 })
 const MasteryChart = dynamic(() => import("@/components/dashboard/analytics/MasteryChart"), {
+    loading: () => <div className="h-[380px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
+    ssr: false,
+})
+const StreakHeatmap = dynamic(() => import("@/components/dashboard/analytics/StreakHeatmap"), {
+    loading: () => <div className="h-[200px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
+    ssr: false,
+})
+const SessionStatsChart = dynamic(() => import("@/components/dashboard/analytics/SessionStatsChart"), {
+    loading: () => <div className="h-[380px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
+    ssr: false,
+})
+const AIInsightsPanel = dynamic(() => import("@/components/dashboard/analytics/AIInsightsPanel"), {
     loading: () => <div className="h-[300px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
     ssr: false,
 })
 
-// --- Mock Data ---
-
-const activityData = [
-    { name: "Mon", hours: 2.5, courses: 1 },
-    { name: "Tue", hours: 4.2, courses: 2 },
-    { name: "Wed", hours: 1.8, courses: 0 },
-    { name: "Thu", hours: 3.5, courses: 1 },
-    { name: "Fri", hours: 5.0, courses: 3 },
-    { name: "Sat", hours: 6.2, courses: 2 },
-    { name: "Sun", hours: 2.0, courses: 1 },
-]
-
-const subjectMasteryData = [
-    { subject: "Coding", A: 120, fullMark: 150 },
-    { subject: "Math", A: 98, fullMark: 150 },
-    { subject: "History", A: 86, fullMark: 150 },
-    { subject: "Science", A: 99, fullMark: 150 },
-    { subject: "Art", A: 85, fullMark: 150 },
-    { subject: "Language", A: 65, fullMark: 150 },
-]
-
-const courseProgressData = [
-    { name: "Completed", value: 4, color: "#10b981" },
-    { name: "In Progress", value: 3, color: "#06b6d4" },
-    { name: "Not Started", value: 2, color: "#64748b" },
-]
+interface AnalyticsData {
+    stats: {
+        totalXP: number
+        level: number
+        levelTitle: string
+        levelProgress: { current: number; needed: number; progress: number }
+        streak: number
+        longestStreak: number
+        totalStudyMinutes: number
+        coursesCompleted: number
+        totalCourses: number
+        sessionsCompleted: number
+        avgSessionRating: number
+        focusScore: number
+        totalCards: number
+        totalResources: number
+        assignmentCompletion: number
+    }
+    activityData: any[]
+    courseProgressData: any[]
+    subjectMasteryData: any[]
+    streakHeatmap: { date: string; count: number }[]
+    sessionStats: any[]
+    topTopics: { topic: string; count: number }[]
+    aiInsights: string[]
+    recentAchievements: {
+        title: string
+        description: string
+        icon: string
+        xp_reward: number
+        unlockedAt: string
+    }[]
+}
 
 export default function AnalyticsPage() {
     const [timeRange, setTimeRange] = useState("week")
     const [loading, setLoading] = useState(true)
-    const [data, setData] = useState<{
-        activityData: any[];
-        courseProgressData: any[];
-        subjectMasteryData: any[];
-        stats: any;
-    } | null>(null)
+    const [data, setData] = useState<AnalyticsData | null>(null)
+
+    const fetchData = useCallback(async (range: string) => {
+        setLoading(true)
+        try {
+            const res = await fetch(`/api/analytics?range=${range}`)
+            if (res.ok) {
+                const jsonData = await res.json()
+                setData(jsonData)
+            }
+        } catch (error) {
+            console.error("Failed to fetch analytics:", error)
+        } finally {
+            setLoading(false)
+        }
+    }, [])
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await fetch("/api/analytics")
-                if (res.ok) {
-                    const jsonData = await res.json()
-                    setData(jsonData)
-                }
-            } catch (error) {
-                console.error("Failed to fetch analytics:", error)
-            } finally {
-                setLoading(false)
-            }
-        }
-        fetchData()
-    }, [])
+        fetchData(timeRange)
+    }, [timeRange, fetchData])
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+            <div className="relative min-h-screen p-6 md:p-8 lg:p-12">
+                <AmbientBackground />
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <div className="flex flex-col items-center gap-3">
+                        <div className="animate-spin rounded-full h-10 w-10 border-2 border-cyan-500 border-t-transparent" />
+                        <span className="text-sm text-foreground/50">Loading analytics…</span>
+                    </div>
+                </div>
             </div>
         )
     }
 
-    const { activityData, courseProgressData, subjectMasteryData, stats } = data || {
-        activityData: [],
-        courseProgressData: [],
-        subjectMasteryData: [],
-        stats: { studyTime: "0h", coursesCompleted: "0", streak: "0 Days", focusScore: "0%" }
+    const stats = data?.stats || {
+        totalXP: 0, level: 0, levelTitle: 'Beginner', levelProgress: { current: 0, needed: 100, progress: 0 },
+        streak: 0, longestStreak: 0, totalStudyMinutes: 0, coursesCompleted: 0, totalCourses: 0,
+        sessionsCompleted: 0, avgSessionRating: 0, focusScore: 0, totalCards: 0, totalResources: 0, assignmentCompletion: 0,
     }
+
+    const formatTime = (minutes: number) => {
+        if (minutes < 60) return `${minutes}m`
+        const h = Math.floor(minutes / 60)
+        const m = minutes % 60
+        return m > 0 ? `${h}h ${m}m` : `${h}h`
+    }
+
+    const statCards = [
+        {
+            label: "Level",
+            value: `${stats.level}`,
+            sub: stats.levelTitle,
+            icon: GraduationCap,
+            color: "text-violet-400",
+            glow: "from-violet-500/10 to-transparent",
+        },
+        {
+            label: "Total XP",
+            value: stats.totalXP.toLocaleString(),
+            sub: `${stats.levelProgress.progress}% to next`,
+            icon: Zap,
+            color: "text-amber-400",
+            glow: "from-amber-500/10 to-transparent",
+        },
+        {
+            label: "Streak",
+            value: `${stats.streak}`,
+            sub: `Best: ${stats.longestStreak} days`,
+            icon: Flame,
+            color: "text-orange-400",
+            glow: "from-orange-500/10 to-transparent",
+        },
+        {
+            label: "Study Time",
+            value: formatTime(stats.totalStudyMinutes),
+            sub: "From AI sessions",
+            icon: Clock,
+            color: "text-blue-400",
+            glow: "from-blue-500/10 to-transparent",
+        },
+        {
+            label: "Courses",
+            value: `${stats.coursesCompleted}/${stats.totalCourses}`,
+            sub: "Completed",
+            icon: BookOpen,
+            color: "text-emerald-400",
+            glow: "from-emerald-500/10 to-transparent",
+        },
+        {
+            label: "Sessions",
+            value: `${stats.sessionsCompleted}`,
+            sub: `⭐ ${stats.avgSessionRating}/5 avg`,
+            icon: Brain,
+            color: "text-cyan-400",
+            glow: "from-cyan-500/10 to-transparent",
+        },
+        {
+            label: "Flashcards",
+            value: `${stats.totalCards}`,
+            sub: `${stats.totalResources} resources`,
+            icon: Layers,
+            color: "text-pink-400",
+            glow: "from-pink-500/10 to-transparent",
+        },
+        {
+            label: "Focus Score",
+            value: `${stats.focusScore}%`,
+            sub: stats.focusScore >= 80 ? "Excellent" : stats.focusScore >= 50 ? "Good" : "Building",
+            icon: Target,
+            color: "text-green-400",
+            glow: "from-green-500/10 to-transparent",
+        },
+    ]
 
     return (
         <div className="relative min-h-screen p-6 md:p-8 lg:p-12 pb-32">
@@ -112,7 +214,7 @@ export default function AnalyticsPage() {
                                 Analytics
                             </span>
                         </h1>
-                        <p className="text-foreground/70">Track your progress and insights.</p>
+                        <p className="text-foreground/60">Your complete learning intelligence dashboard.</p>
                     </div>
                     <Select value={timeRange} onValueChange={setTimeRange}>
                         <SelectTrigger className="w-[180px] glass-surface border-foreground/20 text-foreground">
@@ -121,75 +223,125 @@ export default function AnalyticsPage() {
                         <SelectContent className="glass-surface border-foreground/20">
                             <SelectItem value="week" className="text-foreground">This Week</SelectItem>
                             <SelectItem value="month" className="text-foreground">This Month</SelectItem>
-                            <SelectItem value="year" className="text-foreground">This Year</SelectItem>
+                            <SelectItem value="quarter" className="text-foreground">Last 90 Days</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
             </ScrollReveal>
 
-            {/* Overview Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                {[
-                    { label: "Study Time", value: stats.studyTime, icon: Clock, color: "text-blue-400", sub: "Calculated from activity" },
-                    { label: "Courses Completed", value: stats.coursesCompleted, icon: Trophy, color: "text-yellow-400", sub: "Total finished" },
-                    { label: "Current Streak", value: stats.streak, icon: Flame, color: "text-orange-400", sub: "Keep it up!" },
-                    { label: "Focus Score", value: stats.focusScore, icon: Target, color: "text-green-400", sub: "Top 10% of users" },
-                ].map((stat, i) => (
-                    <ScrollReveal key={stat.label} direction="up" delay={i * 0.05} className="h-full">
-                        <GlassSurface className="p-4 flex flex-col justify-between h-full hover:border-cyan-500/30 transition-colors">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-foreground/60">{stat.label}</span>
-                                <stat.icon className={cn("h-4 w-4", stat.color)} />
-                            </div>
-                            <div>
-                                <div className="text-2xl font-bold text-foreground mb-1">{stat.value}</div>
-                                <div className="text-xs text-foreground/50">{stat.sub}</div>
+            {/* ──── 1. Stats Grid ──── */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                {statCards.map((stat, i) => (
+                    <ScrollReveal key={stat.label} direction="up" delay={i * 0.04} className="h-full">
+                        <GlassSurface className="p-4 flex flex-col justify-between h-full hover:border-white/10 transition-all relative overflow-hidden group">
+                            {/* Subtle glow */}
+                            <div className={`absolute inset-0 bg-gradient-to-br ${stat.glow} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                            <div className="relative z-10">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-xs text-foreground/50 font-medium">{stat.label}</span>
+                                    <stat.icon className={cn("h-4 w-4", stat.color)} />
+                                </div>
+                                <div className="text-2xl font-bold text-foreground mb-0.5">{stat.value}</div>
+                                <div className="text-[11px] text-foreground/40">{stat.sub}</div>
                             </div>
                         </GlassSurface>
                     </ScrollReveal>
                 ))}
             </div>
 
-            {/* Charts Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                {/* Activity Chart */}
-                <ScrollReveal direction="up" delay={0.2} className="col-span-1 lg:col-span-2">
-                    <ActivityChart data={activityData} />
-                </ScrollReveal>
+            {/* XP Progress Bar */}
+            <ScrollReveal direction="up" delay={0.1}>
+                <GlassSurface className="p-4 mb-8">
+                    <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-foreground/60">Level {stats.level} → Level {stats.level + 1}</span>
+                        <span className="text-xs text-foreground/40">{stats.levelProgress.current} / {stats.levelProgress.needed} XP</span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-white/[0.05] overflow-hidden">
+                        <div
+                            className="h-full rounded-full transition-all duration-700"
+                            style={{
+                                width: `${stats.levelProgress.progress}%`,
+                                background: 'linear-gradient(90deg, #8b5cf6, #06b6d4, #10b981)',
+                            }}
+                        />
+                    </div>
+                </GlassSurface>
+            </ScrollReveal>
 
-                {/* Course Progress */}
+            {/* ──── 2. Activity Trends (full width) ──── */}
+            <ScrollReveal direction="up" delay={0.15} className="mb-8">
+                <ActivityChart data={data?.activityData || []} />
+            </ScrollReveal>
+
+            {/* ──── 3. Streak Heatmap (full width) ──── */}
+            <ScrollReveal direction="up" delay={0.2} className="mb-8">
+                <StreakHeatmap
+                    data={data?.streakHeatmap || []}
+                    currentStreak={stats.streak}
+                    longestStreak={stats.longestStreak}
+                />
+            </ScrollReveal>
+
+            {/* ──── 4. Course Progress + Skill Radar (2-col) ──── */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <ScrollReveal direction="up" delay={0.25}>
+                    <ProgressChart data={data?.courseProgressData || []} />
+                </ScrollReveal>
                 <ScrollReveal direction="up" delay={0.3}>
-                    <ProgressChart data={courseProgressData} />
-                </ScrollReveal>
-
-                {/* Subject Mastery */}
-                <ScrollReveal direction="up" delay={0.4}>
-                    <MasteryChart data={subjectMasteryData} />
+                    <MasteryChart data={data?.subjectMasteryData || []} />
                 </ScrollReveal>
             </div>
 
-            {/* Recent Achievements */}
-            <ScrollReveal direction="up" delay={0.5}>
+            {/* ──── 5. Session Performance (full width for single col, or paired) ──── */}
+            <ScrollReveal direction="up" delay={0.35} className="mb-8">
+                <SessionStatsChart
+                    data={data?.sessionStats || []}
+                    totalSessions={stats.sessionsCompleted}
+                    avgRating={stats.avgSessionRating}
+                />
+            </ScrollReveal>
+
+            {/* ──── 6. AI Insights (full width) ──── */}
+            <ScrollReveal direction="up" delay={0.4} className="mb-8">
+                <AIInsightsPanel
+                    insights={data?.aiInsights || []}
+                    topTopics={data?.topTopics || []}
+                />
+            </ScrollReveal>
+
+            {/* ──── 7. Recent Achievements ──── */}
+            <ScrollReveal direction="up" delay={0.45}>
                 <GlassSurface className="p-6">
                     <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                         <Award className="mr-2 h-5 w-5 text-orange-400" />
                         Recent Achievements
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {[
-                            { title: "Early Bird", desc: "Completed 5 lessons before 9 AM", icon: "🌅" },
-                            { title: "Quiz Master", desc: "Scored 100% on 3 quizzes in a row", icon: "🎯" },
-                            { title: "Consistency Is Key", desc: "Studied for 7 days straight", icon: "🔥" },
-                        ].map((achievement, i) => (
-                            <div key={i} className="flex items-start space-x-3 p-3 rounded-lg bg-foreground/5 border border-foreground/10">
-                                <div className="text-2xl">{achievement.icon}</div>
-                                <div>
-                                    <div className="font-semibold text-foreground text-sm">{achievement.title}</div>
-                                    <div className="text-xs text-foreground/60">{achievement.desc}</div>
+                    {(data?.recentAchievements?.length || 0) > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {data!.recentAchievements.map((achievement, i) => (
+                                <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:border-amber-500/20 transition-colors">
+                                    <div className="text-2xl shrink-0">{achievement.icon}</div>
+                                    <div className="min-w-0">
+                                        <div className="font-semibold text-foreground text-sm truncate">{achievement.title}</div>
+                                        <div className="text-xs text-foreground/50 line-clamp-2">{achievement.description}</div>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            {achievement.xp_reward > 0 && (
+                                                <span className="text-[10px] text-amber-400 font-medium">+{achievement.xp_reward} XP</span>
+                                            )}
+                                            <span className="text-[10px] text-foreground/30">
+                                                {new Date(achievement.unlockedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-8 text-foreground/30 text-sm">
+                            <Trophy className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                            <p>No achievements unlocked yet — keep studying to earn them!</p>
+                        </div>
+                    )}
                 </GlassSurface>
             </ScrollReveal>
         </div>
