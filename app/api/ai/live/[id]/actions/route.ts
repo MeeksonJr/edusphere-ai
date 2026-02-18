@@ -56,6 +56,12 @@ export async function POST(
             case 'export_markdown':
                 return handleExportMarkdown(session, topic, transcript, feedback)
 
+            case 'generate_quiz':
+                return await handleGenerateQuiz(supabase, user.id, session, topic, transcriptText, feedback)
+
+            case 'schedule_review':
+                return await handleScheduleReview(supabase, user.id, session, topic, feedback)
+
             default:
                 return Response.json({ error: `Unknown action: ${action}` }, { status: 400 })
         }
@@ -309,5 +315,149 @@ function handleExportMarkdown(
         success: true,
         content: md,
         filename: `${topic.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase()}-session-${session.id.slice(0, 8)}.md`,
+    })
+}
+
+/**
+ * Generate quiz questions from session content
+ */
+async function handleGenerateQuiz(
+    supabase: any,
+    userId: string,
+    session: any,
+    topic: string,
+    transcriptText: string,
+    feedback: any
+) {
+    const keyConceptsHint = feedback.key_concepts?.length
+        ? `\nKey concepts to test: ${feedback.key_concepts.join(', ')}`
+        : ''
+
+    const prompt = `Based on this tutoring session, generate 10 quiz questions to test understanding.
+
+Topic: ${topic}${keyConceptsHint}
+
+Transcript:
+${transcriptText.slice(0, 6000)}
+
+Generate a JSON array of questions with varied types:
+[
+  {
+    "question_type": "multiple-choice",
+    "question": "...",
+    "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
+    "correct_answer": "A) ...",
+    "explanation": "...",
+    "difficulty": "easy" | "medium" | "hard"
+  },
+  {
+    "question_type": "true-false",
+    "question": "...",
+    "correct_answer": "True" or "False",
+    "explanation": "...",
+    "difficulty": "easy" | "medium" | "hard"
+  },
+  {
+    "question_type": "short-answer",
+    "question": "...",
+    "correct_answer": "...",
+    "explanation": "...",
+    "difficulty": "medium"
+  }
+]
+
+Rules:
+- Mix of 6 multiple-choice, 2 true-false, 2 short-answer
+- Range from easy to hard
+- Test understanding, not trivia
+- Explanations should be educational
+- Respond ONLY with the JSON array`
+
+    const result = await generateAIResponse({
+        provider: process.env.GROQ_API_KEY ? 'groq' : 'gemini',
+        prompt,
+        systemPrompt: 'You are an expert educator who creates effective assessment questions. Respond only with a JSON array.',
+        temperature: 0.4,
+        maxTokens: 3000,
+    })
+
+    let questions: any[] = []
+    try {
+        const cleaned = result.text.replace(/```json?\n?/g, '').replace(/```\n?/g, '').trim()
+        const jsonStr = cleaned.match(/\[[\s\S]*\]/)?.[0] || '[]'
+        questions = JSON.parse(jsonStr)
+    } catch {
+        return Response.json({ error: 'Failed to parse generated quiz' }, { status: 500 })
+    }
+
+    if (questions.length === 0) {
+        return Response.json({ error: 'No questions could be generated from this session' }, { status: 400 })
+    }
+
+    return Response.json({
+        success: true,
+        questions,
+        question_count: questions.length,
+        message: `Generated ${questions.length} quiz questions`,
+    })
+}
+
+/**
+ * Schedule a review session → calendar_events table
+ */
+async function handleScheduleReview(
+    supabase: any,
+    userId: string,
+    session: any,
+    topic: string,
+    feedback: any
+) {
+    // Schedule review 3 days from now (spaced repetition principle)
+    const reviewDate = new Date()
+    reviewDate.setDate(reviewDate.getDate() + 3)
+    reviewDate.setHours(10, 0, 0, 0) // Default to 10 AM
+
+    const endDate = new Date(reviewDate)
+    endDate.setMinutes(endDate.getMinutes() + 30)
+
+    const description = [
+        `Review session for: ${topic}`,
+        feedback.areas_to_improve?.length
+            ? `\nFocus areas: ${feedback.areas_to_improve.join(', ')}`
+            : '',
+        feedback.suggested_next_steps?.length
+            ? `\nNext steps: ${feedback.suggested_next_steps.join(', ')}`
+            : '',
+        `\n\nOriginal session: ${session.id}`,
+    ].join('')
+
+    const { data: event, error } = await supabase
+        .from('calendar_events')
+        .insert({
+            user_id: userId,
+            title: `📚 Review: ${topic}`,
+            description,
+            start_time: reviewDate.toISOString(),
+            end_time: endDate.toISOString(),
+            color: '#06b6d4', // cyan
+            source: 'ai-tutor',
+        })
+        .select()
+        .single()
+
+    if (error) {
+        console.error('[Calendar] Insert error:', error)
+        return Response.json({ error: 'Failed to schedule review' }, { status: 500 })
+    }
+
+    const dateStr = reviewDate.toLocaleDateString('en-US', {
+        weekday: 'long', month: 'short', day: 'numeric'
+    })
+
+    return Response.json({
+        success: true,
+        event_id: event.id,
+        review_date: dateStr,
+        message: `Review scheduled for ${dateStr}`,
     })
 }

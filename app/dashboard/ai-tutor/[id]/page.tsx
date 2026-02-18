@@ -25,10 +25,15 @@ import {
     FileText,
     Download,
     ExternalLink,
+    CalendarPlus,
+    ClipboardCheck,
+    ChevronDown,
+    ChevronUp,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { GlassSurface } from '@/components/shared/GlassSurface'
 import { AmbientBackground } from '@/components/shared/AmbientBackground'
+import { GenerateCourseModal } from './generate-course-modal'
 
 const TYPE_META: Record<string, { name: string; icon: any; color: string }> = {
     tutor: { name: '1-on-1 Tutor', icon: GraduationCap, color: 'from-cyan-500 to-blue-500' },
@@ -58,6 +63,9 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
     // Session actions state
     const [actionLoading, setActionLoading] = useState<string | null>(null)
     const [actionResults, setActionResults] = useState<Record<string, { success: boolean; message: string; link?: string }>>({})
+    const [courseModalOpen, setCourseModalOpen] = useState(false)
+    const [quizQuestions, setQuizQuestions] = useState<any[]>([])
+    const [quizRevealed, setQuizRevealed] = useState<Record<number, boolean>>({})
 
     useEffect(() => {
         params.then(p => setSessionId(p.id))
@@ -156,6 +164,25 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                         success: true,
                         message: data.message || 'Study notes saved',
                         link: '/dashboard/resources',
+                    },
+                }))
+            } else if (action === 'generate_quiz') {
+                setQuizQuestions(data.questions || [])
+                setQuizRevealed({})
+                setActionResults(prev => ({
+                    ...prev,
+                    [action]: {
+                        success: true,
+                        message: data.message || `Generated ${data.question_count} questions`,
+                    },
+                }))
+            } else if (action === 'schedule_review') {
+                setActionResults(prev => ({
+                    ...prev,
+                    [action]: {
+                        success: true,
+                        message: data.message || 'Review scheduled',
+                        link: '/dashboard/calendar',
                     },
                 }))
             }
@@ -423,11 +450,11 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                             <Zap className="h-4 w-4 text-amber-400" />
                             Session Actions
                         </h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {/* Generate Flashcards */}
                             <button
                                 onClick={() => handleAction('generate_flashcards')}
-                                disabled={actionLoading === 'generate_flashcards'}
+                                disabled={!!actionLoading}
                                 className="group relative flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-purple-500/30 hover:bg-purple-500/5 transition-all disabled:opacity-50"
                             >
                                 {actionLoading === 'generate_flashcards' ? (
@@ -437,7 +464,7 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                                 ) : (
                                     <Layers className="h-6 w-6 text-purple-400 group-hover:scale-110 transition-transform" />
                                 )}
-                                <span className="text-xs font-medium text-foreground/70">Generate Flashcards</span>
+                                <span className="text-xs font-medium text-foreground/70">Flashcards</span>
                                 {actionResults.generate_flashcards && (
                                     <span className={`text-[10px] ${actionResults.generate_flashcards.success ? 'text-emerald-400' : 'text-red-400'}`}>
                                         {actionResults.generate_flashcards.message}
@@ -456,7 +483,7 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                             {/* Save Study Notes */}
                             <button
                                 onClick={() => handleAction('save_notes')}
-                                disabled={actionLoading === 'save_notes'}
+                                disabled={!!actionLoading}
                                 className="group relative flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all disabled:opacity-50"
                             >
                                 {actionLoading === 'save_notes' ? (
@@ -466,7 +493,7 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                                 ) : (
                                     <FileText className="h-6 w-6 text-emerald-400 group-hover:scale-110 transition-transform" />
                                 )}
-                                <span className="text-xs font-medium text-foreground/70">Save Study Notes</span>
+                                <span className="text-xs font-medium text-foreground/70">Study Notes</span>
                                 {actionResults.save_notes && (
                                     <span className={`text-[10px] ${actionResults.save_notes.success ? 'text-emerald-400' : 'text-red-400'}`}>
                                         {actionResults.save_notes.message}
@@ -485,7 +512,7 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                             {/* Export Markdown */}
                             <button
                                 onClick={() => handleAction('export_markdown')}
-                                disabled={actionLoading === 'export_markdown'}
+                                disabled={!!actionLoading}
                                 className="group relative flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-blue-500/30 hover:bg-blue-500/5 transition-all disabled:opacity-50"
                             >
                                 {actionLoading === 'export_markdown' ? (
@@ -495,16 +522,138 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                                 ) : (
                                     <Download className="h-6 w-6 text-blue-400 group-hover:scale-110 transition-transform" />
                                 )}
-                                <span className="text-xs font-medium text-foreground/70">Export Markdown</span>
+                                <span className="text-xs font-medium text-foreground/70">Export .md</span>
                                 {actionResults.export_markdown && (
                                     <span className={`text-[10px] ${actionResults.export_markdown.success ? 'text-emerald-400' : 'text-red-400'}`}>
                                         {actionResults.export_markdown.message}
                                     </span>
                                 )}
                             </button>
+
+                            {/* Generate Course */}
+                            <button
+                                onClick={() => setCourseModalOpen(true)}
+                                className="group relative flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-cyan-500/30 hover:bg-cyan-500/5 transition-all"
+                            >
+                                <GraduationCap className="h-6 w-6 text-cyan-400 group-hover:scale-110 transition-transform" />
+                                <span className="text-xs font-medium text-foreground/70">Generate Course</span>
+                            </button>
+
+                            {/* Generate Quiz */}
+                            <button
+                                onClick={() => handleAction('generate_quiz')}
+                                disabled={!!actionLoading}
+                                className="group relative flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-amber-500/30 hover:bg-amber-500/5 transition-all disabled:opacity-50"
+                            >
+                                {actionLoading === 'generate_quiz' ? (
+                                    <Loader2 className="h-6 w-6 text-amber-400 animate-spin" />
+                                ) : actionResults.generate_quiz?.success ? (
+                                    <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+                                ) : (
+                                    <ClipboardCheck className="h-6 w-6 text-amber-400 group-hover:scale-110 transition-transform" />
+                                )}
+                                <span className="text-xs font-medium text-foreground/70">Generate Quiz</span>
+                                {actionResults.generate_quiz && (
+                                    <span className={`text-[10px] ${actionResults.generate_quiz.success ? 'text-emerald-400' : 'text-red-400'}`}>
+                                        {actionResults.generate_quiz.message}
+                                    </span>
+                                )}
+                            </button>
+
+                            {/* Schedule Review */}
+                            <button
+                                onClick={() => handleAction('schedule_review')}
+                                disabled={!!actionLoading}
+                                className="group relative flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-teal-500/30 hover:bg-teal-500/5 transition-all disabled:opacity-50"
+                            >
+                                {actionLoading === 'schedule_review' ? (
+                                    <Loader2 className="h-6 w-6 text-teal-400 animate-spin" />
+                                ) : actionResults.schedule_review?.success ? (
+                                    <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+                                ) : (
+                                    <CalendarPlus className="h-6 w-6 text-teal-400 group-hover:scale-110 transition-transform" />
+                                )}
+                                <span className="text-xs font-medium text-foreground/70">Schedule Review</span>
+                                {actionResults.schedule_review && (
+                                    <span className={`text-[10px] ${actionResults.schedule_review.success ? 'text-emerald-400' : 'text-red-400'}`}>
+                                        {actionResults.schedule_review.message}
+                                    </span>
+                                )}
+                                {actionResults.schedule_review?.link && (
+                                    <Link
+                                        href={actionResults.schedule_review.link}
+                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5"
+                                    >
+                                        View <ExternalLink className="h-2.5 w-2.5" />
+                                    </Link>
+                                )}
+                            </button>
                         </div>
                     </GlassSurface>
                 )}
+
+                {/* Inline Quiz Results */}
+                {quizQuestions.length > 0 && (
+                    <GlassSurface className="p-5">
+                        <h2 className="text-sm font-semibold text-foreground/50 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <ClipboardCheck className="h-4 w-4 text-amber-400" />
+                            Quiz — {quizQuestions.length} Questions
+                        </h2>
+                        <div className="space-y-3">
+                            {quizQuestions.map((q: any, i: number) => (
+                                <div key={i} className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${q.difficulty === 'easy' ? 'bg-emerald-500/10 text-emerald-400'
+                                                        : q.difficulty === 'hard' ? 'bg-red-500/10 text-red-400'
+                                                            : 'bg-amber-500/10 text-amber-400'
+                                                    }`}>{q.difficulty}</span>
+                                                <span className="text-[10px] text-foreground/30 uppercase">{q.question_type}</span>
+                                            </div>
+                                            <p className="text-sm text-foreground/80 font-medium">{i + 1}. {q.question}</p>
+                                            {q.options && (
+                                                <ul className="mt-1.5 space-y-0.5">
+                                                    {q.options.map((opt: string, j: number) => (
+                                                        <li key={j} className={`text-xs pl-2 py-0.5 rounded ${quizRevealed[i] && opt === q.correct_answer
+                                                                ? 'text-emerald-400 bg-emerald-500/10 font-medium'
+                                                                : 'text-foreground/50'
+                                                            }`}>{opt}</li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => setQuizRevealed(prev => ({ ...prev, [i]: !prev[i] }))}
+                                            className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5 flex-shrink-0 mt-1"
+                                        >
+                                            {quizRevealed[i] ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                                            {quizRevealed[i] ? 'Hide' : 'Answer'}
+                                        </button>
+                                    </div>
+                                    {quizRevealed[i] && (
+                                        <div className="mt-2 pt-2 border-t border-white/[0.05] space-y-1">
+                                            <p className="text-xs text-emerald-400"><strong>Answer:</strong> {q.correct_answer}</p>
+                                            {q.explanation && (
+                                                <p className="text-xs text-foreground/50">{q.explanation}</p>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </GlassSurface>
+                )}
+
+                {/* Generate Course Modal */}
+                <GenerateCourseModal
+                    open={courseModalOpen}
+                    onOpenChange={setCourseModalOpen}
+                    sessionTopic={session?.topic || 'General Study'}
+                    sessionType={session?.session_type || 'tutor'}
+                    keyConceptsFromAnalysis={feedback?.key_concepts || []}
+                    areasToImprove={feedback?.areas_to_improve || []}
+                />
 
                 {/* Rating */}
                 <GlassSurface className="p-4">
