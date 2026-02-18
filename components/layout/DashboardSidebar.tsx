@@ -23,6 +23,7 @@ import {
   BarChart3,
   Award,
   Bell,
+  StickyNote,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/components/supabase-provider";
@@ -81,6 +82,7 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen }: { mobileOpen: bo
     { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
     { name: "Study Resources", href: "/dashboard/resources", icon: BookOpen },
     { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit },
+    { name: "Notes", href: "/dashboard/notes", icon: StickyNote },
     { name: "Skills", href: "/dashboard/skills", icon: Target },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Certificates", href: "/dashboard/certificates", icon: Award },
