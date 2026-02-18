@@ -35,8 +35,8 @@ export async function GET(request: NextRequest) {
             assignmentsRes,
             analyticsRes,
         ] = await Promise.all([
-            // Profile (XP, level)
-            supabase.from("profiles").select("total_xp, display_name").eq("id", user.id).single(),
+            // Profile (display name, fallback XP)
+            supabase.from("profiles").select("total_xp, display_name, level").eq("id", user.id).single(),
 
             // Streak
             supabase.from("user_streaks").select("*").eq("user_id", user.id).single(),
@@ -86,7 +86,8 @@ export async function GET(request: NextRequest) {
         const analyticsEvents = (analyticsRes.data || []) as any[]
 
         // ─── Stats ───
-        const totalXP = profile?.total_xp || 0
+        // Use user_streaks as primary XP source (same as dashboard), fallback to profiles
+        const totalXP = streak?.total_xp || profile?.total_xp || 0
         const level = calculateLevel(totalXP)
         const levelProgress = xpToNextLevel(totalXP)
         const levelTitle = getLevelTitle(level)

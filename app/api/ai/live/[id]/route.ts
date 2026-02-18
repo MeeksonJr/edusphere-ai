@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { generateAIResponse } from '@/lib/ai-service'
+import { awardXP } from '@/lib/gamification'
 import { NextRequest } from 'next/server'
 
 export const runtime = 'nodejs'
@@ -200,19 +201,41 @@ Respond ONLY with valid JSON, no markdown formatting.`
         const minutes = Math.floor((session.duration_seconds || 0) / 60)
         const xpEarned = Math.min(100, 20 + minutes * 5)
 
+        // Award XP through the gamification engine (updates profiles + user_streaks)
+        let xpResult
+        try {
+            const xpSource = minutes >= 30 ? 'live_session_30min' : minutes >= 15 ? 'live_session_15min' : 'live_session_5min'
+            xpResult = await awardXP(
+                supabase,
+                user.id,
+                xpSource,
+                id,
+                `AI Tutor session: ${session.topic || 'General'}`,
+                xpEarned
+            )
+        } catch (xpErr) {
+            console.error('[Session Analysis] XP award error (non-fatal):', xpErr)
+        }
+
         // Update the session with feedback and XP
         await supabase
             .from('live_sessions')
             .update({
                 feedback,
-                xp_earned: xpEarned,
+                xp_earned: xpResult?.xpAwarded || xpEarned,
                 status: 'completed',
                 ended_at: session.ended_at || new Date().toISOString(),
             })
             .eq('id', id)
             .eq('user_id', user.id)
 
-        return Response.json({ feedback, xp_earned: xpEarned })
+        return Response.json({
+            feedback,
+            xp_earned: xpResult?.xpAwarded || xpEarned,
+            new_total_xp: xpResult?.newTotalXP,
+            new_level: xpResult?.newLevel,
+            leveled_up: xpResult?.leveledUp,
+        })
     } catch (error: any) {
         console.error('[Session Analysis] Error:', error)
         return Response.json({ error: error.message }, { status: 500 })
