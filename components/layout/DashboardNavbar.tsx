@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Bell, Search, Menu, LogOut, Settings, User } from "lucide-react"
+import { Search, Menu, LogOut, Settings, User } from "lucide-react"
 import { useSupabase } from "@/components/supabase-provider"
 import { ThemeToggle } from "@/components/shared/ThemeToggle"
+import { NotificationCenter } from "@/components/dashboard/NotificationCenter"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -99,10 +100,7 @@ export function DashboardNavbar({ onMenuClick }: DashboardNavbarProps) {
 
                 <ThemeToggle />
 
-                <Button variant="ghost" size="icon" className="relative text-foreground/70 hover:text-cyan-500 hover:bg-cyan-500/10 rounded-full">
-                    <Bell className="h-5 w-5" />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-                </Button>
+                <NotificationCenter />
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
