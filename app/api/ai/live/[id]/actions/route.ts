@@ -151,6 +151,8 @@ Rules:
         success: true,
         flashcard_set_id: flashcardSet.id,
         card_count: cards.length,
+        cards,
+        title: `${topic} — AI Tutor Session`,
         message: `Created ${cards.length} flashcards`,
     })
 }
@@ -240,6 +242,8 @@ Write clear, organized, student-friendly notes. Use bullet points and sub-header
     return Response.json({
         success: true,
         resource_id: resource.id,
+        notes_content: noteContent,
+        notes_title: `${topic} — Session Notes`,
         message: 'Study notes saved',
     })
 }
@@ -393,6 +397,13 @@ Rules:
     if (questions.length === 0) {
         return Response.json({ error: 'No questions could be generated from this session' }, { status: 400 })
     }
+
+    // Save quiz to session feedback for persistence
+    const existingFeedback = session.feedback || {}
+    await supabase
+        .from('live_sessions')
+        .update({ feedback: { ...existingFeedback, quiz_questions: questions } })
+        .eq('id', session.id)
 
     return Response.json({
         success: true,

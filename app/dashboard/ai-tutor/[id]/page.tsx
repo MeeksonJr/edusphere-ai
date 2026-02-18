@@ -34,6 +34,8 @@ import { Button } from '@/components/ui/button'
 import { GlassSurface } from '@/components/shared/GlassSurface'
 import { AmbientBackground } from '@/components/shared/AmbientBackground'
 import { GenerateCourseModal } from './generate-course-modal'
+import { FlashcardPreviewModal } from './flashcard-preview-modal'
+import { NotesPreviewModal } from './notes-preview-modal'
 
 const TYPE_META: Record<string, { name: string; icon: any; color: string }> = {
     tutor: { name: '1-on-1 Tutor', icon: GraduationCap, color: 'from-cyan-500 to-blue-500' },
@@ -67,6 +69,14 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
     const [quizQuestions, setQuizQuestions] = useState<any[]>([])
     const [quizRevealed, setQuizRevealed] = useState<Record<number, boolean>>({})
 
+    // Preview modal state
+    const [flashcardPreview, setFlashcardPreview] = useState<{ open: boolean; cards: any[]; title: string }>({
+        open: false, cards: [], title: ''
+    })
+    const [notesPreview, setNotesPreview] = useState<{ open: boolean; content: string; title: string }>({
+        open: false, content: '', title: ''
+    })
+
     useEffect(() => {
         params.then(p => setSessionId(p.id))
     }, [params])
@@ -79,6 +89,10 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                 const data = await res.json()
                 setSession(data)
                 setRating(data.quality_rating || 0)
+                // Restore persisted quiz questions
+                if (data.feedback?.quiz_questions?.length) {
+                    setQuizQuestions(data.feedback.quiz_questions)
+                }
             }
             setLoading(false)
         }
@@ -149,6 +163,11 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                     [action]: { success: true, message: 'Downloaded!' },
                 }))
             } else if (action === 'generate_flashcards') {
+                setFlashcardPreview({
+                    open: true,
+                    cards: data.cards || [],
+                    title: data.title || 'Flashcards',
+                })
                 setActionResults(prev => ({
                     ...prev,
                     [action]: {
@@ -158,6 +177,11 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                     },
                 }))
             } else if (action === 'save_notes') {
+                setNotesPreview({
+                    open: true,
+                    content: data.notes_content || '',
+                    title: data.notes_title || 'Study Notes',
+                })
                 setActionResults(prev => ({
                     ...prev,
                     [action]: {
@@ -470,13 +494,13 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                                         {actionResults.generate_flashcards.message}
                                     </span>
                                 )}
-                                {actionResults.generate_flashcards?.link && (
-                                    <Link
-                                        href={actionResults.generate_flashcards.link}
+                                {actionResults.generate_flashcards?.success && flashcardPreview.cards.length > 0 && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setFlashcardPreview(p => ({ ...p, open: true })) }}
                                         className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5"
                                     >
-                                        View <ExternalLink className="h-2.5 w-2.5" />
-                                    </Link>
+                                        Preview <ExternalLink className="h-2.5 w-2.5" />
+                                    </button>
                                 )}
                             </button>
 
@@ -499,13 +523,13 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                                         {actionResults.save_notes.message}
                                     </span>
                                 )}
-                                {actionResults.save_notes?.link && (
-                                    <Link
-                                        href={actionResults.save_notes.link}
+                                {actionResults.save_notes?.success && notesPreview.content && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setNotesPreview(p => ({ ...p, open: true })) }}
                                         className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5"
                                     >
-                                        View <ExternalLink className="h-2.5 w-2.5" />
-                                    </Link>
+                                        Preview <ExternalLink className="h-2.5 w-2.5" />
+                                    </button>
                                 )}
                             </button>
 
@@ -606,8 +630,8 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2 mb-1">
                                                 <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${q.difficulty === 'easy' ? 'bg-emerald-500/10 text-emerald-400'
-                                                        : q.difficulty === 'hard' ? 'bg-red-500/10 text-red-400'
-                                                            : 'bg-amber-500/10 text-amber-400'
+                                                    : q.difficulty === 'hard' ? 'bg-red-500/10 text-red-400'
+                                                        : 'bg-amber-500/10 text-amber-400'
                                                     }`}>{q.difficulty}</span>
                                                 <span className="text-[10px] text-foreground/30 uppercase">{q.question_type}</span>
                                             </div>
@@ -616,8 +640,8 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                                                 <ul className="mt-1.5 space-y-0.5">
                                                     {q.options.map((opt: string, j: number) => (
                                                         <li key={j} className={`text-xs pl-2 py-0.5 rounded ${quizRevealed[i] && opt === q.correct_answer
-                                                                ? 'text-emerald-400 bg-emerald-500/10 font-medium'
-                                                                : 'text-foreground/50'
+                                                            ? 'text-emerald-400 bg-emerald-500/10 font-medium'
+                                                            : 'text-foreground/50'
                                                             }`}>{opt}</li>
                                                     ))}
                                                 </ul>
@@ -653,6 +677,24 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                     sessionType={session?.session_type || 'tutor'}
                     keyConceptsFromAnalysis={feedback?.key_concepts || []}
                     areasToImprove={feedback?.areas_to_improve || []}
+                />
+
+                {/* Flashcard Preview Modal */}
+                <FlashcardPreviewModal
+                    open={flashcardPreview.open}
+                    onOpenChange={(open) => setFlashcardPreview(p => ({ ...p, open }))}
+                    cards={flashcardPreview.cards}
+                    title={flashcardPreview.title}
+                    flashcardPageLink="/dashboard/flashcards"
+                />
+
+                {/* Notes Preview Modal */}
+                <NotesPreviewModal
+                    open={notesPreview.open}
+                    onOpenChange={(open) => setNotesPreview(p => ({ ...p, open }))}
+                    title={notesPreview.title}
+                    content={notesPreview.content}
+                    resourcePageLink="/dashboard/resources"
                 />
 
                 {/* Rating */}
