@@ -21,6 +21,10 @@ import {
     Lightbulb,
     Loader2,
     CheckCircle2,
+    Layers,
+    FileText,
+    Download,
+    ExternalLink,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { GlassSurface } from '@/components/shared/GlassSurface'
@@ -50,6 +54,10 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
     const [rating, setRating] = useState(0)
     const [ratingHover, setRatingHover] = useState(0)
     const [sessionId, setSessionId] = useState<string>('')
+
+    // Session actions state
+    const [actionLoading, setActionLoading] = useState<string | null>(null)
+    const [actionResults, setActionResults] = useState<Record<string, { success: boolean; message: string; link?: string }>>({})
 
     useEffect(() => {
         params.then(p => setSessionId(p.id))
@@ -93,6 +101,73 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
         }
         setAnalyzing(false)
     }, [sessionId, analyzing])
+
+    // Session action handler (flashcards, notes, export)
+    const handleAction = useCallback(async (action: string) => {
+        if (!sessionId || actionLoading) return
+        setActionLoading(action)
+        setActionResults(prev => ({ ...prev, [action]: undefined as any }))
+
+        try {
+            const res = await fetch(`/api/ai/live/${sessionId}/actions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action }),
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                setActionResults(prev => ({
+                    ...prev,
+                    [action]: { success: false, message: data.error || 'Action failed' },
+                }))
+                return
+            }
+
+            if (action === 'export_markdown' && data.content) {
+                // Trigger browser download
+                const blob = new Blob([data.content], { type: 'text/markdown' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = data.filename || 'session-export.md'
+                document.body.appendChild(a)
+                a.click()
+                document.body.removeChild(a)
+                URL.revokeObjectURL(url)
+                setActionResults(prev => ({
+                    ...prev,
+                    [action]: { success: true, message: 'Downloaded!' },
+                }))
+            } else if (action === 'generate_flashcards') {
+                setActionResults(prev => ({
+                    ...prev,
+                    [action]: {
+                        success: true,
+                        message: data.message || `Created ${data.card_count} flashcards`,
+                        link: '/dashboard/flashcards',
+                    },
+                }))
+            } else if (action === 'save_notes') {
+                setActionResults(prev => ({
+                    ...prev,
+                    [action]: {
+                        success: true,
+                        message: data.message || 'Study notes saved',
+                        link: '/dashboard/resources',
+                    },
+                }))
+            }
+        } catch (e) {
+            setActionResults(prev => ({
+                ...prev,
+                [action]: { success: false, message: 'Network error. Try again.' },
+            }))
+        } finally {
+            setActionLoading(null)
+        }
+    }, [sessionId, actionLoading])
 
     const saveRating = useCallback(async (value: number) => {
         setRating(value)
@@ -337,6 +412,96 @@ export default function SessionDetailPage({ params }: { params: Promise<{ id: st
                                     </ul>
                                 </div>
                             )}
+                        </div>
+                    </GlassSurface>
+                )}
+
+                {/* Session Actions */}
+                {transcript.length > 0 && (
+                    <GlassSurface className="p-5">
+                        <h2 className="text-sm font-semibold text-foreground/50 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <Zap className="h-4 w-4 text-amber-400" />
+                            Session Actions
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            {/* Generate Flashcards */}
+                            <button
+                                onClick={() => handleAction('generate_flashcards')}
+                                disabled={actionLoading === 'generate_flashcards'}
+                                className="group relative flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-purple-500/30 hover:bg-purple-500/5 transition-all disabled:opacity-50"
+                            >
+                                {actionLoading === 'generate_flashcards' ? (
+                                    <Loader2 className="h-6 w-6 text-purple-400 animate-spin" />
+                                ) : actionResults.generate_flashcards?.success ? (
+                                    <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+                                ) : (
+                                    <Layers className="h-6 w-6 text-purple-400 group-hover:scale-110 transition-transform" />
+                                )}
+                                <span className="text-xs font-medium text-foreground/70">Generate Flashcards</span>
+                                {actionResults.generate_flashcards && (
+                                    <span className={`text-[10px] ${actionResults.generate_flashcards.success ? 'text-emerald-400' : 'text-red-400'}`}>
+                                        {actionResults.generate_flashcards.message}
+                                    </span>
+                                )}
+                                {actionResults.generate_flashcards?.link && (
+                                    <Link
+                                        href={actionResults.generate_flashcards.link}
+                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5"
+                                    >
+                                        View <ExternalLink className="h-2.5 w-2.5" />
+                                    </Link>
+                                )}
+                            </button>
+
+                            {/* Save Study Notes */}
+                            <button
+                                onClick={() => handleAction('save_notes')}
+                                disabled={actionLoading === 'save_notes'}
+                                className="group relative flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all disabled:opacity-50"
+                            >
+                                {actionLoading === 'save_notes' ? (
+                                    <Loader2 className="h-6 w-6 text-emerald-400 animate-spin" />
+                                ) : actionResults.save_notes?.success ? (
+                                    <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+                                ) : (
+                                    <FileText className="h-6 w-6 text-emerald-400 group-hover:scale-110 transition-transform" />
+                                )}
+                                <span className="text-xs font-medium text-foreground/70">Save Study Notes</span>
+                                {actionResults.save_notes && (
+                                    <span className={`text-[10px] ${actionResults.save_notes.success ? 'text-emerald-400' : 'text-red-400'}`}>
+                                        {actionResults.save_notes.message}
+                                    </span>
+                                )}
+                                {actionResults.save_notes?.link && (
+                                    <Link
+                                        href={actionResults.save_notes.link}
+                                        className="text-[10px] text-cyan-400 hover:text-cyan-300 flex items-center gap-0.5"
+                                    >
+                                        View <ExternalLink className="h-2.5 w-2.5" />
+                                    </Link>
+                                )}
+                            </button>
+
+                            {/* Export Markdown */}
+                            <button
+                                onClick={() => handleAction('export_markdown')}
+                                disabled={actionLoading === 'export_markdown'}
+                                className="group relative flex flex-col items-center gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-blue-500/30 hover:bg-blue-500/5 transition-all disabled:opacity-50"
+                            >
+                                {actionLoading === 'export_markdown' ? (
+                                    <Loader2 className="h-6 w-6 text-blue-400 animate-spin" />
+                                ) : actionResults.export_markdown?.success ? (
+                                    <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+                                ) : (
+                                    <Download className="h-6 w-6 text-blue-400 group-hover:scale-110 transition-transform" />
+                                )}
+                                <span className="text-xs font-medium text-foreground/70">Export Markdown</span>
+                                {actionResults.export_markdown && (
+                                    <span className={`text-[10px] ${actionResults.export_markdown.success ? 'text-emerald-400' : 'text-red-400'}`}>
+                                        {actionResults.export_markdown.message}
+                                    </span>
+                                )}
+                            </button>
                         </div>
                     </GlassSurface>
                 )}
