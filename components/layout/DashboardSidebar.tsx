@@ -18,6 +18,11 @@ import {
   User,
   ChevronLeft,
   Sparkles,
+  Brain,
+  Target,
+  BarChart3,
+  Award,
+  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/components/supabase-provider";
@@ -72,9 +77,14 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen }: { mobileOpen: bo
     { name: "Courses", href: "/dashboard/courses", icon: Sparkles },
     { name: "Assignments", href: "/dashboard/assignments", icon: CheckSquare },
     { name: "AI Lab", href: "/dashboard/ai-lab", icon: Beaker },
+    { name: "AI Tutor", href: "/dashboard/ai-tutor", icon: Brain },
     { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
     { name: "Study Resources", href: "/dashboard/resources", icon: BookOpen },
     { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit },
+    { name: "Skills", href: "/dashboard/skills", icon: Target },
+    { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+    { name: "Certificates", href: "/dashboard/certificates", icon: Award },
+    { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
     { name: "Profile", href: "/dashboard/profile", icon: User },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
