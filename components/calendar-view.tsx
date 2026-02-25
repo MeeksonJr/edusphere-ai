@@ -147,26 +147,23 @@ export function CalendarView({ view, date, events, onEventClick, isLoading = fal
             return (
               <div
                 key={index}
-                className={`min-h-28 p-1 ${
-                  isToday(day) ? "bg-blue-900/20" : isCurrentMonth(day) ? "bg-gray-900" : "bg-gray-900/50 text-gray-500"
-                }`}
+                className={`min-h-28 p-1 ${isToday(day) ? "bg-blue-900/20" : isCurrentMonth(day) ? "bg-gray-900" : "bg-gray-900/50 text-gray-500"
+                  }`}
               >
                 <div className="text-right p-1">
                   <span
-                    className={`text-sm inline-flex items-center justify-center ${
-                      isToday(day) ? "h-6 w-6 rounded-full bg-blue-600 text-white" : ""
-                    }`}
+                    className={`text-sm inline-flex items-center justify-center ${isToday(day) ? "h-6 w-6 rounded-full bg-blue-600 text-white" : ""
+                      }`}
                   >
                     {day.getDate()}
                   </span>
                 </div>
                 <div className="space-y-1 mt-1">
-                  {dayEvents.slice(0, 3).map((event) => (
+                  {dayEvents.slice(0, 3).map((event, eventIndex) => (
                     <div
-                      key={event.id}
+                      key={event.id || `month-event-${index}-${eventIndex}`}
                       onClick={() => onEventClick(event)}
-                      className={`text-xs p-1 rounded truncate cursor-pointer ${
-                        event.type === "assignment"
+                      className={`text-xs p-1 rounded truncate cursor-pointer ${event.type === "assignment"
                           ? event.status === "completed"
                             ? "bg-green-900/30 text-green-400"
                             : event.priority === "high"
@@ -175,7 +172,7 @@ export function CalendarView({ view, date, events, onEventClick, isLoading = fal
                                 ? "bg-yellow-900/30 text-yellow-400"
                                 : "bg-primary/20 text-primary"
                           : "bg-blue-900/30 text-blue-400"
-                      }`}
+                        }`}
                     >
                       {event.start &&
                         new Date(event.start).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}{" "}
@@ -203,9 +200,8 @@ export function CalendarView({ view, date, events, onEventClick, isLoading = fal
             <div key={index} className="text-center py-2 font-medium text-sm">
               <div>{["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][day.getDay()]}</div>
               <div
-                className={`text-sm inline-flex items-center justify-center mt-1 ${
-                  isToday(day) ? "h-6 w-6 rounded-full bg-blue-600 text-white" : ""
-                }`}
+                className={`text-sm inline-flex items-center justify-center mt-1 ${isToday(day) ? "h-6 w-6 rounded-full bg-blue-600 text-white" : ""
+                  }`}
               >
                 {day.getDate()}
               </div>
@@ -223,12 +219,11 @@ export function CalendarView({ view, date, events, onEventClick, isLoading = fal
                     key={dayIndex}
                     className={`p-1 border-r border-gray-800 ${isToday(day) ? "bg-blue-900/10" : ""}`}
                   >
-                    {hourEvents.map((event) => (
+                    {hourEvents.map((event, eventIndex) => (
                       <div
-                        key={event.id}
+                        key={event.id || `week-event-${dayIndex}-${hour}-${eventIndex}`}
                         onClick={() => onEventClick(event)}
-                        className={`text-xs p-1 rounded truncate cursor-pointer ${
-                          event.type === "assignment"
+                        className={`text-xs p-1 rounded truncate cursor-pointer ${event.type === "assignment"
                             ? event.status === "completed"
                               ? "bg-green-900/30 text-green-400"
                               : event.priority === "high"
@@ -237,7 +232,7 @@ export function CalendarView({ view, date, events, onEventClick, isLoading = fal
                                   ? "bg-yellow-900/30 text-yellow-400"
                                   : "bg-primary/20 text-primary"
                             : "bg-blue-900/30 text-blue-400"
-                        }`}
+                          }`}
                       >
                         {event.title}
                       </div>
@@ -270,12 +265,11 @@ export function CalendarView({ view, date, events, onEventClick, isLoading = fal
             <div key={hour} className="grid grid-cols-[80px_1fr] border-b border-gray-800 min-h-[60px]">
               <div className="py-1 pl-2 text-xs text-gray-400 border-r border-gray-800">{hour}</div>
               <div className="p-1">
-                {hourEvents.map((event) => (
+                {hourEvents.map((event, eventIndex) => (
                   <div
-                    key={event.id}
+                    key={event.id || `day-event-${hour}-${eventIndex}`}
                     onClick={() => onEventClick(event)}
-                    className={`p-2 rounded mb-1 cursor-pointer ${
-                      event.type === "assignment"
+                    className={`p-2 rounded mb-1 cursor-pointer ${event.type === "assignment"
                         ? event.status === "completed"
                           ? "bg-green-900/30 text-green-400"
                           : event.priority === "high"
@@ -284,7 +278,7 @@ export function CalendarView({ view, date, events, onEventClick, isLoading = fal
                               ? "bg-yellow-900/30 text-yellow-400"
                               : "bg-primary/20 text-primary"
                         : "bg-blue-900/30 text-blue-400"
-                    }`}
+                      }`}
                   >
                     <div className="font-medium">{event.title}</div>
                     {event.description && <div className="text-xs mt-1">{event.description}</div>}

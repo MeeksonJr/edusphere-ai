@@ -39,6 +39,82 @@ export function ImportCalendarDialog({ open, onOpenChange, onImport }: ImportCal
     }
   }
 
+  /**
+   * Save parsed events to the calendar_events table in Supabase.
+   * Returns the saved events with their database IDs.
+   */
+  const saveEventsToDatabase = async (events: any[], source: string, feedUrl?: string) => {
+    if (!supabase) throw new Error("Supabase client not available")
+
+    const { data: userData } = await supabase.auth.getUser()
+    if (!userData.user) throw new Error("You must be logged in to import calendars")
+
+    const userId = userData.user.id
+
+    // If there's a feed URL, save/upsert the feed record
+    if (feedUrl) {
+      const { error: feedError } = await supabase
+        .from("calendar_feeds")
+        .upsert(
+          {
+            user_id: userId,
+            name: source === "url" ? "Imported Calendar Feed" : "Uploaded Calendar",
+            url: feedUrl,
+            last_synced_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id,url" }
+        )
+
+      if (feedError) {
+        console.error("Error saving feed:", feedError)
+        // Don't block the import if feed save fails
+      }
+    }
+
+    // Prepare events for insertion, deduplicating by external_id
+    const eventsToInsert = events.map((event) => ({
+      user_id: userId,
+      title: event.title,
+      description: event.description || null,
+      start_time: event.start instanceof Date ? event.start.toISOString() : event.start,
+      end_time: event.end instanceof Date ? event.end.toISOString() : event.end,
+      all_day: event.allDay || false,
+      location: event.location || null,
+      source: source,
+      external_id: event.externalId || null,
+    }))
+
+    // Delete existing events from the same source URL to avoid duplicates on re-import
+    if (feedUrl) {
+      await supabase
+        .from("calendar_events")
+        .delete()
+        .eq("user_id", userId)
+        .eq("source", source)
+    }
+
+    // Insert events in batches of 50
+    const savedEvents: any[] = []
+    for (let i = 0; i < eventsToInsert.length; i += 50) {
+      const batch = eventsToInsert.slice(i, i + 50)
+      const { data, error } = await supabase
+        .from("calendar_events")
+        .insert(batch)
+        .select()
+
+      if (error) {
+        console.error("Error saving events batch:", error)
+        throw new Error(`Failed to save events: ${error.message}`)
+      }
+
+      if (data) {
+        savedEvents.push(...data)
+      }
+    }
+
+    return savedEvents
+  }
+
   const handleImportFromFile = async () => {
     if (!file) {
       toast({
@@ -63,12 +139,27 @@ export function ImportCalendarDialog({ open, onOpenChange, onImport }: ImportCal
         throw new Error("No events found in the calendar file")
       }
 
-      onImport(events)
+      // Save to database
+      const savedEvents = await saveEventsToDatabase(events, `file:${file.name}`)
+
+      // Map saved events to the format expected by the calendar view
+      const mappedEvents = savedEvents.map((event: any) => ({
+        id: event.id,
+        title: event.title,
+        start: new Date(event.start_time),
+        end: new Date(event.end_time),
+        type: "event",
+        location: event.location,
+        description: event.description,
+        source: event.source,
+      }))
+
+      onImport(mappedEvents)
       onOpenChange(false)
 
       toast({
-        title: "Calendar imported",
-        description: `Successfully imported ${events.length} events from the calendar file`,
+        title: "Calendar imported & saved",
+        description: `Successfully imported and saved ${mappedEvents.length} events from the calendar file`,
       })
     } catch (error: any) {
       toast({
@@ -112,12 +203,27 @@ export function ImportCalendarDialog({ open, onOpenChange, onImport }: ImportCal
         throw new Error("No events found in the calendar")
       }
 
-      onImport(events)
+      // Save to database with feed URL
+      const savedEvents = await saveEventsToDatabase(events, `url:${calendarUrl}`, calendarUrl)
+
+      // Map saved events to the format expected by the calendar view
+      const mappedEvents = savedEvents.map((event: any) => ({
+        id: event.id,
+        title: event.title,
+        start: new Date(event.start_time),
+        end: new Date(event.end_time),
+        type: "event",
+        location: event.location,
+        description: event.description,
+        source: event.source,
+      }))
+
+      onImport(mappedEvents)
       onOpenChange(false)
 
       toast({
-        title: "Calendar imported",
-        description: `Successfully imported ${events.length} events from the URL`,
+        title: "Calendar imported & saved",
+        description: `Successfully imported and saved ${mappedEvents.length} events from the URL`,
       })
     } catch (error: any) {
       toast({
@@ -137,6 +243,7 @@ export function ImportCalendarDialog({ open, onOpenChange, onImport }: ImportCal
           <DialogTitle>Import Calendar</DialogTitle>
           <DialogDescription>
             Import events from an iCalendar (.ics) file or URL to add them to your calendar.
+            Events are automatically saved to your account.
           </DialogDescription>
         </DialogHeader>
         <Tabs defaultValue="file" className="mt-4">
@@ -169,7 +276,7 @@ export function ImportCalendarDialog({ open, onOpenChange, onImport }: ImportCal
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing...
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing & Saving...
                 </>
               ) : (
                 <>
@@ -198,7 +305,7 @@ export function ImportCalendarDialog({ open, onOpenChange, onImport }: ImportCal
             >
               {loading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing...
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing & Saving...
                 </>
               ) : (
                 <>

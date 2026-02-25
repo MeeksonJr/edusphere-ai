@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast"
 import { CalendarView } from "@/components/calendar-view"
 import { ImportCalendarDialog } from "@/components/import-calendar-dialog"
 import { CalendarAIDialog } from "@/components/calendar-ai-dialog"
+import { EventDetailDialog } from "@/components/event-detail-dialog"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
@@ -35,6 +36,7 @@ export default function CalendarPage() {
   const [view, setView] = useState<"month" | "week" | "day">("month")
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false)
+  const [isEventDetailOpen, setIsEventDetailOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -94,6 +96,7 @@ export default function CalendarPage() {
             type: "event",
             location: event.location,
             description: event.description,
+            source: event.source,
           })) || []
 
         setEvents(calendarEvents)
@@ -146,19 +149,28 @@ export default function CalendarPage() {
   }
 
   const handleEventClick = (event: any) => {
-    if (event.type === "assignment") {
-      setSelectedEvent(event)
-      setIsAIDialogOpen(true)
-    } else {
-      toast({
-        title: event.title,
-        description: event.description || "No description available",
-      })
-    }
+    setSelectedEvent(event)
+    setIsEventDetailOpen(true)
+  }
+
+  const handleEventDelete = (eventId: string) => {
+    // Remove from assignments or events state
+    setAssignments((prev) => prev.filter((a) => a.id !== eventId))
+    setEvents((prev) => prev.filter((e) => e.id !== eventId))
+  }
+
+  const handleOpenAIFromDetail = (event: any) => {
+    setSelectedEvent(event)
+    setIsAIDialogOpen(true)
   }
 
   const handleImportSuccess = (importedEvents: any[]) => {
-    setEvents((prev) => [...prev, ...importedEvents])
+    // Replace events from the same source, or just add new ones
+    setEvents((prev) => {
+      const importedIds = new Set(importedEvents.map((e) => e.id))
+      const filtered = prev.filter((e) => !importedIds.has(e.id))
+      return [...filtered, ...importedEvents]
+    })
     toast({
       title: "Calendar Imported",
       description: `Successfully imported ${importedEvents.length} events.`,
@@ -245,11 +257,10 @@ export default function CalendarPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`${
-                    view === "month"
+                  className={`${view === "month"
                       ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-foreground"
                       : "text-foreground/70 hover:text-foreground"
-                  }`}
+                    }`}
                   onClick={() => handleViewChange("month")}
                 >
                   Month
@@ -257,11 +268,10 @@ export default function CalendarPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`${
-                    view === "week"
+                  className={`${view === "week"
                       ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-foreground"
                       : "text-foreground/70 hover:text-foreground"
-                  }`}
+                    }`}
                   onClick={() => handleViewChange("week")}
                 >
                   Week
@@ -269,11 +279,10 @@ export default function CalendarPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className={`${
-                    view === "day"
+                  className={`${view === "day"
                       ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-foreground"
                       : "text-foreground/70 hover:text-foreground"
-                  }`}
+                    }`}
                   onClick={() => handleViewChange("day")}
                 >
                   Day
@@ -327,13 +336,13 @@ export default function CalendarPage() {
                 <LoadingSpinner size="sm" text="Loading..." />
               ) : upcomingAssignments.length > 0 ? (
                 <div className="space-y-3">
-                  {upcomingAssignments.map((assignment, index) => (
+                  {upcomingAssignments.map((assignment) => (
                     <div
                       key={assignment.id}
                       className="p-3 rounded-lg glass-surface border-foreground/10 hover:border-cyan-500/30 transition-colors cursor-pointer group"
                       onClick={() => {
                         setSelectedEvent(assignment)
-                        setIsAIDialogOpen(true)
+                        setIsEventDetailOpen(true)
                       }}
                     >
                       <div className="flex items-start space-x-3">
@@ -350,13 +359,12 @@ export default function CalendarPage() {
                           </div>
                           {assignment.priority && (
                             <Badge
-                              className={`mt-2 text-xs ${
-                                assignment.priority === "high"
+                              className={`mt-2 text-xs ${assignment.priority === "high"
                                   ? "bg-red-500/20 text-red-400 border-red-500/30"
                                   : assignment.priority === "medium"
                                     ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
                                     : "bg-green-500/20 text-green-400 border-green-500/30"
-                              }`}
+                                }`}
                             >
                               {assignment.priority}
                             </Badge>
@@ -382,6 +390,13 @@ export default function CalendarPage() {
         open={isImportDialogOpen}
         onOpenChange={setIsImportDialogOpen}
         onImport={handleImportSuccess}
+      />
+      <EventDetailDialog
+        open={isEventDetailOpen}
+        onOpenChange={setIsEventDetailOpen}
+        event={selectedEvent}
+        onDelete={handleEventDelete}
+        onOpenAI={handleOpenAIFromDetail}
       />
       <CalendarAIDialog
         open={isAIDialogOpen}
