@@ -1,10 +1,13 @@
-import { createClient } from "@/utils/supabase/server"
+"use client"
+
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { AmbientBackground } from "@/components/shared/AmbientBackground"
-import { Target, TrendingUp, Clock, Star, Plus, ChevronRight, Sparkles } from "lucide-react"
+import { Target, TrendingUp, Clock, Star, Plus, ChevronRight, Sparkles, Minus, Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 const CATEGORY_CONFIG: Record<string, { icon: string; color: string; gradient: string }> = {
     programming: { icon: '💻', color: 'text-cyan-400', gradient: 'from-cyan-500/20 to-blue-500/20' },
@@ -19,36 +22,84 @@ const CATEGORY_CONFIG: Record<string, { icon: string; color: string; gradient: s
     other: { icon: '📚', color: 'text-gray-400', gradient: 'from-gray-500/20 to-slate-500/20' },
 }
 
-export default async function SkillsPage() {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+export default function SkillsPage() {
+    const { toast } = useToast()
+    const [allSkills, setAllSkills] = useState<any[]>([])
+    const [userSkillMap, setUserSkillMap] = useState<Map<string, any>>(new Map())
+    const [loading, setLoading] = useState(true)
+    const [actionLoading, setActionLoading] = useState<string | null>(null)
 
-    if (!user) {
-        return (
-            <div className="p-6"><GlassSurface className="p-8 text-center">
-                <p className="text-foreground/70">Please log in to view your skills.</p>
-            </GlassSurface></div>
-        )
+    useEffect(() => {
+        fetchSkills()
+    }, [])
+
+    const fetchSkills = async () => {
+        try {
+            setLoading(true)
+            const res = await fetch("/api/skills")
+            if (!res.ok) throw new Error("Failed to fetch skills")
+            const data = await res.json()
+            setAllSkills(data.skills || [])
+            const map = new Map<string, any>((data.userSkills || []).map((us: any) => [us.skill_id, us]))
+            setUserSkillMap(map)
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message, variant: "destructive" })
+        } finally {
+            setLoading(false)
+        }
     }
 
-    // Get all available skills
-    const { data: allSkills } = await supabase
-        .from('skills')
-        .select('*')
-        .order('category')
-        .order('name') as { data: any[] | null }
+    const handleAddSkill = async (skillId: string) => {
+        setActionLoading(skillId)
+        try {
+            const res = await fetch("/api/skills", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ skill_id: skillId }),
+            })
+            if (!res.ok) {
+                const err = await res.json()
+                throw new Error(err.error || "Failed to add skill")
+            }
+            const data = await res.json()
+            setUserSkillMap(prev => {
+                const next = new Map(prev)
+                next.set(skillId, data.userSkill)
+                return next
+            })
+            toast({ title: "Skill Added! 🎯", description: "Start earning XP with practice sessions." })
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message, variant: "destructive" })
+        } finally {
+            setActionLoading(null)
+        }
+    }
 
-    // Get user's skill progress
-    const { data: userSkills } = await supabase
-        .from('user_skills')
-        .select('*, skills(*)')
-        .eq('user_id', user.id) as { data: any[] | null }
-
-    const userSkillMap = new Map((userSkills || []).map((us: any) => [us.skill_id, us]))
+    const handleRemoveSkill = async (skillId: string) => {
+        setActionLoading(skillId)
+        try {
+            const res = await fetch("/api/skills", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ skill_id: skillId }),
+            })
+            if (!res.ok) throw new Error("Failed to remove skill")
+            setUserSkillMap(prev => {
+                const next = new Map(prev)
+                next.delete(skillId)
+                return next
+            })
+            toast({ title: "Skill Removed", description: "Skill removed from your active list." })
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message, variant: "destructive" })
+        } finally {
+            setActionLoading(null)
+        }
+    }
 
     // Group skills by category
     const categories = new Map<string, any[]>()
-    for (const skill of (allSkills || [])) {
+    for (const skill of allSkills) {
         if (!categories.has(skill.category)) {
             categories.set(skill.category, [])
         }
@@ -59,12 +110,23 @@ export default async function SkillsPage() {
     }
 
     // Calculate overall stats
-    const totalSkills = allSkills?.length || 0
-    const activeSkills = userSkills?.length || 0
-    const totalXP = (userSkills || []).reduce((sum: number, s: any) => sum + (s.xp || 0), 0)
+    const activeSkills = userSkillMap.size
+    const totalSkills = allSkills.length
+    const totalXP = Array.from(userSkillMap.values()).reduce((sum: number, s: any) => sum + (s.xp || 0), 0)
     const averageLevel = activeSkills > 0
-        ? Math.round((userSkills || []).reduce((sum: number, s: any) => sum + s.level, 0) / activeSkills)
+        ? Math.round(Array.from(userSkillMap.values()).reduce((sum: number, s: any) => sum + (s.level || 0), 0) / activeSkills)
         : 0
+
+    if (loading) {
+        return (
+            <div className="relative min-h-[calc(100vh-4rem)]">
+                <AmbientBackground />
+                <div className="relative z-10 flex items-center justify-center h-[60vh]">
+                    <Loader2 className="h-8 w-8 text-cyan-400 animate-spin" />
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="relative min-h-[calc(100vh-4rem)]">
@@ -131,13 +193,14 @@ export default async function SkillsPage() {
                                             const xp = progress?.xp || 0
                                             const nextLevelXP = Math.floor(50 * Math.pow(level, 2)) || 50
                                             const xpProgress = nextLevelXP > 0 ? Math.min((xp / nextLevelXP) * 100, 100) : 0
+                                            const isLoading = actionLoading === skill.id
 
                                             return (
                                                 <div
                                                     key={skill.id}
                                                     className={`group p-4 rounded-xl border transition-all duration-300 hover:scale-[1.02] ${progress
-                                                            ? 'border-cyan-500/20 bg-gradient-to-br ' + config.gradient
-                                                            : 'border-white/5 bg-white/[0.02] hover:border-white/10'
+                                                        ? 'border-cyan-500/20 bg-gradient-to-br ' + config.gradient
+                                                        : 'border-white/5 bg-white/[0.02] hover:border-white/10'
                                                         }`}
                                                 >
                                                     <div className="flex items-start justify-between mb-2">
@@ -150,11 +213,25 @@ export default async function SkillsPage() {
                                                                 )}
                                                             </div>
                                                         </div>
-                                                        {progress ? (
-                                                            <div className="text-xs text-foreground/40">{xp} XP</div>
+                                                        {isLoading ? (
+                                                            <Loader2 className="h-4 w-4 text-cyan-400 animate-spin" />
+                                                        ) : progress ? (
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-foreground/40">{xp} XP</span>
+                                                                <button
+                                                                    onClick={() => handleRemoveSkill(skill.id)}
+                                                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-500/10"
+                                                                    title="Remove skill"
+                                                                >
+                                                                    <Minus className="h-3 w-3" />
+                                                                </button>
+                                                            </div>
                                                         ) : (
-                                                            <button className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-cyan-400 hover:text-cyan-300">
-                                                                + Add
+                                                            <button
+                                                                onClick={() => handleAddSkill(skill.id)}
+                                                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 px-2 py-1 rounded hover:bg-cyan-500/10"
+                                                            >
+                                                                <Plus className="h-3 w-3" /> Add
                                                             </button>
                                                         )}
                                                     </div>
@@ -206,8 +283,8 @@ export default async function SkillsPage() {
                         </div>
                         <p className="text-sm text-foreground/60">
                             {activeSkills === 0
-                                ? "Start by adding your first skill! Click any skill card above to begin tracking your progress."
-                                : `You're making great progress! Consider exploring ${Array.from(categories.keys()).find(cat => {
+                                ? "Start by adding your first skill! Hover over any skill card above and click '+ Add' to begin tracking your progress."
+                                : `You're making great progress with ${activeSkills} active skills! Consider exploring ${Array.from(categories.keys()).find(cat => {
                                     const skills = categories.get(cat) || []
                                     return !skills.some((s: any) => s.userProgress)
                                 })?.replace(/_/g, ' ') || 'new'

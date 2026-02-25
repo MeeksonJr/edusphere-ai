@@ -9,11 +9,12 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 
 export default async function AssignmentsPage({
-  searchParams,
+  searchParams: searchParamsPromise,
 }: {
-  searchParams: { status?: string; subject?: string; sort?: string }
+  searchParams: Promise<{ status?: string; subject?: string; sort?: string }>
 }) {
   const supabase = await createClient()
+  const searchParams = await searchParamsPromise
 
   const {
     data: { user },
@@ -36,7 +37,7 @@ export default async function AssignmentsPage({
   const [sortField, sortOrder] = sort.split("-")
 
   // Build query
-  let query = supabase.from("assignments").select("*").eq("user_id", user.id)
+  let query = (supabase.from("assignments") as any).select("*").eq("user_id", user.id)
 
   // Apply filters
   if (status !== "all") {
@@ -56,13 +57,13 @@ export default async function AssignmentsPage({
   const { data: assignments, error } = await query
 
   // Get unique subjects for filter
-  const { data: subjects } = await supabase
-    .from("assignments")
+  const { data: subjects } = await (supabase
+    .from("assignments") as any)
     .select("subject")
     .eq("user_id", user.id)
     .not("subject", "is", null)
 
-  const uniqueSubjects = Array.from(new Set(subjects?.map((item: any) => item.subject) || []))
+  const uniqueSubjects: string[] = Array.from(new Set(subjects?.map((item: any) => item.subject) || []))
 
   const statusFilters = [
     { value: "all", label: "All", icon: CheckSquare },
@@ -116,8 +117,8 @@ export default async function AssignmentsPage({
                   >
                     <Badge
                       className={`inline-flex items-center px-3 py-1.5 text-sm font-medium transition-all ${isActive
-                          ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white border-cyan-500/30"
-                          : "glass-surface border-foreground/20 text-foreground/70 hover:text-foreground hover:border-white/40"
+                        ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white border-cyan-500/30"
+                        : "glass-surface border-foreground/20 text-foreground/70 hover:text-foreground hover:border-white/40"
                         }`}
                     >
                       <Icon className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
@@ -138,8 +139,8 @@ export default async function AssignmentsPage({
               <Link
                 href={`/dashboard/assignments?status=${status}&subject=all&sort=${sort}`}
                 className={`text-sm px-2 py-1 rounded ${subject === "all"
-                    ? "text-cyan-400 font-medium"
-                    : "text-foreground/70 hover:text-foreground"
+                  ? "text-cyan-400 font-medium"
+                  : "text-foreground/70 hover:text-foreground"
                   }`}
               >
                 All
@@ -149,8 +150,8 @@ export default async function AssignmentsPage({
                   key={subj}
                   href={`/dashboard/assignments?status=${status}&subject=${subj}&sort=${sort}`}
                   className={`text-sm px-2 py-1 rounded ${subject === subj
-                      ? "text-cyan-400 font-medium"
-                      : "text-foreground/70 hover:text-foreground"
+                    ? "text-cyan-400 font-medium"
+                    : "text-foreground/70 hover:text-foreground"
                     }`}
                 >
                   {subj}
@@ -164,8 +165,8 @@ export default async function AssignmentsPage({
               <Link
                 href={`/dashboard/assignments?status=${status}&subject=${subject}&sort=due_date-asc`}
                 className={`p-1.5 rounded ${sort === "due_date-asc"
-                    ? "bg-cyan-500/20 text-cyan-400"
-                    : "text-foreground/60 hover:text-foreground"
+                  ? "bg-cyan-500/20 text-cyan-400"
+                  : "text-foreground/60 hover:text-foreground"
                   }`}
                 aria-label="Sort by due date ascending"
               >
@@ -174,8 +175,8 @@ export default async function AssignmentsPage({
               <Link
                 href={`/dashboard/assignments?status=${status}&subject=${subject}&sort=due_date-desc`}
                 className={`p-1.5 rounded ${sort === "due_date-desc"
-                    ? "bg-cyan-500/20 text-cyan-400"
-                    : "text-foreground/60 hover:text-foreground"
+                  ? "bg-cyan-500/20 text-cyan-400"
+                  : "text-foreground/60 hover:text-foreground"
                   }`}
                 aria-label="Sort by due date descending"
               >
@@ -189,7 +190,7 @@ export default async function AssignmentsPage({
       {/* Assignments List */}
       <div className="space-y-4">
         {assignments && assignments.length > 0 ? (
-          assignments.map((assignment, index) => (
+          assignments.map((assignment: any, index: number) => (
             <ScrollReveal key={assignment.id} direction="up" delay={0.05 * index}>
               <Link href={`/dashboard/assignments/${assignment.id}`}>
                 <AnimatedCard variant="3d" delay={0.05 * index} className="cursor-pointer group">
@@ -197,8 +198,8 @@ export default async function AssignmentsPage({
                     <div className="flex items-start space-x-4">
                       <div
                         className={`w-12 h-12 rounded-xl p-3 flex-shrink-0 ${assignment.status === "completed"
-                            ? "bg-gradient-to-br from-green-500/20 to-emerald-500/20"
-                            : "bg-gradient-to-br from-cyan-500/20 to-pink-500/20"
+                          ? "bg-gradient-to-br from-green-500/20 to-emerald-500/20"
+                          : "bg-gradient-to-br from-cyan-500/20 to-pink-500/20"
                           }`}
                       >
                         {assignment.status === "completed" ? (

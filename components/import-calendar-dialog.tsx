@@ -94,7 +94,9 @@ export function ImportCalendarDialog({ open, onOpenChange, onImport }: ImportCal
     setLoading(true)
 
     try {
-      const response = await fetch(calendarUrl)
+      // Use our server-side proxy to bypass CORS restrictions
+      const proxyUrl = `/api/calendar-proxy?url=${encodeURIComponent(calendarUrl)}`
+      const response = await fetch(proxyUrl)
       if (!response.ok) {
         throw new Error("Failed to fetch calendar from URL")
       }
