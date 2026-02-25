@@ -53,7 +53,7 @@ export function ImportCalendarDialog({ open, onOpenChange, onImport }: ImportCal
 
     // If there's a feed URL, save/upsert the feed record
     if (feedUrl) {
-      const { error: feedError } = await supabase
+      const { error: feedError } = await (supabase as any)
         .from("calendar_feeds")
         .upsert(
           {
@@ -97,7 +97,7 @@ export function ImportCalendarDialog({ open, onOpenChange, onImport }: ImportCal
     const savedEvents: any[] = []
     for (let i = 0; i < eventsToInsert.length; i += 50) {
       const batch = eventsToInsert.slice(i, i + 50)
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("calendar_events")
         .insert(batch)
         .select()

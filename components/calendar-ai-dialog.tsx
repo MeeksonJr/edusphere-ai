@@ -35,10 +35,12 @@ export function CalendarAIDialog({ open, onOpenChange, event }: CalendarAIDialog
   const [file, setFile] = useState<File | null>(null)
   const [copied, setCopied] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   const handleGenerateResources = async () => {
     if (!event) return
 
+    setSaved(false)
     try {
       setLoading(true)
       setAiResponse("")
@@ -220,6 +222,7 @@ Provide:
 
       if (error) throw error
 
+      setSaved(true)
       toast({
         title: "Study Guide Saved!",
         description: "Your study guide has been saved and can be viewed in the Study Guides section.",
@@ -317,14 +320,22 @@ Provide:
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-gray-700 bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-500/30"
+                  className={`border-gray-700 ${saved
+                      ? "bg-green-600/30 text-green-300 border-green-500/40 cursor-default"
+                      : "bg-green-600/20 hover:bg-green-600/30 text-green-400 border-green-500/30"
+                    }`}
                   onClick={handleSaveStudyGuide}
-                  disabled={saving}
+                  disabled={saving || saved}
                 >
                   {saving ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-1 animate-spin" />
                       Saving...
+                    </>
+                  ) : saved ? (
+                    <>
+                      <Check className="h-4 w-4 mr-1" />
+                      Saved
                     </>
                   ) : (
                     <>
