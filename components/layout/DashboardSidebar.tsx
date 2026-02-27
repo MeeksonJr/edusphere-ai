@@ -24,6 +24,10 @@ import {
   Award,
   Bell,
   StickyNote,
+  Mic,
+  Users,
+  Code2,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/components/supabase-provider";
@@ -79,14 +83,18 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen }: { mobileOpen: bo
     { name: "Assignments", href: "/dashboard/assignments", icon: CheckSquare },
     { name: "AI Lab", href: "/dashboard/ai-lab", icon: Beaker },
     { name: "AI Tutor", href: "/dashboard/ai-tutor", icon: Brain },
+    { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit },
+    { name: "Podcasts", href: "/dashboard/podcasts", icon: Mic },
     { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
     { name: "Study Resources", href: "/dashboard/resources", icon: BookOpen },
-    { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit },
     { name: "Notes", href: "/dashboard/notes", icon: StickyNote },
     { name: "Skills", href: "/dashboard/skills", icon: Target },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Certificates", href: "/dashboard/certificates", icon: Award },
+    { name: "Family Hub", href: "/dashboard/family", icon: Users },
+    { name: "Developer", href: "/dashboard/developer", icon: Code2 },
     { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
+    { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
     { name: "Profile", href: "/dashboard/profile", icon: User },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ];

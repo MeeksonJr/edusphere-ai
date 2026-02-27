@@ -46,54 +46,73 @@ export async function generateTTS(options: TTSOptions): Promise<TTSResult> {
   const wordCount = text.split(/\s+/).length
   const estimatedDuration = (wordCount / 150) * 60
 
-  // 1. If ElevenLabs explicitly requested or available
-  if (provider === "elevenlabs" || (!provider && process.env.ELEVENLABS_API_KEY)) {
+  const errors: string[] = []
+
+  // Build provider order based on request
+  type ProviderAttempt = { name: TTSProvider; fn: () => Promise<TTSResult> }
+  const providers: ProviderAttempt[] = []
+
+  const tryElevenLabs = (): Promise<TTSResult> =>
+    generateElevenLabsTTS({
+      text,
+      voiceId: voice,
+    }).then((result) => ({
+      buffer: result.buffer,
+      duration: estimatedDuration,
+      format: "mp3" as const,
+      provider: "elevenlabs" as TTSProvider,
+    }))
+
+  const tryEdgeTTS = (): Promise<TTSResult> =>
+    generateEdgeTTS({
+      text,
+      voice: voice || "en-US-AriaNeural",
+      rate: options.rate || "+0%",
+      pitch: options.pitch || "+0Hz",
+    }).then((result) => ({
+      buffer: result.buffer,
+      duration: estimatedDuration,
+      format: "mp3" as const,
+      provider: "edge-tts" as TTSProvider,
+    }))
+
+  // Determine provider priority
+  if (provider === "elevenlabs") {
+    if (process.env.ELEVENLABS_API_KEY) providers.push({ name: "elevenlabs", fn: tryElevenLabs })
+    providers.push({ name: "edge-tts", fn: tryEdgeTTS })
+  } else if (provider === "edge-tts") {
+    providers.push({ name: "edge-tts", fn: tryEdgeTTS })
+    if (process.env.ELEVENLABS_API_KEY) providers.push({ name: "elevenlabs", fn: tryElevenLabs })
+  } else {
+    // No provider specified — try ElevenLabs first if key available, then edge-tts
+    if (process.env.ELEVENLABS_API_KEY) providers.push({ name: "elevenlabs", fn: tryElevenLabs })
+    providers.push({ name: "edge-tts", fn: tryEdgeTTS })
+  }
+
+  // Try each provider in order
+  for (const p of providers) {
     try {
-      const result = await generateElevenLabsTTS({
-        text,
-        voiceId: voice, // ElevenLabs uses voice IDs
-      })
-      return {
-        buffer: result.buffer,
-        duration: estimatedDuration,
-        format: "mp3",
-        provider: "elevenlabs",
-      }
-    } catch (error) {
-      console.warn("ElevenLabs TTS failed, falling back to Edge-TTS:", error)
+      return await p.fn()
+    } catch (error: any) {
+      const msg = `${p.name} failed: ${error?.message || error}`
+      console.warn(msg)
+      errors.push(msg)
     }
   }
 
-  // 2. Edge-TTS (free, always available)
-  if (provider === "edge-tts" || !provider) {
-    try {
-      const result = await generateEdgeTTS({
-        text,
-        voice: voice || "en-US-AriaNeural",
-        rate: options.rate || "+0%",
-        pitch: options.pitch || "+0Hz",
-      })
-      return {
-        buffer: result.buffer,
-        duration: estimatedDuration,
-        format: "mp3",
-        provider: "edge-tts",
-      }
-    } catch (error) {
-      console.warn("Edge-TTS failed:", error)
-    }
-  }
-
-  // 3. Google Cloud TTS (legacy fallback)
+  // Google Cloud TTS (legacy fallback — last resort)
   if (process.env.GOOGLE_CLOUD_TTS_KEY || process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     try {
       return await generateTTSGoogleCloud(text, voice, estimatedDuration)
-    } catch (error) {
-      console.warn("Google Cloud TTS failed:", error)
+    } catch (error: any) {
+      const msg = `Google Cloud TTS failed: ${error?.message || error}`
+      console.warn(msg)
+      errors.push(msg)
     }
   }
 
-  throw new Error("All TTS providers failed. Check your configuration.")
+  const details = errors.length > 0 ? " Details: " + errors.join(" | ") : ""
+  throw new Error(`All TTS providers failed.${details}`)
 }
 
 /**

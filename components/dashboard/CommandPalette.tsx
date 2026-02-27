@@ -79,7 +79,7 @@ export function CommandPalette() {
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
 
-                    <CommandGroup heading="Suggestions">
+                    <CommandGroup heading="Navigation">
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard"))}>
                             <LayoutDashboard className="mr-2 h-4 w-4" />
                             <span>Dashboard</span>
@@ -92,6 +92,26 @@ export function CommandPalette() {
                             <Sparkles className="mr-2 h-4 w-4" />
                             <span>AI Lab</span>
                         </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/flashcards"))}>
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            <span>Flashcards</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/podcasts"))}>
+                            <Zap className="mr-2 h-4 w-4" />
+                            <span>Podcasts</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/calendar"))}>
+                            <Calendar className="mr-2 h-4 w-4" />
+                            <span>Calendar</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/family"))}>
+                            <User className="mr-2 h-4 w-4" />
+                            <span>Family Hub</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/developer"))}>
+                            <Zap className="mr-2 h-4 w-4" />
+                            <span>Developer Console</span>
+                        </CommandItem>
                     </CommandGroup>
 
                     <CommandSeparator />
@@ -100,11 +120,14 @@ export function CommandPalette() {
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/courses/new"))}>
                             <Plus className="mr-2 h-4 w-4" />
                             <span>Create New Course</span>
-                            <CommandShortcut>⌘C</CommandShortcut>
                         </CommandItem>
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/assignments/new"))}>
                             <FileText className="mr-2 h-4 w-4" />
                             <span>New Assignment</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/developer/keys"))}>
+                            <Zap className="mr-2 h-4 w-4" />
+                            <span>Manage API Keys</span>
                         </CommandItem>
                     </CommandGroup>
 
@@ -118,8 +141,7 @@ export function CommandPalette() {
                         </CommandItem>
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/subscription"))}>
                             <CreditCard className="mr-2 h-4 w-4" />
-                            <span>Billing</span>
-                            <CommandShortcut>⌘B</CommandShortcut>
+                            <span>Subscription & Billing</span>
                         </CommandItem>
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/settings"))}>
                             <Settings className="mr-2 h-4 w-4" />
