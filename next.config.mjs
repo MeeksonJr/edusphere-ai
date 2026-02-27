@@ -19,6 +19,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  transpilePackages: ["edge-tts"],
   images: {
     unoptimized: true,
     formats: ['image/avif', 'image/webp'],
