@@ -17,6 +17,7 @@ import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 import { AmbientBackground } from "@/components/shared/AmbientBackground"
+import { CalendarSyncSettings } from "@/components/calendar-sync-settings"
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -438,6 +439,11 @@ export default function SettingsPage() {
                 </div>
               </div>
             </GlassSurface>
+          </ScrollReveal>
+
+          {/* Calendar Integrations */}
+          <ScrollReveal direction="up" delay={0.1}>
+            <CalendarSyncSettings />
           </ScrollReveal>
         </TabsContent>
 

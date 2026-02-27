@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Plus,
   Upload,
+  Download,
   CheckSquare,
   Clock,
   CalendarIcon as CalendarComponent,
@@ -335,6 +336,30 @@ export default function CalendarPage() {
                   Day
                 </Button>
               </div>
+              <Button
+                variant="outline"
+                className="glass-surface border-foreground/20 hover:border-cyan-500/50 text-foreground"
+                onClick={async () => {
+                  try {
+                    const res = await fetch("/api/calendar/export")
+                    if (!res.ok) throw new Error("Export failed")
+                    const blob = await res.blob()
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement("a")
+                    a.href = url
+                    a.download = "edusphere-calendar.ics"
+                    document.body.appendChild(a)
+                    a.click()
+                    document.body.removeChild(a)
+                    URL.revokeObjectURL(url)
+                  } catch {
+                    toast({ title: "Export failed", variant: "destructive" })
+                  }
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" aria-hidden="true" />
+                Export
+              </Button>
               <Button
                 variant="outline"
                 className="glass-surface border-foreground/20 hover:border-cyan-500/50 text-foreground"
