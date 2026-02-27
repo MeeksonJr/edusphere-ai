@@ -43,7 +43,7 @@ export default function ChildDetailPage() {
                 }
 
                 const found = (data.children || []).find(
-                    (c: any) => c.id === params.id
+                    (c: any) => c.id === params.childId
                 )
 
                 if (!found) {
@@ -60,7 +60,7 @@ export default function ChildDetailPage() {
         }
 
         fetchChild()
-    }, [params.id, router])
+    }, [params.childId, router])
 
     const handleLogProgress = async () => {
         if (!logSubject.trim()) {
@@ -75,7 +75,7 @@ export default function ChildDetailPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     action: "log_progress",
-                    childId: params.id,
+                    childId: params.childId,
                     subject: logSubject.trim(),
                     score: logScore ? parseFloat(logScore) : null,
                     timeSpentMinutes: logMinutes ? parseInt(logMinutes) : 0,

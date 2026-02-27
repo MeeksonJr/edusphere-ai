@@ -1,7 +1,10 @@
-import { createClient } from "@/utils/supabase/server"
+"use client"
+
+import { useState, useEffect } from "react"
+import { useSupabase } from "@/components/supabase-provider"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Plus, Video, Clock, CheckCircle, XCircle, Loader2, Play, MoreVertical, Trash2, Edit } from "lucide-react"
+import { Plus, Video, Clock, CheckCircle, XCircle, Loader2, MoreVertical, Trash2, Edit } from "lucide-react"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
@@ -14,29 +17,35 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-export default async function CoursesPage() {
-  const supabase = await createClient()
+export default function CoursesPage() {
+  const [courses, setCourses] = useState<any[] | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
+  const { supabase } = useSupabase()
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  useEffect(() => {
+    if (!supabase) return
 
-  if (!user) {
-    return (
-      <div className="relative min-h-[calc(100vh-4rem)] p-6 md:p-8 lg:p-12">
-        <GlassSurface className="p-8 text-center max-w-md mx-auto mt-20">
-          <p className="text-foreground/70">Please log in to view your courses.</p>
-        </GlassSurface>
-      </div>
-    )
-  }
+    async function fetchData() {
+      const { data: { user } } = await supabase!.auth.getUser()
+      setUser(user)
+      if (!user) {
+        setLoading(false)
+        return
+      }
 
-  // Fetch user's courses
-  const { data: courses, error } = await supabase
-    .from("courses")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
+      const { data } = await supabase!
+        .from("courses")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+
+      setCourses(data || [])
+      setLoading(false)
+    }
+
+    fetchData()
+  }, [supabase])
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -74,8 +83,26 @@ export default async function CoursesPage() {
   const formatDuration = (seconds: number | null) => {
     if (!seconds) return "N/A"
     const minutes = Math.floor(seconds / 60)
-    // const remainingSeconds = seconds % 60
     return `${minutes} min`
+  }
+
+  if (loading) {
+    return (
+      <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center">
+        <AmbientBackground />
+        <Loader2 className="h-8 w-8 text-cyan-400 animate-spin" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="relative min-h-[calc(100vh-4rem)] p-6 md:p-8 lg:p-12">
+        <GlassSurface className="p-8 text-center max-w-md mx-auto mt-20">
+          <p className="text-foreground/70">Please log in to view your courses.</p>
+        </GlassSurface>
+      </div>
+    )
   }
 
   return (
@@ -195,5 +222,3 @@ export default async function CoursesPage() {
     </div>
   )
 }
-
-
