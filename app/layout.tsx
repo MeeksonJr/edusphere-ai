@@ -37,14 +37,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://edusphere.ai"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://edusphere-ai-eight.vercel.app/"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://edusphere.ai",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://edusphere-ai-eight.vercel.app/",
     title: "EduSphere AI - AI-Powered Course Creation Platform",
     description: "Create professional video courses in minutes with AI-powered course generation.",
     siteName: "EduSphere AI",
