@@ -5,13 +5,114 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { useSupabase } from "@/components/supabase-provider"
 import { useToast } from "@/hooks/use-toast"
-import { PayPalButton } from "@/components/paypal-button"
-import { Loader2, CheckCircle2, CreditCard, Sparkles, Zap, Users, Mic } from "lucide-react"
+import {
+  Loader2,
+  CheckCircle2,
+  CreditCard,
+  Sparkles,
+  Zap,
+  Users,
+  Mic,
+  BookOpen,
+  Calendar,
+  Headphones,
+  Code,
+  ShoppingBag,
+  ExternalLink,
+  Crown,
+  Star,
+  X,
+} from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { AnimatedCard } from "@/components/shared/AnimatedCard"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
+
+const plans = [
+  {
+    id: "free",
+    name: "Free",
+    price: 0,
+    description: "Get started with AI-powered learning",
+    color: "from-gray-500 to-gray-600",
+    borderColor: "border-gray-500/30",
+    badgeColor: "bg-gray-500/20 text-gray-300",
+    icon: BookOpen,
+    features: [
+      { icon: Zap, text: "5 AI requests/day" },
+      { icon: BookOpen, text: "3 courses" },
+      { icon: Sparkles, text: "Basic flashcards & quizzes" },
+      { icon: CheckCircle2, text: "Notes & study resources" },
+    ],
+    limitations: [
+      { icon: X, text: "No calendar sync" },
+      { icon: X, text: "No video narration" },
+      { icon: X, text: "No API access" },
+    ],
+  },
+  {
+    id: "student",
+    name: "Student",
+    price: 9,
+    description: "Unlimited learning with AI power",
+    color: "from-blue-500 to-cyan-500",
+    borderColor: "border-blue-500/30",
+    badgeColor: "bg-blue-500/20 text-blue-300",
+    icon: Star,
+    popular: false,
+    features: [
+      { icon: Zap, text: "Unlimited AI requests" },
+      { icon: BookOpen, text: "20 courses" },
+      { icon: Calendar, text: "Calendar sync" },
+      { icon: Headphones, text: "Podcast generation" },
+      { icon: Sparkles, text: "Priority support" },
+    ],
+    limitations: [
+      { icon: X, text: "No video narration" },
+      { icon: X, text: "No API access" },
+    ],
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: 19,
+    description: "Full power for creators & developers",
+    color: "from-violet-500 to-purple-500",
+    borderColor: "border-violet-500/30",
+    badgeColor: "bg-violet-500/20 text-violet-300",
+    icon: Crown,
+    popular: true,
+    features: [
+      { icon: Zap, text: "Unlimited AI requests" },
+      { icon: BookOpen, text: "Unlimited courses" },
+      { icon: Calendar, text: "Calendar sync" },
+      { icon: Mic, text: "AI video narration (ElevenLabs)" },
+      { icon: Headphones, text: "Podcast generation" },
+      { icon: Code, text: "API access (100 calls/day)" },
+      { icon: ShoppingBag, text: "Marketplace selling" },
+    ],
+    limitations: [],
+  },
+  {
+    id: "family",
+    name: "Family",
+    price: 29,
+    description: "Pro features for the whole family",
+    color: "from-pink-500 to-rose-500",
+    borderColor: "border-pink-500/30",
+    badgeColor: "bg-pink-500/20 text-pink-300",
+    icon: Users,
+    features: [
+      { icon: CheckCircle2, text: "Everything in Pro" },
+      { icon: Users, text: "Up to 5 child accounts" },
+      { icon: Sparkles, text: "Progress reports & insights" },
+      { icon: CreditCard, text: "Parental controls" },
+      { icon: BookOpen, text: "Shared family library" },
+    ],
+    limitations: [],
+  },
+]
 
 export default function SubscriptionPage() {
   const router = useRouter()
@@ -19,14 +120,12 @@ export default function SubscriptionPage() {
   const { toast } = useToast()
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [selectedPlan, setSelectedPlan] = useState<"pro" | "ultimate" | null>(null)
-
-  const planIds = {
-    pro: "P-5ML4271244454362WXNWU5NQ",
-    ultimate: "P-3RX095426H3469222XNWU5VY",
-  }
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
+  const [portalLoading, setPortalLoading] = useState(false)
 
   useEffect(() => {
+    if (!supabase) return
+
     const getUser = async () => {
       try {
         setLoading(true)
@@ -40,7 +139,6 @@ export default function SubscriptionPage() {
             .single()
 
           if (error && error.code !== "PGRST116") throw error
-
           setUser({ ...data.user, profile: profileData })
         }
       } catch (error: any) {
@@ -57,39 +155,49 @@ export default function SubscriptionPage() {
     getUser()
   }, [supabase, toast])
 
-  const handleSelectPlan = (plan: "pro" | "ultimate") => {
-    setSelectedPlan(plan)
-  }
-
-  const handleCancelSubscription = async () => {
+  const handleCheckout = async (tier: string) => {
+    if (tier === "free") return
     try {
-      if (!user) return
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          subscription_tier: "free",
-          subscription_id: null,
-          subscription_status: null,
-          subscription_updated_at: new Date().toISOString(),
-        })
-        .eq("id", user.id)
-
-      if (error) throw error
-
-      toast({
-        title: "Subscription Cancelled",
-        description: "Your subscription has been cancelled successfully.",
+      setCheckoutLoading(tier)
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier }),
       })
 
-      const { data: profileData } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-      setUser({ ...user, profile: profileData })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      if (data.url) window.location.href = data.url
+    } catch (error: any) {
+      toast({
+        title: "Checkout Error",
+        description: error.message || "Failed to start checkout",
+        variant: "destructive",
+      })
+    } finally {
+      setCheckoutLoading(null)
+    }
+  }
+
+  const handleManageBilling = async () => {
+    try {
+      setPortalLoading(true)
+      const res = await fetch("/api/stripe/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      if (data.url) window.location.href = data.url
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Failed to cancel subscription",
+        description: error.message || "Failed to open billing portal",
         variant: "destructive",
       })
+    } finally {
+      setPortalLoading(false)
     }
   }
 
@@ -102,6 +210,7 @@ export default function SubscriptionPage() {
   }
 
   const currentTier = user?.profile?.subscription_tier || "free"
+  const currentPlan = plans.find((p) => p.id === currentTier) || plans[0]
 
   return (
     <div className="p-6 md:p-8 lg:p-12">
@@ -114,232 +223,231 @@ export default function SubscriptionPage() {
               Plans
             </span>
           </h1>
-          <p className="text-foreground/70">Choose the plan that works best for you</p>
+          <p className="text-foreground/70">
+            Choose the plan that powers your learning journey
+          </p>
         </div>
       </ScrollReveal>
 
-      {/* Current Plan */}
+      {/* Current Plan Banner */}
       {currentTier !== "free" && (
         <ScrollReveal direction="up" delay={0.1}>
-          <GlassSurface className="p-6 lg:p-8 mb-8 border-cyan-500/30">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground mb-2">
-                  {currentTier === "ultimate" ? "Ultimate Plan" : "Pro Plan"}
-                </h2>
-                <p className="text-foreground/70">
-                  {currentTier === "ultimate" ? "$12.99/month" : "$6.99/month"}
-                </p>
+          <GlassSurface className={`p-6 lg:p-8 mb-8 ${currentPlan.borderColor}`}>
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${currentPlan.color} flex items-center justify-center`}>
+                  <currentPlan.icon className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">
+                    {currentPlan.name} Plan
+                  </h2>
+                  <p className="text-foreground/70">
+                    ${currentPlan.price}/month •{" "}
+                    <span className="text-green-400">
+                      {user?.profile?.subscription_status || "Active"}
+                    </span>
+                  </p>
+                </div>
               </div>
-              <Badge
-                className={
-                  currentTier === "ultimate"
-                    ? "bg-gradient-to-r from-pink-500 to-pink-600 text-foreground"
-                    : "bg-gradient-to-r from-blue-500 to-blue-600 text-foreground"
-                }
+              <Button
+                variant="outline"
+                className="border-foreground/20 hover:border-foreground/40"
+                onClick={handleManageBilling}
+                disabled={portalLoading}
               >
-                {currentTier === "ultimate" ? "Ultimate" : "Pro"}
-              </Badge>
+                {portalLoading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                )}
+                Manage Billing
+              </Button>
             </div>
-
-            {user?.profile?.subscription_id && (
-              <div className="space-y-2 text-sm text-foreground/60 mb-6">
-                <p>Subscription ID: {user.profile.subscription_id}</p>
-                <p>Status: {user.profile.subscription_status || "Active"}</p>
-                <p>
-                  Last Updated:{" "}
-                  {new Date(user.profile.subscription_updated_at || Date.now()).toLocaleDateString()}
-                </p>
-              </div>
-            )}
-
-            <Button
-              variant="outline"
-              className="border-red-500/30 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-              onClick={handleCancelSubscription}
-            >
-              Cancel Subscription
-            </Button>
           </GlassSurface>
         </ScrollReveal>
       )}
 
-      {/* Available Plans */}
-      {currentTier === "free" && (
-        <ScrollReveal direction="up" delay={0.2}>
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Available Plans</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Pro Plan */}
-              <AnimatedCard
-                variant="3d"
-                className={`cursor-pointer transition-all ${
-                  selectedPlan === "pro" ? "border-blue-500/50 scale-105" : ""
-                }`}
-                onClick={() => handleSelectPlan("pro")}
-              >
-                <div className="p-6 lg:p-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-2xl font-bold text-foreground">Pro Plan</h3>
-                    {selectedPlan === "pro" && (
-                      <CheckCircle2 className="h-6 w-6 text-blue-400" aria-hidden="true" />
-                    )}
-                  </div>
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold text-foreground">$6.99</span>
-                    <span className="text-foreground/60">/month</span>
-                  </div>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-center text-foreground/80">
-                      <Zap className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                      Unlimited AI prompts
-                    </li>
-                    <li className="flex items-center text-foreground/80">
-                      <Sparkles className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                      Priority support
-                    </li>
-                    <li className="flex items-center text-foreground/80">
-                      <CreditCard className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                      Premium Gemini features
-                    </li>
-                    <li className="flex items-center text-foreground/80">
-                      <Sparkles className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                      Flashcard & quiz generator
-                    </li>
-                  </ul>
-                  {selectedPlan === "pro" ? (
-                    <PayPalButton planId={planIds.pro} tier="pro" />
-                  ) : (
-                    <Button
-                      className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-foreground"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleSelectPlan("pro")
-                      }}
-                    >
-                      Select Pro Plan
-                    </Button>
-                  )}
-                </div>
-              </AnimatedCard>
+      {/* Plan Cards */}
+      <ScrollReveal direction="up" delay={0.2}>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {plans.map((plan, index) => {
+            const isCurrentPlan = plan.id === currentTier
+            const isDowngrade =
+              plans.findIndex((p) => p.id === currentTier) >
+              plans.findIndex((p) => p.id === plan.id)
 
-              {/* Ultimate Plan */}
+            return (
               <AnimatedCard
+                key={plan.id}
                 variant="3d"
-                delay={0.1}
-                className={`cursor-pointer transition-all ${
-                  selectedPlan === "ultimate" ? "border-pink-500/50 scale-105" : ""
-                }`}
-                onClick={() => handleSelectPlan("ultimate")}
+                delay={index * 0.05}
+                className={`relative transition-all duration-300 ${isCurrentPlan
+                  ? `${plan.borderColor} ring-2 ring-offset-0 ring-${plan.id === "pro" ? "violet" : plan.id === "student" ? "blue" : plan.id === "family" ? "pink" : "gray"}-500/30`
+                  : "hover:scale-[1.02]"
+                  }`}
               >
-                <div className="p-6 lg:p-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-2xl font-bold text-foreground">Ultimate Plan</h3>
-                    {selectedPlan === "ultimate" && (
-                      <CheckCircle2 className="h-6 w-6 text-pink-400" aria-hidden="true" />
+                {/* Popular Badge */}
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                    <Badge className="bg-gradient-to-r from-violet-500 to-purple-600 text-white px-3 py-1 text-xs font-semibold shadow-lg">
+                      Most Popular
+                    </Badge>
+                  </div>
+                )}
+
+                <div className="p-6 flex flex-col h-full">
+                  {/* Plan Header */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div
+                      className={`w-10 h-10 rounded-lg bg-gradient-to-br ${plan.color} flex items-center justify-center`}
+                    >
+                      <plan.icon className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground">
+                        {plan.name}
+                      </h3>
+                      {isCurrentPlan && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-green-500/40 text-green-400">
+                          Current
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Price */}
+                  <div className="mb-4">
+                    <span className="text-3xl font-bold text-foreground">
+                      {plan.price === 0 ? "Free" : `$${plan.price}`}
+                    </span>
+                    {plan.price > 0 && (
+                      <span className="text-sm text-foreground/60">/month</span>
                     )}
                   </div>
-                  <div className="mb-6">
-                    <span className="text-4xl font-bold text-foreground">$12.99</span>
-                    <span className="text-foreground/60">/month</span>
-                  </div>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-center text-foreground/80">
-                      <CheckCircle2 className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                      Everything in Pro
-                    </li>
-                    <li className="flex items-center text-foreground/80">
-                      <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                      Multi-project/class support
-                    </li>
-                    <li className="flex items-center text-foreground/80">
-                      <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                      Study groups (peer-to-peer)
-                    </li>
-                    <li className="flex items-center text-foreground/80">
-                      <Mic className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                      Voice assistant for Gemini AI
-                    </li>
+
+                  <p className="text-sm text-foreground/60 mb-5">
+                    {plan.description}
+                  </p>
+
+                  {/* Features */}
+                  <ul className="space-y-2.5 mb-6 flex-1">
+                    {plan.features.map((feature, i) => (
+                      <li
+                        key={i}
+                        className="flex items-center gap-2.5 text-sm text-foreground/80"
+                      >
+                        <feature.icon className="h-4 w-4 text-green-400 flex-shrink-0" />
+                        {feature.text}
+                      </li>
+                    ))}
+                    {plan.limitations.map((limit, i) => (
+                      <li
+                        key={`limit-${i}`}
+                        className="flex items-center gap-2.5 text-sm text-foreground/40"
+                      >
+                        <limit.icon className="h-4 w-4 text-foreground/30 flex-shrink-0" />
+                        {limit.text}
+                      </li>
+                    ))}
                   </ul>
-                  {selectedPlan === "ultimate" ? (
-                    <PayPalButton planId={planIds.ultimate} tier="ultimate" />
+
+                  {/* CTA Button */}
+                  {isCurrentPlan ? (
+                    <Button
+                      disabled
+                      className="w-full bg-foreground/10 text-foreground/50 cursor-default"
+                    >
+                      Current Plan
+                    </Button>
+                  ) : plan.id === "free" ? (
+                    <Button
+                      variant="outline"
+                      className="w-full border-foreground/20 text-foreground/60"
+                      disabled
+                    >
+                      Free Forever
+                    </Button>
+                  ) : isDowngrade ? (
+                    <Button
+                      variant="outline"
+                      className="w-full border-foreground/20 text-foreground/60"
+                      onClick={handleManageBilling}
+                      disabled={portalLoading}
+                    >
+                      {portalLoading ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : null}
+                      Manage Plan
+                    </Button>
                   ) : (
                     <Button
-                      className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-foreground"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleSelectPlan("ultimate")
-                      }}
+                      className={`w-full bg-gradient-to-r ${plan.color} hover:opacity-90 text-white font-semibold`}
+                      onClick={() => handleCheckout(plan.id)}
+                      disabled={checkoutLoading === plan.id}
                     >
-                      Select Ultimate Plan
+                      {checkoutLoading === plan.id ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <CreditCard className="h-4 w-4 mr-2" />
+                      )}
+                      {currentTier !== "free" ? "Upgrade" : "Subscribe"} — $
+                      {plan.price}/mo
                     </Button>
                   )}
                 </div>
               </AnimatedCard>
+            )
+          })}
+        </div>
+      </ScrollReveal>
+
+      {/* FAQ / Info */}
+      <ScrollReveal direction="up" delay={0.3}>
+        <GlassSurface className="p-6 lg:p-8 mt-8">
+          <h2 className="text-lg font-bold text-foreground mb-4">
+            Frequently Asked Questions
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6 text-sm">
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">
+                Can I cancel anytime?
+              </h3>
+              <p className="text-foreground/60">
+                Yes! Cancel anytime from the Manage Billing portal. You&apos;ll
+                keep your plan until the end of the billing period.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">
+                What happens to my content?
+              </h3>
+              <p className="text-foreground/60">
+                All your courses, flashcards, notes, and resources stay
+                accessible. Some features may become limited on the free tier.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">
+                Can I switch plans?
+              </h3>
+              <p className="text-foreground/60">
+                Upgrade or downgrade anytime. Upgrades take effect immediately
+                with prorated billing.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">
+                Is there a student discount?
+              </h3>
+              <p className="text-foreground/60">
+                The Student plan at $9/mo is already our most affordable option.
+                Contact us for institutional pricing.
+              </p>
             </div>
           </div>
-        </ScrollReveal>
-      )}
-
-      {/* Upgrade Plan */}
-      {currentTier === "pro" && (
-        <ScrollReveal direction="up" delay={0.2}>
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-6">Upgrade Your Plan</h2>
-            <AnimatedCard
-              variant="3d"
-              className={`cursor-pointer transition-all max-w-2xl ${
-                selectedPlan === "ultimate" ? "border-pink-500/50 scale-105" : ""
-              }`}
-              onClick={() => handleSelectPlan("ultimate")}
-            >
-              <div className="p-6 lg:p-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-2xl font-bold text-foreground">Ultimate Plan</h3>
-                  {selectedPlan === "ultimate" && (
-                    <CheckCircle2 className="h-6 w-6 text-pink-400" aria-hidden="true" />
-                  )}
-                </div>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold text-foreground">$12.99</span>
-                  <span className="text-foreground/60">/month</span>
-                </div>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-center text-foreground/80">
-                    <CheckCircle2 className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                    Everything in Pro
-                  </li>
-                  <li className="flex items-center text-foreground/80">
-                    <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                    Multi-project/class support
-                  </li>
-                  <li className="flex items-center text-foreground/80">
-                    <Users className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                    Study groups (peer-to-peer)
-                  </li>
-                  <li className="flex items-center text-foreground/80">
-                    <Mic className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" aria-hidden="true" />
-                    Voice assistant for Gemini AI
-                  </li>
-                </ul>
-                {selectedPlan === "ultimate" ? (
-                  <PayPalButton planId={planIds.ultimate} tier="ultimate" />
-                ) : (
-                  <Button
-                    className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-foreground"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleSelectPlan("ultimate")
-                    }}
-                  >
-                    Upgrade to Ultimate
-                  </Button>
-                )}
-              </div>
-            </AnimatedCard>
-          </div>
-        </ScrollReveal>
-      )}
+        </GlassSurface>
+      </ScrollReveal>
     </div>
   )
 }

@@ -119,6 +119,9 @@ importers:
       '@remotion/player':
         specifier: ^4.0.407
         version: 4.0.407(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@stripe/stripe-js':
+        specifier: ^8.8.0
+        version: 8.8.0
       '@supabase/auth-helpers-nextjs':
         specifier: latest
         version: 0.15.0(@supabase/supabase-js@2.91.0)
@@ -200,6 +203,9 @@ importers:
       sonner:
         specifier: ^1.7.4
         version: 1.7.4(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      stripe:
+        specifier: ^20.4.0
+        version: 20.4.0(@types/node@22.19.7)
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.0
@@ -1518,6 +1524,10 @@ packages:
     resolution: {integrity: sha512-8+Xt6yPrw+Wrsni8CVB9pnNsuGLTvRehXBCYDBioDrTDSnVTG9flkJNNdzWeWtNQ/VAGGPtk6Kqs0L6QV/vnjQ==}
     peerDependencies:
       zod: 3.22.3
+
+  '@stripe/stripe-js@8.8.0':
+    resolution: {integrity: sha512-NNYuyW8qmLjyHnpyFgs/23wUrjB8k0xN9YIZFOMLewCa/pIkIji9e9aY/EgdNryEDDRptc6TcPIHRvG1R0ClFw==}
+    engines: {node: '>=12.16'}
 
   '@supabase/auth-helpers-nextjs@0.15.0':
     resolution: {integrity: sha512-VtXz3GGnxluoxks1g3SaCoYr2OZ7PgRukDl+pLWrDfD2dPDaG8hmkp5iBZsU+lmsDYALGNO2dgbymgpAfD8eCQ==}
@@ -3172,6 +3182,15 @@ packages:
     resolution: {integrity: sha512-BrpvfNAE3dcvq7ll3xVumzjKjZQ5tI1sEUIKr3Uoks0XUl45St3FlatVqef9prk4jRDzhW6WZg+3bk93y6pLjA==}
     engines: {node: '>=6'}
 
+  stripe@20.4.0:
+    resolution: {integrity: sha512-F/aN1IQ9vHmlyLNi3DkiIbyzQb6gyBG0uYFd/VrEVQSc9BLtlgknPUx0EvzZdBMRLFuRaPFIFd7Mxwtg7Pbwzw==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@types/node': '>=16'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   stubs@3.0.0:
     resolution: {integrity: sha512-PdHt7hHUJKxvTCgbKX9C1V/ftOcjJQgz8BZwNfV5c4B6dcGqlpelTbJ999jBGZ2jYiPAwcX5dP6oBwVlBlUbxw==}
 
@@ -4822,6 +4841,8 @@ snapshots:
     transitivePeerDependencies:
       - react
       - react-dom
+
+  '@stripe/stripe-js@8.8.0': {}
 
   '@supabase/auth-helpers-nextjs@0.15.0(@supabase/supabase-js@2.91.0)':
     dependencies:
@@ -6525,6 +6546,10 @@ snapshots:
       ansi-regex: 6.2.2
 
   strip-final-newline@2.0.0: {}
+
+  stripe@20.4.0(@types/node@22.19.7):
+    optionalDependencies:
+      '@types/node': 22.19.7
 
   stubs@3.0.0: {}
 
