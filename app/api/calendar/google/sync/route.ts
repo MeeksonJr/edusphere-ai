@@ -33,78 +33,122 @@ export async function POST() {
 
         if (intError || !integration) {
             return NextResponse.json(
-                { error: "Google Calendar not connected" },
+                { error: "Google Calendar not connected. Please reconnect." },
                 { status: 404 }
             )
         }
 
+        // Ensure we have tokens
+        if (!integration.access_token || !integration.refresh_token || !integration.token_expires_at) {
+            return NextResponse.json(
+                { error: "Missing Google tokens. Please disconnect and reconnect Google Calendar." },
+                { status: 400 }
+            )
+        }
+
         // Get valid access token (auto-refreshes if expired)
-        const accessToken = await getValidAccessToken(
-            {
-                access_token: integration.access_token!,
-                refresh_token: integration.refresh_token!,
-                token_expires_at: integration.token_expires_at!,
-            },
-            async (newAccessToken: string, newExpiresAt: string) => {
-                await supabase
-                    .from("calendar_integrations")
-                    .update({
-                        access_token: newAccessToken,
-                        token_expires_at: newExpiresAt,
-                    })
-                    .eq("id", integration.id)
-            }
-        )
+        let accessToken: string
+        try {
+            accessToken = await getValidAccessToken(
+                {
+                    access_token: integration.access_token,
+                    refresh_token: integration.refresh_token,
+                    token_expires_at: integration.token_expires_at,
+                },
+                async (newAccessToken: string, newExpiresAt: string) => {
+                    await supabase
+                        .from("calendar_integrations")
+                        .update({
+                            access_token: newAccessToken,
+                            token_expires_at: newExpiresAt,
+                        })
+                        .eq("id", integration.id)
+                }
+            )
+        } catch (tokenErr: any) {
+            console.error("Token refresh failed:", tokenErr)
+            return NextResponse.json(
+                {
+                    error: "Your Google session has expired. Please disconnect and reconnect Google Calendar.",
+                    code: "TOKEN_REFRESH_FAILED",
+                },
+                { status: 401 }
+            )
+        }
 
         // ── Pull from Google ────────────────────────────────────
-        const { events: googleEvents, nextSyncToken } = await fetchGoogleEvents(
-            accessToken,
-            integration.google_calendar_id || "primary",
-            integration.sync_token || undefined
-        )
+        let googleEvents: any[]
+        let nextSyncToken: string | undefined
+
+        try {
+            const result = await fetchGoogleEvents(
+                accessToken,
+                integration.google_calendar_id || "primary",
+                integration.sync_token || undefined
+            )
+            googleEvents = result.events
+            nextSyncToken = result.nextSyncToken
+        } catch (fetchErr: any) {
+            console.error("Google Calendar fetch failed:", fetchErr)
+            return NextResponse.json(
+                { error: `Failed to fetch Google Calendar events: ${fetchErr.message}` },
+                { status: 502 }
+            )
+        }
+
+        console.log(`[sync] Fetched ${googleEvents.length} events from Google Calendar`)
+
+        // Check if user wants to save to DB
+        const saveToDb = integration.save_to_db !== false // default true
 
         let imported = 0
         let updated = 0
 
-        for (const ge of googleEvents) {
-            // Skip cancelled events
-            if (ge.status === "cancelled") {
-                // Delete locally if it exists
-                await supabase
+        if (saveToDb) {
+            for (const ge of googleEvents) {
+                // Skip cancelled events
+                if (ge.status === "cancelled") {
+                    // Delete locally if it exists
+                    await supabase
+                        .from("calendar_events")
+                        .delete()
+                        .eq("user_id", user.id)
+                        .eq("external_id", ge.id)
+                        .eq("source", "google")
+                    continue
+                }
+
+                const localEvent = googleEventToLocal(ge)
+
+                // Check if event already exists
+                const { data: existing } = await supabase
                     .from("calendar_events")
-                    .delete()
+                    .select("id")
                     .eq("user_id", user.id)
                     .eq("external_id", ge.id)
                     .eq("source", "google")
-                continue
-            }
+                    .single()
 
-            const localEvent = googleEventToLocal(ge)
-
-            // Check if event already exists
-            const { data: existing } = await supabase
-                .from("calendar_events")
-                .select("id")
-                .eq("user_id", user.id)
-                .eq("external_id", ge.id)
-                .eq("source", "google")
-                .single()
-
-            if (existing) {
-                await supabase
-                    .from("calendar_events")
-                    .update({
+                if (existing) {
+                    await supabase
+                        .from("calendar_events")
+                        .update({
+                            ...localEvent,
+                            updated_at: new Date().toISOString(),
+                        })
+                        .eq("id", existing.id)
+                    updated++
+                } else {
+                    const { error: insertErr } = await supabase.from("calendar_events").insert({
+                        user_id: user.id,
                         ...localEvent,
-                        updated_at: new Date().toISOString(),
                     })
-                    .eq("id", existing.id)
-                updated++
-            } else {
-                await supabase.from("calendar_events").insert({
-                    user_id: user.id,
-                    ...localEvent,
-                })
-                imported++
+                    if (insertErr) {
+                        console.error(`[sync] Failed to insert event "${ge.summary}":`, insertErr)
+                    } else {
+                        imported++
+                    }
+                }
             }
         }
 
@@ -158,12 +202,15 @@ export async function POST() {
             })
             .eq("id", integration.id)
 
+        console.log(`[sync] Complete: imported=${imported}, updated=${updated}, pushed=${pushed}`)
+
         return NextResponse.json({
             success: true,
             imported,
             updated,
             pushed,
             total_google_events: googleEvents.length,
+            saved_to_db: saveToDb,
         })
     } catch (error: any) {
         console.error("Calendar sync error:", error)

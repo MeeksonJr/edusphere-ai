@@ -18,7 +18,7 @@ export async function GET() {
 
         const { data: integration } = await supabase
             .from("calendar_integrations")
-            .select("id, provider, sync_enabled, last_synced_at, created_at")
+            .select("id, provider, sync_enabled, save_to_db, last_synced_at, created_at")
             .eq("user_id", user.id)
             .eq("provider", "google")
             .single()

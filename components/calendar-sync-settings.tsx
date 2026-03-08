@@ -14,12 +14,14 @@ import {
     Download,
     ExternalLink,
     Clock,
+    Database,
 } from "lucide-react"
 
 interface CalendarIntegration {
     id: string
     provider: string
     sync_enabled: boolean
+    save_to_db: boolean
     last_synced_at: string | null
     created_at: string
 }
@@ -31,6 +33,7 @@ export function CalendarSyncSettings() {
     const [syncing, setSyncing] = useState(false)
     const [disconnecting, setDisconnecting] = useState(false)
     const [exporting, setExporting] = useState(false)
+    const [savingPref, setSavingPref] = useState(false)
 
     useEffect(() => {
         fetchIntegration()
@@ -82,6 +85,15 @@ export function CalendarSyncSettings() {
             const data = await res.json()
 
             if (!res.ok) {
+                // If token expired, prompt reconnect
+                if (data.code === "TOKEN_REFRESH_FAILED") {
+                    toast({
+                        title: "Session Expired",
+                        description: "Please disconnect and reconnect Google Calendar.",
+                        variant: "destructive",
+                    })
+                    return
+                }
                 throw new Error(data.error || "Sync failed")
             }
 
@@ -157,6 +169,39 @@ export function CalendarSyncSettings() {
             })
         } finally {
             setExporting(false)
+        }
+    }
+
+    const handleToggleSaveToDb = async () => {
+        if (!integration) return
+
+        const newValue = !integration.save_to_db
+        setSavingPref(true)
+        try {
+            const res = await fetch("/api/calendar/google/save-settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ save_to_db: newValue }),
+            })
+            const data = await res.json()
+
+            if (!res.ok) throw new Error(data.error || "Failed to update")
+
+            setIntegration({ ...integration, save_to_db: newValue })
+            toast({
+                title: newValue ? "Saving Enabled" : "Saving Disabled",
+                description: newValue
+                    ? "Synced events will be stored in your database."
+                    : "Stored Google events have been removed. Events will only show during sync.",
+            })
+        } catch (err: any) {
+            toast({
+                title: "Error",
+                description: err.message,
+                variant: "destructive",
+            })
+        } finally {
+            setSavingPref(false)
         }
     }
 
@@ -268,6 +313,45 @@ export function CalendarSyncSettings() {
                                 minute: "2-digit",
                             })}
                         </span>
+                    </div>
+                )}
+
+                {/* Save to Database Toggle */}
+                {integration && (
+                    <div className="flex items-center justify-between pl-11 pt-2 border-t border-white/5">
+                        <div className="flex items-center gap-2">
+                            <Database className="h-3.5 w-3.5 text-foreground/40" />
+                            <div>
+                                <p className="text-xs font-medium text-foreground/70">
+                                    Save synced events to database
+                                </p>
+                                <p className="text-[10px] text-foreground/30">
+                                    Store Google events locally for faster access
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            role="switch"
+                            aria-checked={integration.save_to_db}
+                            disabled={savingPref}
+                            onClick={handleToggleSaveToDb}
+                            className={`
+                                relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full
+                                border-2 border-transparent transition-colors duration-200
+                                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500
+                                disabled:cursor-not-allowed disabled:opacity-50
+                                ${integration.save_to_db ? "bg-cyan-500" : "bg-white/20"}
+                            `}
+                        >
+                            <span
+                                className={`
+                                    pointer-events-none inline-block h-4 w-4 rounded-full
+                                    bg-white shadow-lg transform transition-transform duration-200
+                                    ${integration.save_to_db ? "translate-x-4" : "translate-x-0"}
+                                `}
+                            />
+                        </button>
                     </div>
                 )}
             </div>

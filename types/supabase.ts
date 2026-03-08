@@ -336,6 +336,7 @@ export type Database = {
           last_synced_at: string | null
           provider: string
           refresh_token: string | null
+          save_to_db: boolean | null
           sync_enabled: boolean | null
           sync_token: string | null
           token_expires_at: string | null
@@ -349,6 +350,7 @@ export type Database = {
           last_synced_at?: string | null
           provider?: string
           refresh_token?: string | null
+          save_to_db?: boolean | null
           sync_enabled?: boolean | null
           sync_token?: string | null
           token_expires_at?: string | null
@@ -362,6 +364,7 @@ export type Database = {
           last_synced_at?: string | null
           provider?: string
           refresh_token?: string | null
+          save_to_db?: boolean | null
           sync_enabled?: boolean | null
           sync_token?: string | null
           token_expires_at?: string | null
@@ -2055,4 +2058,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-
