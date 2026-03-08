@@ -479,6 +479,188 @@ export type Database = {
           },
         ]
       }
+      class_assignments: {
+        Row: {
+          assignment_type: string | null
+          class_id: string
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          is_published: boolean | null
+          max_points: number | null
+          teacher_id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          assignment_type?: string | null
+          class_id: string
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_published?: boolean | null
+          max_points?: number | null
+          teacher_id: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          assignment_type?: string | null
+          class_id?: string
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_published?: boolean | null
+          max_points?: number | null
+          teacher_id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_assignments_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_enrollments: {
+        Row: {
+          class_id: string
+          enrolled_at: string | null
+          id: string
+          status: string | null
+          student_id: string
+        }
+        Insert: {
+          class_id: string
+          enrolled_at?: string | null
+          id?: string
+          status?: string | null
+          student_id: string
+        }
+        Update: {
+          class_id?: string
+          enrolled_at?: string | null
+          id?: string
+          status?: string | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_enrollments_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_submissions: {
+        Row: {
+          assignment_id: string
+          content: string | null
+          feedback: string | null
+          file_url: string | null
+          grade: number | null
+          graded_at: string | null
+          id: string
+          status: string | null
+          student_id: string
+          submitted_at: string | null
+        }
+        Insert: {
+          assignment_id: string
+          content?: string | null
+          feedback?: string | null
+          file_url?: string | null
+          grade?: number | null
+          graded_at?: string | null
+          id?: string
+          status?: string | null
+          student_id: string
+          submitted_at?: string | null
+        }
+        Update: {
+          assignment_id?: string
+          content?: string | null
+          feedback?: string | null
+          file_url?: string | null
+          grade?: number | null
+          graded_at?: string | null
+          id?: string
+          status?: string | null
+          student_id?: string
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_submissions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "class_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classes: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          grade_level: string | null
+          id: string
+          institution_id: string
+          invite_code: string | null
+          is_active: boolean | null
+          max_students: number | null
+          name: string
+          subject: string | null
+          teacher_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          grade_level?: string | null
+          id?: string
+          institution_id: string
+          invite_code?: string | null
+          is_active?: boolean | null
+          max_students?: number | null
+          name: string
+          subject?: string | null
+          teacher_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          grade_level?: string | null
+          id?: string
+          institution_id?: string
+          invite_code?: string | null
+          is_active?: boolean | null
+          max_students?: number | null
+          name?: string
+          subject?: string | null
+          teacher_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classes_institution_id_fkey"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_messages: {
         Row: {
           created_at: string | null
@@ -1099,6 +1281,42 @@ export type Database = {
         }
         Relationships: []
       }
+      institutions: {
+        Row: {
+          created_at: string | null
+          domain: string | null
+          id: string
+          invite_code: string | null
+          logo_url: string | null
+          name: string
+          owner_id: string
+          plan: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          domain?: string | null
+          id?: string
+          invite_code?: string | null
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          plan?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          domain?: string | null
+          id?: string
+          invite_code?: string | null
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          plan?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       learning_path_items: {
         Row: {
           created_at: string | null
@@ -1578,6 +1796,8 @@ export type Database = {
           daily_goal_minutes: number | null
           full_name: string | null
           id: string
+          institution_id: string | null
+          institution_role: string | null
           is_developer: boolean | null
           last_active_at: string | null
           learning_goals: string[] | null
@@ -1586,6 +1806,7 @@ export type Database = {
           onboarding_completed: boolean | null
           preferred_ai_voice: string | null
           preferred_language: string | null
+          streak: number | null
           stripe_customer_id: string | null
           subscription_id: string | null
           subscription_last_updated: string | null
@@ -1595,6 +1816,7 @@ export type Database = {
           total_xp: number | null
           updated_at: string | null
           username: string | null
+          xp: number | null
         }
         Insert: {
           ai_requests_count?: number | null
@@ -1605,6 +1827,8 @@ export type Database = {
           daily_goal_minutes?: number | null
           full_name?: string | null
           id: string
+          institution_id?: string | null
+          institution_role?: string | null
           is_developer?: boolean | null
           last_active_at?: string | null
           learning_goals?: string[] | null
@@ -1613,6 +1837,7 @@ export type Database = {
           onboarding_completed?: boolean | null
           preferred_ai_voice?: string | null
           preferred_language?: string | null
+          streak?: number | null
           stripe_customer_id?: string | null
           subscription_id?: string | null
           subscription_last_updated?: string | null
@@ -1622,6 +1847,7 @@ export type Database = {
           total_xp?: number | null
           updated_at?: string | null
           username?: string | null
+          xp?: number | null
         }
         Update: {
           ai_requests_count?: number | null
@@ -1632,6 +1858,8 @@ export type Database = {
           daily_goal_minutes?: number | null
           full_name?: string | null
           id?: string
+          institution_id?: string | null
+          institution_role?: string | null
           is_developer?: boolean | null
           last_active_at?: string | null
           learning_goals?: string[] | null
@@ -1640,6 +1868,7 @@ export type Database = {
           onboarding_completed?: boolean | null
           preferred_ai_voice?: string | null
           preferred_language?: string | null
+          streak?: number | null
           stripe_customer_id?: string | null
           subscription_id?: string | null
           subscription_last_updated?: string | null
@@ -1649,8 +1878,17 @@ export type Database = {
           total_xp?: number | null
           updated_at?: string | null
           username?: string | null
+          xp?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_institution_fk"
+            columns: ["institution_id"]
+            isOneToOne: false
+            referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       render_jobs: {
         Row: {
@@ -2302,3 +2540,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

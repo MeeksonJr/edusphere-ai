@@ -16,6 +16,7 @@ import {
   BrainCircuit,
   User,
   Users,
+  GraduationCap,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
@@ -100,6 +101,7 @@ export function Sidebar() {
     { name: "Study Resources", href: "/dashboard/resources", icon: BookOpen },
     { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit },
     { name: "Community", href: "/dashboard/community", icon: Users },
+    ...(user?.profile?.institution_role ? [{ name: "Institution", href: "/dashboard/institution", icon: GraduationCap }] : []),
     { name: "Profile", href: "/dashboard/profile", icon: User },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ]
