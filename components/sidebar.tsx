@@ -15,6 +15,7 @@ import {
   BookOpen,
   BrainCircuit,
   User,
+  Users,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
@@ -34,6 +35,7 @@ export function Sidebar() {
 
   useEffect(() => {
     const getUser = async () => {
+      if (!supabase) return
       const { data } = await supabase.auth.getUser()
       if (data.user) {
         const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
@@ -67,6 +69,7 @@ export function Sidebar() {
   }, [collapsed, isMobile])
 
   const handleSignOut = async () => {
+    if (!supabase) return
     await supabase.auth.signOut()
     router.push("/")
     router.refresh()
@@ -96,6 +99,7 @@ export function Sidebar() {
     { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
     { name: "Study Resources", href: "/dashboard/resources", icon: BookOpen },
     { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit },
+    { name: "Community", href: "/dashboard/community", icon: Users },
     { name: "Profile", href: "/dashboard/profile", icon: User },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ]
@@ -127,9 +131,8 @@ export function Sidebar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 transform bg-gray-900 transition-all duration-300 ease-in-out md:translate-x-0 ${
-          open ? "translate-x-0" : "-translate-x-full"
-        } ${collapsed && !isMobile ? "w-16" : "w-64"}`}
+        className={`fixed inset-y-0 left-0 z-40 transform bg-gray-900 transition-all duration-300 ease-in-out md:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"
+          } ${collapsed && !isMobile ? "w-16" : "w-64"}`}
       >
         <div className="flex h-full flex-col">
           <div
@@ -154,11 +157,10 @@ export function Sidebar() {
                   key={item.name}
                   href={item.href}
                   onClick={closeSidebar}
-                  className={`group flex items-center rounded-md px-2 py-2 text-sm font-medium transition-all ${
-                    isActive
-                      ? "bg-gray-800 text-white neon-text-purple"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                  }`}
+                  className={`group flex items-center rounded-md px-2 py-2 text-sm font-medium transition-all ${isActive
+                    ? "bg-gray-800 text-white neon-text-purple"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                    }`}
                   title={collapsed && !isMobile ? item.name : ""}
                 >
                   <item.icon

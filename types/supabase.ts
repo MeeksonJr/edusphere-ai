@@ -940,6 +940,7 @@ export type Database = {
           created_at: string | null
           description: string | null
           id: string
+          is_public: boolean | null
           subject: string | null
           title: string
           updated_at: string | null
@@ -950,6 +951,7 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          is_public?: boolean | null
           subject?: string | null
           title: string
           updated_at?: string | null
@@ -960,10 +962,140 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          is_public?: boolean | null
           subject?: string | null
           title?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      forum_posts: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string | null
+          downvotes: number | null
+          id: string
+          is_pinned: boolean | null
+          is_solved: boolean | null
+          reply_count: number | null
+          subject: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          upvotes: number | null
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string | null
+          downvotes?: number | null
+          id?: string
+          is_pinned?: boolean | null
+          is_solved?: boolean | null
+          reply_count?: number | null
+          subject?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          upvotes?: number | null
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string | null
+          downvotes?: number | null
+          id?: string
+          is_pinned?: boolean | null
+          is_solved?: boolean | null
+          reply_count?: number | null
+          subject?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          upvotes?: number | null
+        }
+        Relationships: []
+      }
+      forum_replies: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string | null
+          downvotes: number | null
+          id: string
+          is_accepted: boolean | null
+          parent_reply_id: string | null
+          post_id: string
+          updated_at: string | null
+          upvotes: number | null
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string | null
+          downvotes?: number | null
+          id?: string
+          is_accepted?: boolean | null
+          parent_reply_id?: string | null
+          post_id: string
+          updated_at?: string | null
+          upvotes?: number | null
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string | null
+          downvotes?: number | null
+          id?: string
+          is_accepted?: boolean | null
+          parent_reply_id?: string | null
+          post_id?: string
+          updated_at?: string | null
+          upvotes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_replies_parent_reply_id_fkey"
+            columns: ["parent_reply_id"]
+            isOneToOne: false
+            referencedRelation: "forum_replies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_replies_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_votes: {
+        Row: {
+          created_at: string | null
+          id: string
+          target_id: string
+          target_type: string
+          user_id: string
+          vote_value: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          target_id: string
+          target_type: string
+          user_id: string
+          vote_value: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
+          vote_value?: number
         }
         Relationships: []
       }
@@ -1607,6 +1739,118 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      study_group_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_group_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          group_id: string
+          id: string
+          message_type: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          group_id: string
+          id?: string
+          message_type?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          group_id?: string
+          id?: string
+          message_type?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_group_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_groups: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          invite_code: string | null
+          is_public: boolean | null
+          max_members: number | null
+          member_count: number | null
+          name: string
+          owner_id: string
+          subject: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          invite_code?: string | null
+          is_public?: boolean | null
+          max_members?: number | null
+          member_count?: number | null
+          name: string
+          owner_id: string
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          invite_code?: string | null
+          is_public?: boolean | null
+          max_members?: number | null
+          member_count?: number | null
+          name?: string
+          owner_id?: string
+          subject?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       study_guides: {
         Row: {
