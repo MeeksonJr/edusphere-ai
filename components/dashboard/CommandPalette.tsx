@@ -5,9 +5,7 @@ import {
     Calendar,
     CreditCard,
     Settings,
-    Smile,
     User,
-    Calculator,
     Search,
     LayoutDashboard,
     FileText,
@@ -15,6 +13,20 @@ import {
     BookOpen,
     Sparkles,
     Zap,
+    CheckSquare,
+    BrainCircuit,
+    Beaker,
+    Users,
+    GraduationCap,
+    BarChart3,
+    Award,
+    Bell,
+    Heart,
+    Code,
+    Mic,
+    Headphones,
+    BookMarked,
+    Lightbulb,
 } from "lucide-react"
 import {
     CommandDialog,
@@ -79,38 +91,81 @@ export function CommandPalette() {
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
 
-                    <CommandGroup heading="Navigation">
+                    <CommandGroup heading="Study">
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard"))}>
                             <LayoutDashboard className="mr-2 h-4 w-4" />
                             <span>Dashboard</span>
                         </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/courses"))}>
-                            <BookOpen className="mr-2 h-4 w-4" />
-                            <span>My Courses</span>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/assignments"))}>
+                            <CheckSquare className="mr-2 h-4 w-4" />
+                            <span>Assignments</span>
                         </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/ai-lab"))}>
-                            <Sparkles className="mr-2 h-4 w-4" />
-                            <span>AI Lab</span>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/courses"))}>
+                            <BookMarked className="mr-2 h-4 w-4" />
+                            <span>Courses</span>
                         </CommandItem>
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/flashcards"))}>
-                            <BookOpen className="mr-2 h-4 w-4" />
+                            <BrainCircuit className="mr-2 h-4 w-4" />
                             <span>Flashcards</span>
                         </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/notes"))}>
+                            <FileText className="mr-2 h-4 w-4" />
+                            <span>Notes</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/resources"))}>
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            <span>Study Resources</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/skills"))}>
+                            <Lightbulb className="mr-2 h-4 w-4" />
+                            <span>Skills</span>
+                        </CommandItem>
+                    </CommandGroup>
+
+                    <CommandSeparator />
+
+                    <CommandGroup heading="AI Tools">
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/ai-lab"))}>
+                            <Beaker className="mr-2 h-4 w-4" />
+                            <span>AI Lab</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/ai-tutor"))}>
+                            <Headphones className="mr-2 h-4 w-4" />
+                            <span>AI Tutor</span>
+                        </CommandItem>
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/podcasts"))}>
-                            <Zap className="mr-2 h-4 w-4" />
+                            <Mic className="mr-2 h-4 w-4" />
                             <span>Podcasts</span>
+                        </CommandItem>
+                    </CommandGroup>
+
+                    <CommandSeparator />
+
+                    <CommandGroup heading="Social">
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/community"))}>
+                            <Users className="mr-2 h-4 w-4" />
+                            <span>Community</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/institution"))}>
+                            <GraduationCap className="mr-2 h-4 w-4" />
+                            <span>Institution</span>
+                        </CommandItem>
+                    </CommandGroup>
+
+                    <CommandSeparator />
+
+                    <CommandGroup heading="Analytics">
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/analytics"))}>
+                            <BarChart3 className="mr-2 h-4 w-4" />
+                            <span>Analytics</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/certificates"))}>
+                            <Award className="mr-2 h-4 w-4" />
+                            <span>Certificates</span>
                         </CommandItem>
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/calendar"))}>
                             <Calendar className="mr-2 h-4 w-4" />
                             <span>Calendar</span>
-                        </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/family"))}>
-                            <User className="mr-2 h-4 w-4" />
-                            <span>Family Hub</span>
-                        </CommandItem>
-                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/developer"))}>
-                            <Zap className="mr-2 h-4 w-4" />
-                            <span>Developer Console</span>
                         </CommandItem>
                     </CommandGroup>
 
@@ -125,6 +180,14 @@ export function CommandPalette() {
                             <FileText className="mr-2 h-4 w-4" />
                             <span>New Assignment</span>
                         </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/flashcards/new"))}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            <span>New Flashcard Set</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/podcasts/new"))}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            <span>New Podcast</span>
+                        </CommandItem>
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/developer/keys"))}>
                             <Zap className="mr-2 h-4 w-4" />
                             <span>Manage API Keys</span>
@@ -133,7 +196,7 @@ export function CommandPalette() {
 
                     <CommandSeparator />
 
-                    <CommandGroup heading="Settings">
+                    <CommandGroup heading="Account & Settings">
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/profile"))}>
                             <User className="mr-2 h-4 w-4" />
                             <span>Profile</span>
@@ -142,6 +205,18 @@ export function CommandPalette() {
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/subscription"))}>
                             <CreditCard className="mr-2 h-4 w-4" />
                             <span>Subscription & Billing</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/notifications"))}>
+                            <Bell className="mr-2 h-4 w-4" />
+                            <span>Notifications</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/family"))}>
+                            <Heart className="mr-2 h-4 w-4" />
+                            <span>Family Hub</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/developer"))}>
+                            <Code className="mr-2 h-4 w-4" />
+                            <span>Developer Console</span>
                         </CommandItem>
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/settings"))}>
                             <Settings className="mr-2 h-4 w-4" />

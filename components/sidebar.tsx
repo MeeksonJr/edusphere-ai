@@ -1,10 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
-  Calendar,
   Home,
   CheckSquare,
   Settings,
@@ -19,11 +18,39 @@ import {
   GraduationCap,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Sparkles,
+  BarChart3,
+  Calendar,
+  Award,
+  Bell,
+  CreditCard,
+  FileText,
+  Mic,
+  Heart,
+  Code,
+  Lightbulb,
+  type LucideIcon,
+  BookMarked,
+  Headphones,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSupabase } from "@/components/supabase-provider"
 import { useMediaQuery } from "@/hooks/use-mobile"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+interface NavItem {
+  name: string
+  href: string
+  icon: LucideIcon
+}
+
+interface NavGroup {
+  name: string
+  icon: LucideIcon
+  items: NavItem[]
+  condition?: boolean // If false, group is hidden
+}
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -33,6 +60,7 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
   const [user, setUser] = useState<any>(null)
+  const [expandedGroup, setExpandedGroup] = useState<string | null>(null)
 
   useEffect(() => {
     const getUser = async () => {
@@ -40,34 +68,106 @@ export function Sidebar() {
       const { data } = await supabase.auth.getUser()
       if (data.user) {
         const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
-
         setUser({ ...data.user, profile })
       }
     }
-
     getUser()
   }, [supabase])
 
   useEffect(() => {
-    // Close sidebar on mobile by default
     if (isMobile) {
       setOpen(false)
-      setCollapsed(false) // Don't allow collapsed state on mobile
+      setCollapsed(false)
     } else {
-      setOpen(true) // Always open on desktop
+      setOpen(true)
     }
   }, [isMobile])
 
-  // Update body class when sidebar state changes
   useEffect(() => {
     if (!isMobile) {
       document.body.classList.toggle("sidebar-collapsed", collapsed)
-
-      // Add event to dispatch resize event when sidebar state changes
-      // This helps components like charts to resize properly
       window.dispatchEvent(new Event("resize"))
     }
   }, [collapsed, isMobile])
+
+  // Define grouped navigation
+  const navGroups: NavGroup[] = useMemo(
+    () => [
+      {
+        name: "Study",
+        icon: BookOpen,
+        items: [
+          { name: "Assignments", href: "/dashboard/assignments", icon: CheckSquare },
+          { name: "Courses", href: "/dashboard/courses", icon: BookMarked },
+          { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit },
+          { name: "Notes", href: "/dashboard/notes", icon: FileText },
+          { name: "Resources", href: "/dashboard/resources", icon: BookOpen },
+          { name: "Skills", href: "/dashboard/skills", icon: Lightbulb },
+        ],
+      },
+      {
+        name: "AI Tools",
+        icon: Sparkles,
+        items: [
+          { name: "AI Lab", href: "/dashboard/ai-lab", icon: Beaker },
+          { name: "AI Tutor", href: "/dashboard/ai-tutor", icon: Headphones },
+          { name: "Podcasts", href: "/dashboard/podcasts", icon: Mic },
+        ],
+      },
+      {
+        name: "Social",
+        icon: Users,
+        items: [
+          { name: "Community", href: "/dashboard/community", icon: Users },
+          ...(user?.profile?.institution_role
+            ? [{ name: "Institution", href: "/dashboard/institution", icon: GraduationCap }]
+            : []),
+        ],
+      },
+      {
+        name: "Analytics",
+        icon: BarChart3,
+        items: [
+          { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+          { name: "Certificates", href: "/dashboard/certificates", icon: Award },
+          { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
+        ],
+      },
+      {
+        name: "Account",
+        icon: User,
+        items: [
+          { name: "Profile", href: "/dashboard/profile", icon: User },
+          { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
+          { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
+          { name: "Settings", href: "/dashboard/settings", icon: Settings },
+        ],
+      },
+      {
+        name: "Manage",
+        icon: Code,
+        items: [
+          { name: "Family Hub", href: "/dashboard/family", icon: Heart },
+          { name: "Developer", href: "/dashboard/developer", icon: Code },
+        ],
+      },
+    ],
+    [user]
+  )
+
+  // Auto-expand the group containing the active page
+  useEffect(() => {
+    if (pathname === "/dashboard") {
+      setExpandedGroup(null)
+      return
+    }
+    for (const group of navGroups) {
+      if (group.items.some((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))) {
+        setExpandedGroup(group.name)
+        return
+      }
+    }
+  }, [pathname, navGroups])
 
   const handleSignOut = async () => {
     if (!supabase) return
@@ -76,37 +176,34 @@ export function Sidebar() {
     router.refresh()
   }
 
-  const toggleSidebar = () => {
-    setOpen(!open)
-  }
+  const toggleSidebar = () => setOpen(!open)
 
   const toggleCollapse = () => {
     setCollapsed(!collapsed)
-    // Update layout
     document.querySelector(".md\\:pl-64")?.classList.toggle("md:pl-16", collapsed)
     document.querySelector(".md\\:pl-64")?.classList.toggle("md:pl-64", !collapsed)
   }
 
   const closeSidebar = () => {
-    if (isMobile) {
-      setOpen(false)
-    }
+    if (isMobile) setOpen(false)
   }
 
-  const navItems = [
-    { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Assignments", href: "/dashboard/assignments", icon: CheckSquare },
-    { name: "AI Lab", href: "/dashboard/ai-lab", icon: Beaker },
-    { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
-    { name: "Study Resources", href: "/dashboard/resources", icon: BookOpen },
-    { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit },
-    { name: "Community", href: "/dashboard/community", icon: Users },
-    ...(user?.profile?.institution_role ? [{ name: "Institution", href: "/dashboard/institution", icon: GraduationCap }] : []),
-    { name: "Profile", href: "/dashboard/profile", icon: User },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
-  ]
+  const toggleGroup = (groupName: string) => {
+    // If collapsed, expand sidebar first
+    if (collapsed && !isMobile) {
+      setCollapsed(false)
+      document.querySelector(".md\\:pl-64")?.classList.remove("md:pl-16")
+      document.querySelector(".md\\:pl-64")?.classList.add("md:pl-64")
+      document.body.classList.remove("sidebar-collapsed")
+      window.dispatchEvent(new Event("resize"))
+    }
+    setExpandedGroup((prev) => (prev === groupName ? null : groupName))
+  }
 
-  // Overlay for mobile
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
+
+  const isDashboardActive = pathname === "/dashboard"
+
   const Overlay = () =>
     isMobile && open ? <div className="fixed inset-0 bg-black bg-opacity-50 z-30" onClick={toggleSidebar} /> : null
 
@@ -137,8 +234,10 @@ export function Sidebar() {
           } ${collapsed && !isMobile ? "w-16" : "w-64"}`}
       >
         <div className="flex h-full flex-col">
+          {/* Header */}
           <div
-            className={`flex h-16 items-center justify-center border-b border-gray-800 ${collapsed && !isMobile ? "px-2" : "px-4"}`}
+            className={`flex h-16 items-center justify-center border-b border-gray-800 ${collapsed && !isMobile ? "px-2" : "px-4"
+              }`}
           >
             <Link href="/dashboard" className="flex items-center" onClick={closeSidebar}>
               {collapsed && !isMobile ? (
@@ -151,29 +250,95 @@ export function Sidebar() {
             </Link>
           </div>
 
-          <nav className="flex-1 space-y-1 px-2 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+          {/* Navigation */}
+          <nav className="flex-1 px-2 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800">
+            {/* Dashboard — always-visible top link */}
+            <Link
+              href="/dashboard"
+              onClick={closeSidebar}
+              className={`group flex items-center rounded-md px-2 py-2 text-sm font-medium transition-all mb-1 ${isDashboardActive
+                  ? "bg-gray-800 text-white neon-text-purple"
+                  : "text-gray-300 hover:bg-gray-800 hover:text-white"
+                }`}
+              title={collapsed && !isMobile ? "Dashboard" : ""}
+            >
+              <Home
+                className={`${collapsed && !isMobile ? "mx-auto" : "mr-3"} h-5 w-5 ${isDashboardActive ? "text-primary" : "text-gray-400 group-hover:text-white"
+                  }`}
+              />
+              {(!collapsed || isMobile) && "Dashboard"}
+            </Link>
+
+            {/* Divider */}
+            {(!collapsed || isMobile) && <div className="border-t border-gray-800 my-2 mx-1" />}
+
+            {/* Grouped nav */}
+            {navGroups.map((group) => {
+              const isGroupExpanded = expandedGroup === group.name
+              const hasActiveChild = group.items.some((item) => isActive(item.href))
+
               return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={closeSidebar}
-                  className={`group flex items-center rounded-md px-2 py-2 text-sm font-medium transition-all ${isActive
-                    ? "bg-gray-800 text-white neon-text-purple"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-white"
-                    }`}
-                  title={collapsed && !isMobile ? item.name : ""}
-                >
-                  <item.icon
-                    className={`${collapsed && !isMobile ? "mx-auto" : "mr-3"} h-5 w-5 ${isActive ? "text-primary" : "text-gray-400 group-hover:text-white"}`}
-                  />
-                  {(!collapsed || isMobile) && item.name}
-                </Link>
+                <div key={group.name} className="mb-0.5">
+                  {/* Group header */}
+                  <button
+                    onClick={() => toggleGroup(group.name)}
+                    className={`w-full group flex items-center rounded-md px-2 py-2 text-sm font-medium transition-all ${hasActiveChild
+                        ? "text-white bg-gray-800/50"
+                        : "text-gray-400 hover:bg-gray-800/50 hover:text-gray-200"
+                      }`}
+                    title={collapsed && !isMobile ? group.name : ""}
+                  >
+                    <group.icon
+                      className={`${collapsed && !isMobile ? "mx-auto" : "mr-3"} h-5 w-5 transition-colors ${hasActiveChild ? "text-primary" : "text-gray-500 group-hover:text-gray-300"
+                        }`}
+                    />
+                    {(!collapsed || isMobile) && (
+                      <>
+                        <span className="flex-1 text-left">{group.name}</span>
+                        <ChevronDown
+                          className={`h-4 w-4 text-gray-500 transition-transform duration-200 ${isGroupExpanded ? "rotate-180" : ""
+                            }`}
+                        />
+                      </>
+                    )}
+                  </button>
+
+                  {/* Group items — animated expand/collapse */}
+                  {(!collapsed || isMobile) && (
+                    <div
+                      className={`overflow-hidden transition-all duration-200 ease-in-out ${isGroupExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                        }`}
+                    >
+                      <div className="ml-3 border-l border-gray-800 pl-2 py-0.5">
+                        {group.items.map((item) => {
+                          const itemActive = isActive(item.href)
+                          return (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              onClick={closeSidebar}
+                              className={`group flex items-center rounded-md px-2 py-1.5 text-sm transition-all ${itemActive
+                                  ? "bg-gray-800 text-white neon-text-purple"
+                                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                                }`}
+                            >
+                              <item.icon
+                                className={`mr-2.5 h-4 w-4 ${itemActive ? "text-primary" : "text-gray-500 group-hover:text-white"
+                                  }`}
+                              />
+                              {item.name}
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )
             })}
           </nav>
 
+          {/* User footer */}
           <div className={`border-t border-gray-800 p-4 ${collapsed && !isMobile ? "px-2" : ""}`}>
             {user && !collapsed && (
               <div className="flex items-center mb-4 space-x-3">
@@ -194,7 +359,8 @@ export function Sidebar() {
 
             <Button
               variant="ghost"
-              className={`${collapsed && !isMobile ? "w-full justify-center px-0" : "w-full justify-start"} text-gray-300 hover:bg-gray-800 hover:text-white`}
+              className={`${collapsed && !isMobile ? "w-full justify-center px-0" : "w-full justify-start"
+                } text-gray-300 hover:bg-gray-800 hover:text-white`}
               onClick={handleSignOut}
               title={collapsed && !isMobile ? "Sign out" : ""}
             >
