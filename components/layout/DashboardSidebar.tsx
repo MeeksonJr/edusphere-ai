@@ -92,6 +92,7 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen }: { mobileOpen: bo
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Certificates", href: "/dashboard/certificates", icon: Award },
     { name: "Family Hub", href: "/dashboard/family", icon: Users },
+    { name: "Study Groups", href: "/dashboard/groups", icon: Users },
     { name: "Developer", href: "/dashboard/developer", icon: Code2 },
     { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
     { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },

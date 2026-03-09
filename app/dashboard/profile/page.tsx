@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Switch } from "@/components/ui/switch"
 import { useSupabase } from "@/components/supabase-provider"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -63,6 +64,7 @@ function ProfileContent() {
     full_name: "",
     username: "",
     avatar_url: "",
+    is_public: false,
   })
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
@@ -113,6 +115,7 @@ function ProfileContent() {
               full_name: newProfileData?.full_name || "",
               username: newProfileData?.username || "",
               avatar_url: newProfileData?.avatar_url || "",
+              is_public: newProfileData?.is_public || false,
             })
           } else if (profileError) {
             throw profileError
@@ -122,6 +125,7 @@ function ProfileContent() {
               full_name: profileData?.full_name || "",
               username: profileData?.username || "",
               avatar_url: profileData?.avatar_url || "",
+              is_public: profileData?.is_public || false,
             })
           }
 
@@ -230,6 +234,7 @@ function ProfileContent() {
           full_name: profile.full_name,
           username: profile.username,
           avatar_url: avatarUrl,
+          is_public: profile.is_public,
           updated_at: new Date().toISOString(),
         })
         .eq("id", user.id)
@@ -442,6 +447,22 @@ function ProfileContent() {
                       className="glass-surface border-foreground/20 text-foreground/50 opacity-70"
                     />
                     <p className="text-xs text-foreground/50 mt-1">Email cannot be changed</p>
+                  </div>
+
+                  <div className="flex items-center space-x-3 pt-2">
+                    <Switch
+                      id="is_public"
+                      checked={profile.is_public}
+                      onCheckedChange={(checked) => setProfile({ ...profile, is_public: checked })}
+                    />
+                    <div>
+                      <Label htmlFor="is_public" className="text-foreground font-medium">
+                        Make Profile Public
+                      </Label>
+                      <p className="text-xs text-foreground/60 w-full mt-1">
+                        Allow others to see your profile by visiting /u/{profile.username || "username"}
+                      </p>
+                    </div>
                   </div>
 
                   <div className="pt-4">
