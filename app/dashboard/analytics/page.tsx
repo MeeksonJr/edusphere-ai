@@ -1,349 +1,250 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import dynamic from "next/dynamic"
-import {
-    Trophy,
-    Flame,
-    Clock,
-    Target,
-    Award,
-    Zap,
-    GraduationCap,
-    BarChart3,
-    Sparkles,
-    Brain,
-    BookOpen,
-    Layers,
-} from "lucide-react"
+import { useEffect, useState, useMemo } from 'react'
+import { useSupabase } from "@/components/supabase-provider"
 import { GlassSurface } from "@/components/shared/GlassSurface"
-import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { AmbientBackground } from "@/components/shared/AmbientBackground"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { cn } from "@/lib/utils"
-
-// Lazy load chart components
-const ActivityChart = dynamic(() => import("@/components/dashboard/analytics/ActivityChart"), {
-    loading: () => <div className="h-[380px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
-    ssr: false,
-})
-const ProgressChart = dynamic(() => import("@/components/dashboard/analytics/ProgressChart"), {
-    loading: () => <div className="h-[380px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
-    ssr: false,
-})
-const MasteryChart = dynamic(() => import("@/components/dashboard/analytics/MasteryChart"), {
-    loading: () => <div className="h-[380px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
-    ssr: false,
-})
-const StreakHeatmap = dynamic(() => import("@/components/dashboard/analytics/StreakHeatmap"), {
-    loading: () => <div className="h-[200px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
-    ssr: false,
-})
-const SessionStatsChart = dynamic(() => import("@/components/dashboard/analytics/SessionStatsChart"), {
-    loading: () => <div className="h-[380px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
-    ssr: false,
-})
-const AIInsightsPanel = dynamic(() => import("@/components/dashboard/analytics/AIInsightsPanel"), {
-    loading: () => <div className="h-[300px] w-full animate-pulse bg-gray-800/20 rounded-lg" />,
-    ssr: false,
-})
-
-interface AnalyticsData {
-    stats: {
-        totalXP: number
-        level: number
-        levelTitle: string
-        levelProgress: { current: number; needed: number; progress: number }
-        streak: number
-        longestStreak: number
-        totalStudyMinutes: number
-        coursesCompleted: number
-        totalCourses: number
-        sessionsCompleted: number
-        avgSessionRating: number
-        focusScore: number
-        totalCards: number
-        totalResources: number
-        assignmentCompletion: number
-    }
-    activityData: any[]
-    courseProgressData: any[]
-    subjectMasteryData: any[]
-    streakHeatmap: { date: string; count: number }[]
-    sessionStats: any[]
-    topTopics: { topic: string; count: number }[]
-    aiInsights: string[]
-    recentAchievements: {
-        title: string
-        description: string
-        icon: string
-        xp_reward: number
-        unlockedAt: string
-    }[]
-}
+import { ScrollReveal } from "@/components/shared/ScrollReveal"
+import { 
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend,
+  LineChart, Line
+} from 'recharts'
+import { TrendingUp, Clock, Target, Award, ArrowLeft, Loader2 } from "lucide-react"
+import Link from 'next/link'
+import { Button } from "@/components/ui/button"
 
 export default function AnalyticsPage() {
-    const [timeRange, setTimeRange] = useState("week")
-    const [loading, setLoading] = useState(true)
-    const [data, setData] = useState<AnalyticsData | null>(null)
+  const { supabase } = useSupabase()
+  const [loading, setLoading] = useState(true)
+  const [analyticsData, setAnalyticsData] = useState<any[]>([])
+  const [streakData, setStreakData] = useState<any>(null)
+  
+  useEffect(() => {
+    async function fetchAnalyticsData() {
+      if (!supabase) return
 
-    const fetchData = useCallback(async (range: string) => {
-        setLoading(true)
-        try {
-            const res = await fetch(`/api/analytics?range=${range}`)
-            if (res.ok) {
-                const jsonData = await res.json()
-                setData(jsonData)
-            }
-        } catch (error) {
-            console.error("Failed to fetch analytics:", error)
-        } finally {
-            setLoading(false)
-        }
-    }, [])
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setLoading(false)
+        return
+      }
 
-    useEffect(() => {
-        fetchData(timeRange)
-    }, [timeRange, fetchData])
+      const [analyticsRes, streakRes] = await Promise.all([
+        supabase.from('learning_analytics').select('*').eq('user_id', user.id).order('mastery_score', { ascending: false }).limit(6),
+        supabase.from('user_streaks').select('*').eq('user_id', user.id).single()
+      ])
 
-    if (loading) {
-        return (
-            <div className="relative min-h-screen p-6 md:p-8 lg:p-12">
-                <AmbientBackground />
-                <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="flex flex-col items-center gap-3">
-                        <div className="animate-spin rounded-full h-10 w-10 border-2 border-cyan-500 border-t-transparent" />
-                        <span className="text-sm text-foreground/50">Loading analytics…</span>
-                    </div>
-                </div>
-            </div>
-        )
+      setAnalyticsData(analyticsRes.data || [])
+      setStreakData(streakRes.data || null)
+      setLoading(false)
     }
 
-    const stats = data?.stats || {
-        totalXP: 0, level: 0, levelTitle: 'Beginner', levelProgress: { current: 0, needed: 100, progress: 0 },
-        streak: 0, longestStreak: 0, totalStudyMinutes: 0, coursesCompleted: 0, totalCourses: 0,
-        sessionsCompleted: 0, avgSessionRating: 0, focusScore: 0, totalCards: 0, totalResources: 0, assignmentCompletion: 0,
-    }
+    fetchAnalyticsData()
+  }, [supabase])
 
-    const formatTime = (minutes: number) => {
-        if (minutes < 60) return `${minutes}m`
-        const h = Math.floor(minutes / 60)
-        const m = minutes % 60
-        return m > 0 ? `${h}h ${m}m` : `${h}h`
-    }
+  const radarData = useMemo(() => {
+    return analyticsData.map(d => ({
+      subject: d.topic,
+      mastery: d.mastery_score,
+      fullMark: 100
+    }))
+  }, [analyticsData])
 
-    const statCards = [
-        {
-            label: "Level",
-            value: `${stats.level}`,
-            sub: stats.levelTitle,
-            icon: GraduationCap,
-            color: "text-violet-400",
-            glow: "from-violet-500/10 to-transparent",
-        },
-        {
-            label: "Total XP",
-            value: stats.totalXP.toLocaleString(),
-            sub: `${stats.levelProgress.progress}% to next`,
-            icon: Zap,
-            color: "text-amber-400",
-            glow: "from-amber-500/10 to-transparent",
-        },
-        {
-            label: "Streak",
-            value: `${stats.streak}`,
-            sub: `Best: ${stats.longestStreak} days`,
-            icon: Flame,
-            color: "text-orange-400",
-            glow: "from-orange-500/10 to-transparent",
-        },
-        {
-            label: "Study Time",
-            value: formatTime(stats.totalStudyMinutes),
-            sub: "From AI sessions",
-            icon: Clock,
-            color: "text-blue-400",
-            glow: "from-blue-500/10 to-transparent",
-        },
-        {
-            label: "Courses",
-            value: `${stats.coursesCompleted}/${stats.totalCourses}`,
-            sub: "Completed",
-            icon: BookOpen,
-            color: "text-emerald-400",
-            glow: "from-emerald-500/10 to-transparent",
-        },
-        {
-            label: "Sessions",
-            value: `${stats.sessionsCompleted}`,
-            sub: `⭐ ${stats.avgSessionRating}/5 avg`,
-            icon: Brain,
-            color: "text-cyan-400",
-            glow: "from-cyan-500/10 to-transparent",
-        },
-        {
-            label: "Flashcards",
-            value: `${stats.totalCards}`,
-            sub: `${stats.totalResources} resources`,
-            icon: Layers,
-            color: "text-pink-400",
-            glow: "from-pink-500/10 to-transparent",
-        },
-        {
-            label: "Focus Score",
-            value: `${stats.focusScore}%`,
-            sub: stats.focusScore >= 80 ? "Excellent" : stats.focusScore >= 50 ? "Good" : "Building",
-            icon: Target,
-            color: "text-green-400",
-            glow: "from-green-500/10 to-transparent",
-        },
-    ]
+  const timeData = useMemo(() => {
+    return analyticsData.map(d => ({
+      name: d.topic,
+      minutes: d.time_spent_minutes
+    }))
+  }, [analyticsData])
 
+  const weeklyXPData = useMemo(() => {
+    if (!streakData || !streakData.weekly_xp) return []
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    return (streakData.weekly_xp as number[]).map((xp, index) => ({
+      day: days[index],
+      xp: xp
+    }))
+  }, [streakData])
+
+  const totalTimeSpent = analyticsData.reduce((acc, curr) => acc + curr.time_spent_minutes, 0)
+  const totalMastery = analyticsData.reduce((acc, curr) => acc + curr.mastery_score, 0)
+  const averageMastery = analyticsData.length > 0 ? Math.round(totalMastery / analyticsData.length) : 0
+
+  if (loading) {
     return (
-        <div className="relative min-h-screen p-6 md:p-8 lg:p-12 pb-32">
-            <AmbientBackground />
-
-            {/* Header */}
-            <ScrollReveal direction="up">
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-bold mb-2">
-                            <span className="text-foreground">Learning</span>{" "}
-                            <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                                Analytics
-                            </span>
-                        </h1>
-                        <p className="text-foreground/60">Your complete learning intelligence dashboard.</p>
-                    </div>
-                    <Select value={timeRange} onValueChange={setTimeRange}>
-                        <SelectTrigger className="w-[180px] glass-surface border-foreground/20 text-foreground">
-                            <SelectValue placeholder="Select range" />
-                        </SelectTrigger>
-                        <SelectContent className="glass-surface border-foreground/20">
-                            <SelectItem value="week" className="text-foreground">This Week</SelectItem>
-                            <SelectItem value="month" className="text-foreground">This Month</SelectItem>
-                            <SelectItem value="quarter" className="text-foreground">Last 90 Days</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-            </ScrollReveal>
-
-            {/* ──── 1. Stats Grid ──── */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-                {statCards.map((stat, i) => (
-                    <ScrollReveal key={stat.label} direction="up" delay={i * 0.04} className="h-full">
-                        <GlassSurface className="p-4 flex flex-col justify-between h-full hover:border-white/10 transition-all relative overflow-hidden group">
-                            {/* Subtle glow */}
-                            <div className={`absolute inset-0 bg-gradient-to-br ${stat.glow} opacity-0 group-hover:opacity-100 transition-opacity`} />
-                            <div className="relative z-10">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs text-foreground/50 font-medium">{stat.label}</span>
-                                    <stat.icon className={cn("h-4 w-4", stat.color)} />
-                                </div>
-                                <div className="text-2xl font-bold text-foreground mb-0.5">{stat.value}</div>
-                                <div className="text-[11px] text-foreground/40">{stat.sub}</div>
-                            </div>
-                        </GlassSurface>
-                    </ScrollReveal>
-                ))}
-            </div>
-
-            {/* XP Progress Bar */}
-            <ScrollReveal direction="up" delay={0.1}>
-                <GlassSurface className="p-4 mb-8">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-foreground/60">Level {stats.level} → Level {stats.level + 1}</span>
-                        <span className="text-xs text-foreground/40">{stats.levelProgress.current} / {stats.levelProgress.needed} XP</span>
-                    </div>
-                    <div className="h-2 w-full rounded-full bg-white/[0.05] overflow-hidden">
-                        <div
-                            className="h-full rounded-full transition-all duration-700"
-                            style={{
-                                width: `${stats.levelProgress.progress}%`,
-                                background: 'linear-gradient(90deg, #8b5cf6, #06b6d4, #10b981)',
-                            }}
-                        />
-                    </div>
-                </GlassSurface>
-            </ScrollReveal>
-
-            {/* ──── 2. Activity Trends (full width) ──── */}
-            <ScrollReveal direction="up" delay={0.15} className="mb-8">
-                <ActivityChart data={data?.activityData || []} />
-            </ScrollReveal>
-
-            {/* ──── 3. Streak Heatmap (full width) ──── */}
-            <ScrollReveal direction="up" delay={0.2} className="mb-8">
-                <StreakHeatmap
-                    data={data?.streakHeatmap || []}
-                    currentStreak={stats.streak}
-                    longestStreak={stats.longestStreak}
-                />
-            </ScrollReveal>
-
-            {/* ──── 4. Course Progress + Skill Radar (2-col) ──── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <ScrollReveal direction="up" delay={0.25}>
-                    <ProgressChart data={data?.courseProgressData || []} />
-                </ScrollReveal>
-                <ScrollReveal direction="up" delay={0.3}>
-                    <MasteryChart data={data?.subjectMasteryData || []} />
-                </ScrollReveal>
-            </div>
-
-            {/* ──── 5. Session Performance (full width for single col, or paired) ──── */}
-            <ScrollReveal direction="up" delay={0.35} className="mb-8">
-                <SessionStatsChart
-                    data={data?.sessionStats || []}
-                    totalSessions={stats.sessionsCompleted}
-                    avgRating={stats.avgSessionRating}
-                />
-            </ScrollReveal>
-
-            {/* ──── 6. AI Insights (full width) ──── */}
-            <ScrollReveal direction="up" delay={0.4} className="mb-8">
-                <AIInsightsPanel
-                    insights={data?.aiInsights || []}
-                    topTopics={data?.topTopics || []}
-                />
-            </ScrollReveal>
-
-            {/* ──── 7. Recent Achievements ──── */}
-            <ScrollReveal direction="up" delay={0.45}>
-                <GlassSurface className="p-6">
-                    <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
-                        <Award className="mr-2 h-5 w-5 text-orange-400" />
-                        Recent Achievements
-                    </h3>
-                    {(data?.recentAchievements?.length || 0) > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {data!.recentAchievements.map((achievement, i) => (
-                                <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:border-amber-500/20 transition-colors">
-                                    <div className="text-2xl shrink-0">{achievement.icon}</div>
-                                    <div className="min-w-0">
-                                        <div className="font-semibold text-foreground text-sm truncate">{achievement.title}</div>
-                                        <div className="text-xs text-foreground/50 line-clamp-2">{achievement.description}</div>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            {achievement.xp_reward > 0 && (
-                                                <span className="text-[10px] text-amber-400 font-medium">+{achievement.xp_reward} XP</span>
-                                            )}
-                                            <span className="text-[10px] text-foreground/30">
-                                                {new Date(achievement.unlockedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-8 text-foreground/30 text-sm">
-                            <Trophy className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                            <p>No achievements unlocked yet — keep studying to earn them!</p>
-                        </div>
-                    )}
-                </GlassSurface>
-            </ScrollReveal>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 text-cyan-400 animate-spin" />
+      </div>
     )
+  }
+
+  return (
+    <div className="relative min-h-[calc(100vh-4rem)]">
+      <AmbientBackground />
+
+      <div className="relative z-10 space-y-8 p-4 md:p-8">
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <ScrollReveal direction="up">
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard">
+                <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10">
+                  <ArrowLeft className="h-5 w-5" />
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-3xl font-bold font-display tracking-tight text-foreground flex items-center gap-2">
+                  <TrendingUp className="h-8 w-8 text-cyan-400" />
+                  Your Learning Analytics
+                </h1>
+                <p className="text-foreground/60 mt-1">
+                  Track your progress, mastery, and study velocity.
+                </p>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+
+        {analyticsData.length === 0 ? (
+          <GlassSurface className="p-12 text-center rounded-2xl border border-white/10">
+            <Target className="h-16 w-16 mx-auto text-foreground/20 mb-4" />
+            <h2 className="text-xl font-bold mb-2">Not enough data yet!</h2>
+            <p className="text-foreground/60 mb-6">Complete some flashcards and assignments to see your insights.</p>
+            <Link href="/dashboard">
+              <Button className="bg-cyan-600 hover:bg-cyan-500">Back to Dashboard</Button>
+            </Link>
+          </GlassSurface>
+        ) : (
+          <div className="space-y-8">
+            
+            {/* KPI Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <ScrollReveal direction="up" delay={0.1}>
+                <GlassSurface className="p-6 rounded-2xl border border-cyan-500/20 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-colors" />
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+                      <Target className="h-6 w-6 text-cyan-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-foreground/60 font-medium">Average Mastery</p>
+                      <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+                        {averageMastery}%
+                      </h3>
+                    </div>
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
+              
+              <ScrollReveal direction="up" delay={0.2}>
+                <GlassSurface className="p-6 rounded-2xl border border-purple-500/20 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-colors" />
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                      <Clock className="h-6 w-6 text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-foreground/60 font-medium">Total Study Time</p>
+                      <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+                        {Math.floor(totalTimeSpent / 60)}h {totalTimeSpent % 60}m
+                      </h3>
+                    </div>
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
+
+              <ScrollReveal direction="up" delay={0.3}>
+                <GlassSurface className="p-6 rounded-2xl border border-amber-500/20 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-colors" />
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                      <Award className="h-6 w-6 text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-foreground/60 font-medium">Topics Tracked</p>
+                      <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
+                        {analyticsData.length}
+                      </h3>
+                    </div>
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
+            </div>
+
+            {/* Charts Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              
+              {/* Mastery Radar */}
+              <ScrollReveal direction="up" delay={0.4}>
+                <GlassSurface className="p-6 rounded-2xl h-[400px] border border-white/5 flex flex-col">
+                  <h3 className="text-lg font-semibold mb-4">Topic Mastery</h3>
+                  <div className="flex-1 min-h-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                        <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                        <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 12 }} />
+                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: 'rgba(255,255,255,0.4)' }} />
+                        <Radar name="Mastery %" dataKey="mastery" stroke="#06b6d4" fill="#06b6d4" fillOpacity={0.3} />
+                        <RechartsTooltip 
+                          contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                          itemStyle={{ color: '#06b6d4' }}
+                        />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
+
+              {/* Weekly XP Velocity */}
+              <ScrollReveal direction="up" delay={0.5}>
+                <GlassSurface className="p-6 rounded-2xl h-[400px] border border-white/5 flex flex-col">
+                  <h3 className="text-lg font-semibold mb-4">7-Day Study Velocity (XP)</h3>
+                  <div className="flex-1 min-h-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={weeklyXPData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <XAxis dataKey="day" stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.6)', fontSize: 12}} />
+                        <YAxis stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.6)', fontSize: 12}} />
+                        <RechartsTooltip 
+                          contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                          labelStyle={{ color: 'rgba(255,255,255,0.8)', marginBottom: '4px' }}
+                        />
+                        <Line type="monotone" dataKey="xp" stroke="#a855f7" strokeWidth={3} dot={{ fill: '#a855f7', strokeWidth: 2, r: 4 }} activeDot={{ r: 6, fill: '#fff' }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
+
+              {/* Study Time Break Down */}
+              <ScrollReveal direction="up" delay={0.6} className="lg:col-span-2">
+                <GlassSurface className="p-6 rounded-2xl h-[400px] border border-white/5 flex flex-col">
+                  <h3 className="text-lg font-semibold mb-4">Study Time Breakdown (Minutes)</h3>
+                  <div className="flex-1 min-h-0">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={timeData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                        <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.6)', fontSize: 12}} />
+                        <YAxis stroke="rgba(255,255,255,0.3)" tick={{fill: 'rgba(255,255,255,0.6)', fontSize: 12}} />
+                        <RechartsTooltip 
+                          cursor={{fill: 'rgba(255,255,255,0.05)'}}
+                          contentStyle={{ backgroundColor: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                          itemStyle={{ color: '#10b981' }}
+                        />
+                        <Bar dataKey="minutes" fill="#10b981" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </GlassSurface>
+              </ScrollReveal>
+
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  )
 }

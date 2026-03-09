@@ -2444,6 +2444,54 @@ export type Database = {
           },
         ]
       }
+      learning_analytics: {
+        Row: {
+          created_at: string
+          id: string
+          last_studied: string
+          mastery_score: number
+          time_spent_minutes: number
+          topic: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_studied?: string
+          mastery_score?: number
+          time_spent_minutes?: number
+          topic: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_studied?: string
+          mastery_score?: number
+          time_spent_minutes?: number
+          topic?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_dashboard_preferences: {
+        Row: {
+          layout_config: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          layout_config?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          layout_config?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_streaks: {
         Row: {
           activities_today: Json | null

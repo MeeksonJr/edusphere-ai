@@ -53,6 +53,9 @@ export function DashboardNavbar({ onMenuClick }: DashboardNavbarProps) {
                     .eq("id", user.id)
                     .single()
                 setUser({ ...user, profile })
+                
+                // Fire and forget smart notifications evaluation
+                fetch('/api/notifications/process').catch(() => {})
             }
         }
         getUser()
