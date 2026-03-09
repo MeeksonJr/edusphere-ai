@@ -8,6 +8,7 @@ import { DashboardNavbar } from "@/components/layout/DashboardNavbar"
 // For now, we'll assume the parent layout handles the providers, and this component handles the UI structure
 
 import { OnboardingModal } from "@/components/dashboard/OnboardingModal"
+import { AITutorWidget } from "@/components/dashboard/AITutorWidget"
 
 export function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
     const [mobileOpen, setMobileOpen] = useState(false)
@@ -20,11 +21,12 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
             <DashboardSidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 md:pl-64 sidebar-collapsed:md:pl-16">
+            <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 md:pl-64 sidebar-collapsed:md:pl-16 relative">
                 <DashboardNavbar onMenuClick={() => setMobileOpen(true)} />
                 <main id="main-content" className="flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-8">
                     {children}
                 </main>
+                <AITutorWidget />
             </div>
         </div>
     )
