@@ -86,6 +86,8 @@ export default function FlashcardsPage() {
   const [newCard, setNewCard] = useState({ question: "", answer: "" })
   const [flashcardCount, setFlashcardCount] = useState("10")
   const [flashcardTopic, setFlashcardTopic] = useState("")
+  const [generateType, setGenerateType] = useState<"topic" | "text">("topic")
+  const [flashcardText, setFlashcardText] = useState("")
 
   useEffect(() => {
     const getUser = async () => {
@@ -107,6 +109,7 @@ export default function FlashcardsPage() {
   }, [user, subjectFilter, searchQuery])
 
   const fetchFlashcardSets = async () => {
+    if (!supabase) return
     try {
       setLoading(true)
       let query = supabase.from("flashcard_sets").select("*").eq("user_id", user.id)
@@ -137,6 +140,7 @@ export default function FlashcardsPage() {
 
   const handleCreateSet = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabase) return
 
     if (!newSet.title || !newSet.subject || newSet.cards.length === 0) {
       toast({
@@ -207,10 +211,19 @@ export default function FlashcardsPage() {
   }
 
   const handleGenerateFlashcards = async () => {
-    if (!flashcardTopic) {
+    if (generateType === "topic" && !flashcardTopic) {
       toast({
         title: "Missing topic",
         description: "Please provide a topic to generate flashcards",
+        variant: "destructive",
+      })
+      return
+    }
+    
+    if (generateType === "text" && !flashcardText) {
+      toast({
+        title: "Missing text",
+        description: "Please paste your notes or text to generate flashcards",
         variant: "destructive",
       })
       return
@@ -220,16 +233,13 @@ export default function FlashcardsPage() {
       setGeneratingFlashcards(true)
 
       const count = Number.parseInt(flashcardCount)
-      const response = await fetch("/api/ai", {
+      const response = await fetch("/api/flashcards/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: "generateAIResponse",
-          provider: "gemini",
-          prompt: `Generate ${count} flashcards for studying ${flashcardTopic}. Format each flashcard as a JSON object with 'question' and 'answer' fields, and return a JSON array.`,
-          systemPrompt:
-            "You are an educational AI assistant that creates effective flashcards for studying. Respond ONLY with a JSON array.",
-          maxTokens: 1200,
+          topic: generateType === "topic" ? flashcardTopic : undefined,
+          text: generateType === "text" ? flashcardText : undefined,
+          count
         }),
       })
 
@@ -238,22 +248,15 @@ export default function FlashcardsPage() {
         throw new Error(result.error || "Failed to generate flashcards")
       }
 
-      let cards: { question: string; answer: string }[] = []
-      try {
-        const text: string = result.data?.text || ""
-        const jsonStr = text.match(/\[[\s\S]*\]/)?.[0] || "[]"
-        cards = JSON.parse(jsonStr)
-      } catch {
-        cards = []
-      }
+      const cards: { question: string; answer: string }[] = result.data?.cards || []
 
       if (!cards.length) {
-        throw new Error("Failed to generate flashcards. Please try again with a different topic.")
+        throw new Error("Failed to generate flashcards. Please try again.")
       }
 
       setNewSet((prev) => ({
         ...prev,
-        title: flashcardTopic,
+        title: newSet.title || (generateType === "topic" ? flashcardTopic : "From Notes"),
         cards: [...prev.cards, ...cards],
       }))
 
@@ -273,6 +276,7 @@ export default function FlashcardsPage() {
   }
 
   const handleDeleteSet = async (id: string) => {
+    if (!supabase) return
     try {
       const { error } = await supabase.from("flashcard_sets").delete().eq("id", id)
 
@@ -622,20 +626,56 @@ export default function FlashcardsPage() {
               </div>
 
               <div className="border-t border-foreground/10 pt-4">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Or Generate with AI</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-foreground">✨ Magic Flashcards</h3>
+                  
+                  <div className="flex bg-foreground/5 p-1 rounded-lg border border-foreground/10">
+                    <button
+                      type="button"
+                      onClick={() => setGenerateType("topic")}
+                      className={`px-3 py-1 text-xs rounded-md transition-colors ${generateType === "topic" ? "bg-cyan-500/20 text-cyan-400 font-medium" : "text-foreground/70 hover:text-foreground"}`}
+                    >
+                      From Topic
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setGenerateType("text")}
+                      className={`px-3 py-1 text-xs rounded-md transition-colors ${generateType === "text" ? "bg-cyan-500/20 text-cyan-400 font-medium" : "text-foreground/70 hover:text-foreground"}`}
+                    >
+                      From Text
+                    </button>
+                  </div>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div className="md:col-span-2">
-                    <Label htmlFor="flashcard-topic" className="text-foreground mb-2 block">
-                      Topic
-                    </Label>
-                    <Input
-                      id="flashcard-topic"
-                      value={flashcardTopic}
-                      onChange={(e) => setFlashcardTopic(e.target.value)}
-                      placeholder="e.g., Spanish Vocabulary, Chemical Elements"
-                      className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
-                    />
+                    {generateType === "topic" ? (
+                      <>
+                        <Label htmlFor="flashcard-topic" className="text-foreground mb-2 block">
+                          Topic
+                        </Label>
+                        <Input
+                          id="flashcard-topic"
+                          value={flashcardTopic}
+                          onChange={(e) => setFlashcardTopic(e.target.value)}
+                          placeholder="e.g., Spanish Vocabulary, Chemical Elements"
+                          className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Label htmlFor="flashcard-text" className="text-foreground mb-2 block">
+                          Paste your notes or text
+                        </Label>
+                        <Textarea
+                          id="flashcard-text"
+                          value={flashcardText}
+                          onChange={(e) => setFlashcardText(e.target.value)}
+                          placeholder="Paste the text you want to generate flashcards from..."
+                          className="glass-surface border-foreground/20 text-white placeholder:text-foreground/40 resize-y min-h-[100px]"
+                        />
+                      </>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="flashcard-count" className="text-foreground mb-2 block">
@@ -658,7 +698,7 @@ export default function FlashcardsPage() {
                 <Button
                   type="button"
                   onClick={handleGenerateFlashcards}
-                  disabled={generatingFlashcards || !flashcardTopic}
+                  disabled={generatingFlashcards || (generateType === "topic" ? !flashcardTopic : !flashcardText)}
                   className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white disabled:opacity-50"
                 >
                   {generatingFlashcards ? (
