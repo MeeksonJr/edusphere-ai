@@ -33,6 +33,9 @@ import {
   type LucideIcon,
   BookMarked,
   Headphones,
+  Timer,
+  Bookmark,
+  CalendarClock
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useSupabase } from "@/components/supabase-provider"
@@ -103,6 +106,8 @@ export function Sidebar() {
           { name: "Notes", href: "/dashboard/notes", icon: FileText },
           { name: "Resources", href: "/dashboard/resources", icon: BookOpen },
           { name: "Skills", href: "/dashboard/skills", icon: Lightbulb },
+          { name: "Pomodoro", href: "/dashboard/pomodoro", icon: Timer },
+          { name: "Bookmarks", href: "/dashboard/bookmarks", icon: Bookmark },
         ],
       },
       {
@@ -131,6 +136,7 @@ export function Sidebar() {
           { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
           { name: "Certificates", href: "/dashboard/certificates", icon: Award },
           { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
+          { name: "Reminders", href: "/dashboard/reminders", icon: CalendarClock },
         ],
       },
       {

@@ -8,6 +8,7 @@ import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { Target, TrendingUp, Clock, Star, Plus, ChevronRight, Sparkles, Minus, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { SkillTreeGraph } from "@/components/dashboard/SkillTreeGraph"
 
 const CATEGORY_CONFIG: Record<string, { icon: string; color: string; gradient: string }> = {
     programming: { icon: '💻', color: 'text-cyan-400', gradient: 'from-cyan-500/20 to-blue-500/20' },
@@ -28,6 +29,7 @@ export default function SkillsPage() {
     const [userSkillMap, setUserSkillMap] = useState<Map<string, any>>(new Map())
     const [loading, setLoading] = useState(true)
     const [actionLoading, setActionLoading] = useState<string | null>(null)
+    const [viewMode, setViewMode] = useState<'grid' | 'tree'>('grid')
 
     useEffect(() => {
         fetchSkills()
@@ -143,6 +145,20 @@ export default function SkillsPage() {
                             </h1>
                             <p className="text-foreground/60 mt-1">Track your growth across every subject.</p>
                         </div>
+                        <div className="flex bg-gray-900 border border-gray-800 rounded-xl p-1 shadow-inner">
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'grid' ? 'bg-cyan-500/20 text-cyan-300 shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
+                            >
+                                Grid View
+                            </button>
+                            <button
+                                onClick={() => setViewMode('tree')}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'tree' ? 'bg-cyan-500/20 text-cyan-300 shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
+                            >
+                                Tree View
+                            </button>
+                        </div>
                     </div>
                 </ScrollReveal>
 
@@ -166,107 +182,119 @@ export default function SkillsPage() {
                     </div>
                 </ScrollReveal>
 
-                {/* Skill Categories */}
+                {/* Skill Categories or Graph */}
                 <div className="space-y-6">
-                    {Array.from(categories.entries()).map(([category, skills], categoryIndex) => {
-                        const config = CATEGORY_CONFIG[category] || CATEGORY_CONFIG.other
-                        const categoryName = category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-                        const activeInCategory = skills.filter((s: any) => s.userProgress).length
+                    {viewMode === 'grid' ? (
+                        Array.from(categories.entries()).map(([category, skills], categoryIndex) => {
+                            const config = CATEGORY_CONFIG[category] || CATEGORY_CONFIG.other
+                            const categoryName = category.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                            const activeInCategory = skills.filter((s: any) => s.userProgress).length
 
-                        return (
-                            <ScrollReveal key={category} direction="up" delay={0.1 + categoryIndex * 0.05}>
-                                <GlassSurface className="p-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                                            <span className="text-xl">{config.icon}</span>
-                                            {categoryName}
-                                            <span className="text-xs text-foreground/40 ml-2">
-                                                {activeInCategory}/{skills.length} active
-                                            </span>
-                                        </h2>
-                                    </div>
+                            return (
+                                <ScrollReveal key={category} direction="up" delay={0.1 + categoryIndex * 0.05}>
+                                    <GlassSurface className="p-6">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                                                <span className="text-xl">{config.icon}</span>
+                                                {categoryName}
+                                                <span className="text-xs text-foreground/40 ml-2">
+                                                    {activeInCategory}/{skills.length} active
+                                                </span>
+                                            </h2>
+                                        </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                        {skills.map((skill: any) => {
-                                            const progress = skill.userProgress
-                                            const level = progress?.level || 0
-                                            const xp = progress?.xp || 0
-                                            const nextLevelXP = Math.floor(50 * Math.pow(level, 2)) || 50
-                                            const xpProgress = nextLevelXP > 0 ? Math.min((xp / nextLevelXP) * 100, 100) : 0
-                                            const isLoading = actionLoading === skill.id
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                            {skills.map((skill: any) => {
+                                                const progress = skill.userProgress
+                                                const level = progress?.level || 0
+                                                const xp = progress?.xp || 0
+                                                const nextLevelXP = Math.floor(50 * Math.pow(level, 2)) || 50
+                                                const xpProgress = nextLevelXP > 0 ? Math.min((xp / nextLevelXP) * 100, 100) : 0
+                                                const isLoading = actionLoading === skill.id
 
-                                            return (
-                                                <div
-                                                    key={skill.id}
-                                                    className={`group p-4 rounded-xl border transition-all duration-300 hover:scale-[1.02] ${progress
-                                                        ? 'border-cyan-500/20 bg-gradient-to-br ' + config.gradient
-                                                        : 'border-white/5 bg-white/[0.02] hover:border-white/10'
-                                                        }`}
-                                                >
-                                                    <div className="flex items-start justify-between mb-2">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-lg">{skill.icon}</span>
-                                                            <div>
-                                                                <h3 className="text-sm font-medium text-foreground">{skill.name}</h3>
-                                                                {progress && (
-                                                                    <span className={`text-xs ${config.color}`}>Level {level}</span>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        {isLoading ? (
-                                                            <Loader2 className="h-4 w-4 text-cyan-400 animate-spin" />
-                                                        ) : progress ? (
+                                                return (
+                                                    <div
+                                                        key={skill.id}
+                                                        className={`group p-4 rounded-xl border transition-all duration-300 hover:scale-[1.02] ${progress
+                                                            ? 'border-cyan-500/20 bg-gradient-to-br ' + config.gradient
+                                                            : 'border-white/5 bg-white/[0.02] hover:border-white/10'
+                                                            }`}
+                                                    >
+                                                        <div className="flex items-start justify-between mb-2">
                                                             <div className="flex items-center gap-2">
-                                                                <span className="text-xs text-foreground/40">{xp} XP</span>
-                                                                <button
-                                                                    onClick={() => handleRemoveSkill(skill.id)}
-                                                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-500/10"
-                                                                    title="Remove skill"
-                                                                >
-                                                                    <Minus className="h-3 w-3" />
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            <button
-                                                                onClick={() => handleAddSkill(skill.id)}
-                                                                className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 px-2 py-1 rounded hover:bg-cyan-500/10"
-                                                            >
-                                                                <Plus className="h-3 w-3" /> Add
-                                                            </button>
-                                                        )}
-                                                    </div>
-
-                                                    {skill.description && (
-                                                        <p className="text-xs text-foreground/40 mb-2 line-clamp-1">{skill.description}</p>
-                                                    )}
-
-                                                    {progress && (
-                                                        <div className="mt-2">
-                                                            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                                                <div
-                                                                    className="h-full rounded-full transition-all duration-1000"
-                                                                    style={{
-                                                                        width: `${xpProgress}%`,
-                                                                        background: `linear-gradient(90deg, var(--primary), hsl(var(--primary) / 0.6))`,
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            {progress.next_review_date && (
-                                                                <div className="flex items-center gap-1 mt-1 text-[10px] text-foreground/30">
-                                                                    <Clock className="h-2.5 w-2.5" />
-                                                                    Review: {new Date(progress.next_review_date).toLocaleDateString()}
+                                                                <span className="text-lg">{skill.icon}</span>
+                                                                <div>
+                                                                    <h3 className="text-sm font-medium text-foreground">{skill.name}</h3>
+                                                                    {progress && (
+                                                                        <span className={`text-xs ${config.color}`}>Level {level}</span>
+                                                                    )}
                                                                 </div>
+                                                            </div>
+                                                            {isLoading ? (
+                                                                <Loader2 className="h-4 w-4 text-cyan-400 animate-spin" />
+                                                            ) : progress ? (
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-xs text-foreground/40">{xp} XP</span>
+                                                                    <button
+                                                                        onClick={() => handleRemoveSkill(skill.id)}
+                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-500/10"
+                                                                        title="Remove skill"
+                                                                    >
+                                                                        <Minus className="h-3 w-3" />
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <button
+                                                                    onClick={() => handleAddSkill(skill.id)}
+                                                                    className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 px-2 py-1 rounded hover:bg-cyan-500/10"
+                                                                >
+                                                                    <Plus className="h-3 w-3" /> Add
+                                                                </button>
                                                             )}
                                                         </div>
-                                                    )}
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                </GlassSurface>
-                            </ScrollReveal>
-                        )
-                    })}
+
+                                                        {skill.description && (
+                                                            <p className="text-xs text-foreground/40 mb-2 line-clamp-1">{skill.description}</p>
+                                                        )}
+
+                                                        {progress && (
+                                                            <div className="mt-2">
+                                                                <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                                                    <div
+                                                                        className="h-full rounded-full transition-all duration-1000"
+                                                                        style={{
+                                                                            width: `${xpProgress}%`,
+                                                                            background: `linear-gradient(90deg, var(--primary), hsl(var(--primary) / 0.6))`,
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                                {progress.next_review_date && (
+                                                                    <div className="flex items-center gap-1 mt-1 text-[10px] text-foreground/30">
+                                                                        <Clock className="h-2.5 w-2.5" />
+                                                                        Review: {new Date(progress.next_review_date).toLocaleDateString()}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    </GlassSurface>
+                                </ScrollReveal>
+                            )
+                        })
+                    ) : (
+                        <ScrollReveal direction="up" delay={0.1}>
+                            <SkillTreeGraph 
+                                allSkills={allSkills} 
+                                userSkillMap={userSkillMap} 
+                                categories={categories} 
+                                onNodeClick={handleAddSkill} 
+                                actionLoading={actionLoading} 
+                            />
+                        </ScrollReveal>
+                    )}
                 </div>
 
                 {/* AI Recommendation */}

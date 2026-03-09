@@ -27,6 +27,9 @@ import {
     Headphones,
     BookMarked,
     Lightbulb,
+    Timer,
+    Bookmark,
+    CalendarClock
 } from "lucide-react"
 import {
     CommandDialog,
@@ -120,6 +123,14 @@ export function CommandPalette() {
                             <Lightbulb className="mr-2 h-4 w-4" />
                             <span>Skills</span>
                         </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/pomodoro"))}>
+                            <Timer className="mr-2 h-4 w-4" />
+                            <span>Pomodoro Timer</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/bookmarks"))}>
+                            <Bookmark className="mr-2 h-4 w-4" />
+                            <span>Bookmarks</span>
+                        </CommandItem>
                     </CommandGroup>
 
                     <CommandSeparator />
@@ -166,6 +177,10 @@ export function CommandPalette() {
                         <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/calendar"))}>
                             <Calendar className="mr-2 h-4 w-4" />
                             <span>Calendar</span>
+                        </CommandItem>
+                        <CommandItem onSelect={() => runCommand(() => router.push("/dashboard/reminders"))}>
+                            <CalendarClock className="mr-2 h-4 w-4" />
+                            <span>Study Reminders</span>
                         </CommandItem>
                     </CommandGroup>
 

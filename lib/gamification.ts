@@ -48,6 +48,12 @@ export const XP_REWARDS = {
 
     // Achievements
     achievement_unlock: 0, // XP comes from achievement itself
+
+    // Productivity (Phase 3D)
+    pomodoro_complete: 25,
+    daily_challenge_complete: 30,
+    all_challenges_complete: 75,
+    bookmark_create: 5,
 } as const
 
 export type XPSource = keyof typeof XP_REWARDS

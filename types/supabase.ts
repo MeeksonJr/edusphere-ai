@@ -252,6 +252,45 @@ export type Database = {
         }
         Relationships: []
       }
+      bookmarks: {
+        Row: {
+          created_at: string
+          description: string | null
+          favicon_url: string | null
+          folder: string | null
+          id: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          favicon_url?: string | null
+          folder?: string | null
+          id?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          favicon_url?: string | null
+          folder?: string | null
+          id?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       calendar_events: {
         Row: {
           all_day: boolean | null
@@ -1113,6 +1152,51 @@ export type Database = {
           period_start?: string | null
           reference_id?: string | null
           status?: string | null
+        }
+        Relationships: []
+      }
+      daily_challenges: {
+        Row: {
+          challenge_date: string
+          challenge_type: string
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          current_value: number
+          description: string | null
+          id: string
+          target_value: number
+          title: string
+          user_id: string
+          xp_reward: number
+        }
+        Insert: {
+          challenge_date?: string
+          challenge_type: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_value?: number
+          description?: string | null
+          id?: string
+          target_value?: number
+          title: string
+          user_id: string
+          xp_reward?: number
+        }
+        Update: {
+          challenge_date?: string
+          challenge_type?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_value?: number
+          description?: string | null
+          id?: string
+          target_value?: number
+          title?: string
+          user_id?: string
+          xp_reward?: number
         }
         Relationships: []
       }
@@ -2165,6 +2249,45 @@ export type Database = {
         }
         Relationships: []
       }
+      study_sessions: {
+        Row: {
+          completed: boolean
+          completed_at: string
+          created_at: string
+          duration_minutes: number
+          id: string
+          notes: string | null
+          session_type: string
+          started_at: string
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          notes?: string | null
+          session_type?: string
+          started_at?: string
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          notes?: string | null
+          session_type?: string
+          started_at?: string
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -2540,4 +2663,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-
