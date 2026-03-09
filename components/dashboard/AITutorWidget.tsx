@@ -181,9 +181,9 @@ export function AITutorWidget() {
 
   return (
     <div
-      className={\`fixed bottom-6 right-6 w-[350px] sm:w-[400px] z-50 transition-all duration-300 ease-in-out \${
+      className={`fixed bottom-6 right-6 w-[350px] sm:w-[400px] z-50 transition-all duration-300 ease-in-out ${
         isMinimized ? "h-[60px]" : "h-[500px] max-h-[80vh]"
-      }\`}
+      }`}
     >
       <GlassSurface className="h-full flex flex-col overflow-hidden border border-cyan-500/30 shadow-2xl rounded-2xl bg-background/80 backdrop-blur-xl">
         {/* Header */}
@@ -240,16 +240,16 @@ export function AITutorWidget() {
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={\`flex \${msg.role === "user" ? "justify-end" : "justify-start"}\`}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={\`max-w-[85%] rounded-2xl px-4 py-2 text-sm \${
+                      className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
                         msg.role === "user"
                           ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-br-none"
                           : msg.id === "welcome"
                             ? "bg-cyan-500/20 text-cyan-500 font-medium rounded-bl-none border border-cyan-500/40"
                             : "bg-foreground/5 text-foreground rounded-bl-none border border-foreground/10"
-                      }\`}
+                      }`}
                     >
                       {msg.content ? (
                         <p className="whitespace-pre-wrap">{msg.content}</p>

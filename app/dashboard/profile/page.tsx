@@ -58,7 +58,7 @@ function ProfileContent() {
     assignments: { total: 0, completed: 0 },
     flashcards: { sets: 0, cards: 0 },
     resources: { total: 0 },
-    aiUsage: { total: 0, remaining: 0 },
+    aiUsage: { total: 0, remaining: 0 as number | string },
   })
   const [profile, setProfile] = useState({
     full_name: "",
@@ -81,6 +81,7 @@ function ProfileContent() {
     const getUser = async () => {
       try {
         setLoading(true)
+        if (!supabase) return
         const { data } = await supabase.auth.getUser()
 
         if (data.user) {
@@ -115,7 +116,7 @@ function ProfileContent() {
               full_name: newProfileData?.full_name || "",
               username: newProfileData?.username || "",
               avatar_url: newProfileData?.avatar_url || "",
-              is_public: newProfileData?.is_public || false,
+              is_public: (newProfileData as any)?.is_public || false,
             })
           } else if (profileError) {
             throw profileError
@@ -125,7 +126,7 @@ function ProfileContent() {
               full_name: profileData?.full_name || "",
               username: profileData?.username || "",
               avatar_url: profileData?.avatar_url || "",
-              is_public: profileData?.is_public || false,
+              is_public: (profileData as any)?.is_public || false,
             })
           }
 
@@ -147,6 +148,7 @@ function ProfileContent() {
 
   const fetchUserStats = async (userId: string) => {
     try {
+      if (!supabase) return
       const { data: assignments } = await supabase
         .from("assignments")
         .select("status")
@@ -159,7 +161,7 @@ function ProfileContent() {
         .select("cards")
         .eq("user_id", userId)
 
-      const totalCards = flashcardSets?.reduce((acc, set) => acc + (set.cards?.length || 0), 0) || 0
+      const totalCards = flashcardSets?.reduce((acc, set) => acc + ((set.cards as any[])?.length || 0), 0) || 0
 
       const { data: resources } = await supabase.from("study_resources").select("id").eq("user_id", userId)
 
@@ -192,7 +194,7 @@ function ProfileContent() {
   const handleUpdateProfile = async () => {
     try {
       setUpdating(true)
-      if (!user) return
+      if (!user || !supabase) return
 
       let avatarUrl = profile.avatar_url
       if (avatarFile && supabase) {
@@ -272,6 +274,7 @@ function ProfileContent() {
 
   const handleSignOut = async () => {
     try {
+      if (!supabase) return
       await supabase.auth.signOut()
       router.push("/")
       router.refresh()
@@ -286,12 +289,12 @@ function ProfileContent() {
 
   const handleDeleteAccount = async () => {
     try {
-      if (!user) return
+      if (!user || !supabase) return
       setUpdating(true)
 
       const tables = ["assignments", "flashcard_sets", "study_resources", "ai_chats", "profiles"]
       for (const table of tables) {
-        await supabase.from(table).delete().eq("user_id", user.id)
+        await supabase.from(table as any).delete().eq("user_id", user.id)
       }
 
       await supabase.auth.signOut()
