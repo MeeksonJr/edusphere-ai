@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Loader2, Sparkles, Podcast } from "lucide-react"
+import { ArrowLeft, Loader2, Sparkles, Podcast, Plus, Trash2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { GlassSurface } from "@/components/shared/GlassSurface"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
@@ -18,8 +18,9 @@ export default function CreatePodcastPage() {
     const { toast } = useToast()
     const [topic, setTopic] = useState("")
     const [duration, setDuration] = useState("short")
-    const [selectedVoice, setSelectedVoice] = useState("")
-    const [selectedProvider, setSelectedProvider] = useState("edge-tts")
+    const [speakers, setSpeakers] = useState([
+        { id: 1, name: "Host", voiceId: "", provider: "edge-tts" }
+    ])
     const [generating, setGenerating] = useState(false)
 
     const handleGenerate = async () => {
@@ -40,8 +41,11 @@ export default function CreatePodcastPage() {
                 body: JSON.stringify({
                     topic: topic.trim(),
                     duration,
-                    voiceId: selectedVoice || undefined,
-                    voiceProvider: selectedProvider || undefined,
+                    speakers: speakers.map(s => ({
+                        name: s.name.trim() || `Speaker ${s.id}`,
+                        voiceId: s.voiceId || undefined,
+                        provider: s.provider || undefined
+                    })),
                 }),
             })
 
@@ -166,14 +170,71 @@ export default function CreatePodcastPage() {
                         </Select>
                     </div>
 
-                    {/* Voice selector */}
-                    <VoiceSelector
-                        selectedVoice={selectedVoice}
-                        onVoiceChange={(id, provider) => {
-                            setSelectedVoice(id)
-                            setSelectedProvider(provider)
-                        }}
-                    />
+                    {/* Speakers Configuration */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <Label className="text-foreground text-sm font-medium">
+                                Speakers ({speakers.length}/5)
+                            </Label>
+                            {speakers.length < 5 && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 text-xs border-purple-500/30 hover:bg-purple-500/10 text-purple-300"
+                                    onClick={() => setSpeakers([...speakers, { id: Date.now(), name: `Guest ${speakers.length}`, voiceId: "", provider: "edge-tts" }])}
+                                >
+                                    <Plus className="mr-1 h-3 w-3" />
+                                    Add Speaker
+                                </Button>
+                            )}
+                        </div>
+
+                        <div className="grid gap-4">
+                            {speakers.map((speaker, index) => (
+                                <div key={speaker.id} className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <h4 className="text-sm font-medium text-purple-300">Speaker {index + 1}</h4>
+                                        {speakers.length > 1 && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-6 w-6 p-0 text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                                                onClick={() => setSpeakers(speakers.filter(s => s.id !== speaker.id))}
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                    
+                                    <div>
+                                        <Label className="text-foreground/70 mb-1 block text-xs">Name / Role</Label>
+                                        <Input
+                                            value={speaker.name}
+                                            onChange={(e) => {
+                                                const newSpeakers = [...speakers]
+                                                newSpeakers[index].name = e.target.value
+                                                setSpeakers(newSpeakers)
+                                            }}
+                                            placeholder="e.g. Dr. Sarah (Expert)"
+                                            className="glass-surface border-foreground/20 text-white h-9"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <VoiceSelector
+                                            selectedVoice={speaker.voiceId}
+                                            onVoiceChange={(id, provider) => {
+                                                const newSpeakers = [...speakers]
+                                                newSpeakers[index].voiceId = id
+                                                newSpeakers[index].provider = provider
+                                                setSpeakers(newSpeakers)
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
                     {/* Generate button */}
                     <Button

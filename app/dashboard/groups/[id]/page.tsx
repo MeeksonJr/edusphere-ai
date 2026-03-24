@@ -17,7 +17,7 @@ interface Message {
   user_id: string
   content: string
   created_at: string
-  profile?: {
+  profiles?: {
     full_name: string | null
     username: string | null
     avatar_url: string | null
@@ -105,7 +105,7 @@ export default function GroupDetailsPage() {
         .from("study_group_messages")
         .select(`
           *,
-          profile:profiles(full_name, username, avatar_url)
+          profiles(full_name, username, avatar_url)
         `)
         .eq("group_id", groupId)
         .order("created_at", { ascending: true })
@@ -131,7 +131,7 @@ export default function GroupDetailsPage() {
           const newMsg = payload.new as Message
           // Fetch profile for this newly inserted message sender
           const { data: prof } = await supabase.from("profiles").select("full_name, username, avatar_url").eq("id", newMsg.user_id).single()
-          if (prof) newMsg.profile = prof
+          if (prof) newMsg.profiles = prof // Changed from 'profile' to 'profiles'
           setMessages(prev => [...prev, newMsg])
         }
       )
@@ -298,9 +298,9 @@ export default function GroupDetailsPage() {
                       <div key={msg.id} className={`flex gap-3 ${isMe ? 'flex-row-reverse' : 'flex-row'} ${!showHeader ? 'mt-1' : 'mt-4'}`}>
                         {showHeader ? (
                           <Avatar className="h-8 w-8 shrink-0 border border-foreground/10">
-                            <AvatarImage src={msg.profile?.avatar_url || ""} />
+                            <AvatarImage src={msg.profiles?.avatar_url || ""} /> {/* Changed from 'profile' to 'profiles' */}
                             <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-blue-500 text-white text-[10px]">
-                              {(msg.profile?.full_name || msg.profile?.username || "?")[0].toUpperCase()}
+                              {(msg.profiles?.full_name || msg.profiles?.username || "?")[0].toUpperCase()} {/* Changed from 'profile' to 'profiles' */}
                             </AvatarFallback>
                           </Avatar>
                         ) : (
@@ -310,7 +310,7 @@ export default function GroupDetailsPage() {
                         <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[75%]`}>
                           {!isMe && showHeader && (
                             <span className="text-[10px] uppercase tracking-wider text-foreground/50 mb-1 ml-1 font-semibold">
-                              {msg.profile?.full_name || msg.profile?.username || "Unknown"}
+                              {msg.profiles?.full_name || msg.profiles?.username || "Unknown"} {/* Changed from 'profile' to 'profiles' */}
                             </span>
                           )}
                           <div className={`px-4 py-2.5 shadow-sm text-sm ${

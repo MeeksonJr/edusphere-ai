@@ -147,12 +147,12 @@ Return a JSON array of chapter objects with this structure (no markdown fences, 
       return NextResponse.json({ error: "Failed to persist new chapters" }, { status: 500 })
     }
 
-    // Trigger async background processing for slides and audio using fire-and-forget fallback or promise
-    processCourse({ courseId: params.id, userId: user.id }).catch(err => console.error("Course processing error:", err))
+    // Trigger async background processing for slides and audio      // Generate audio/images in the background (fire and forget) so we don't block the request and cause Vercel to timeout
+      processCourse({ courseId: params.id, userId: user.id }).catch(err => console.error("Background processing error:", err))
 
-    return NextResponse.json({
-      success: true,
-      message: `${newChapters.length} chapters added successfully. Audio generation has started.`,
+      return NextResponse.json({ 
+        success: true, 
+        message: "Chapters added and audio generation started in background.",
       chapters: newChapters,
       totalDuration,
     })

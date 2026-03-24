@@ -34,10 +34,14 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json()
-        const { topic, voiceId, voiceProvider, duration = "short" } = body
+        const { topic, speakers = [], duration = "short" } = body
 
         if (!topic || typeof topic !== "string" || !topic.trim()) {
             return NextResponse.json({ error: "Topic is required" }, { status: 400 })
+        }
+        
+        if (speakers.length === 0) {
+            speakers.push({ name: "Host", voiceId: "", provider: "edge-tts" })
         }
 
         // Create podcast record in "generating" state
@@ -48,8 +52,8 @@ export async function POST(req: NextRequest) {
                 title: topic.substring(0, 200),
                 topic,
                 status: "generating",
-                voice_id: voiceId || null,
-                voice_provider: voiceProvider || "edge-tts",
+                voice_id: speakers[0].voiceId || null,
+                voice_provider: speakers[0].provider || "edge-tts",
             })
             .select()
             .single()
@@ -68,8 +72,7 @@ export async function POST(req: NextRequest) {
             user.id,
             topic,
             duration,
-            voiceId,
-            voiceProvider as TTSProvider | undefined,
+            speakers,
             req.headers.get("Cookie") || ""
         )
 
@@ -95,8 +98,7 @@ async function generatePodcastAsync(
     userId: string,
     topic: string,
     duration: "short" | "medium" | "long",
-    voiceId?: string,
-    voiceProvider?: TTSProvider,
+    speakers: any[],
     cookie?: string
 ) {
     // Admin client for background updates
@@ -110,6 +112,8 @@ async function generatePodcastAsync(
         // Determine segment count based on duration
         const segmentCount =
             duration === "short" ? 3 : duration === "medium" ? 6 : 10
+            
+        const speakersText = speakers.map((s: any, i: number) => `${s.name} (Speaker ${i+1})`).join(", ")
 
         // Step 1: Generate podcast script via AI
         const scriptResult = await generateAIResponse({
@@ -117,43 +121,66 @@ async function generatePodcastAsync(
             prompt: `Create a ${duration} educational podcast script about: "${topic}"
 
 Requirements:
-- Write an engaging, conversational podcast script as if a single host is teaching the audience
+- Write an engaging, conversational podcast script featuring the following speakers: ${speakersText}
 - Include an introduction, ${segmentCount} main content segments, and a conclusion
-- Each segment should be 2-4 paragraphs
-- Use clear, accessible language appropriate for learners
-- Include interesting facts, examples, and analogies
-- End with a summary of key takeaways
+- Each segment should be 2-4 short paragraphs of dialogue between the speakers
+- The dialogue should flow naturally with interruptions, agreements, and questions
+- Format the script STRICTLY as a JSON array of dialogue objects. Do NOT use markdown code blocks.
 
-Return ONLY the full script text, no JSON or formatting markers. Use "---" on its own line to separate segments.`,
+REQUIRED JSON FORMAT:
+[
+  { "speaker": "Speaker Name", "text": "Welcome to the podcast..." },
+  { "speaker": "Another Speaker", "text": "Thanks for having me!" }
+]`,
             systemPrompt:
-                "You are an expert educational podcast host. Write engaging, clear, and informative podcast scripts that make complex topics accessible and interesting to a broad audience.",
-            maxTokens: 4000,
+                "You are an expert educational podcast host and producer. Write engaging, clear, and informative podcast scripts. Output STRICTLY in the requested JSON array format.",
+            maxTokens: 5000,
             temperature: 0.7,
         })
 
-        const script = scriptResult?.text || ""
-        if (!script || script.length < 100) {
-            throw new Error("AI failed to generate a sufficient podcast script")
+        const scriptStr = scriptResult?.text || ""
+        const jsonMatch = scriptStr.match(/\[[\s\S]*\]/)
+        if (!jsonMatch) {
+            throw new Error("AI failed to output valid JSON for the script")
         }
+        
+        const scriptJson = JSON.parse(jsonMatch[0])
+        if (!Array.isArray(scriptJson) || scriptJson.length === 0) {
+            throw new Error("AI generated an empty script")
+        }
+
+        const scriptText = scriptJson.map((line: any) => `**${line.speaker}**: ${line.text}`).join("\n\n")
 
         // Update podcast with script
         await supabase
             .from("podcasts")
-            .update({ script, title: extractTitle(topic, script) })
+            .update({ script: scriptText, title: extractTitle(topic, scriptText) })
             .eq("id", podcastId)
 
         // Step 2: Generate audio from script using TTS
-        const ttsResult = await generateTTS({
-            text: script.replace(/---/g, " ").substring(0, 5000), // Remove segment markers, respect char limit
-            voice: voiceId,
-            provider: voiceProvider,
-        })
+        let audioBuffers: Buffer[] = []
+        let totalDuration = 0
+
+        for (const line of scriptJson) {
+            const speakerInfo = speakers.find((s: any) => s.name.toLowerCase().includes(line.speaker.toLowerCase()) || line.speaker.toLowerCase().includes(s.name.toLowerCase())) || speakers[0]
+            
+            const ttsResult = await generateTTS({
+                text: line.text.substring(0, 3000), // Safety clip
+                voice: speakerInfo.voiceId,
+                provider: speakerInfo.provider,
+            })
+            
+            audioBuffers.push(ttsResult.buffer)
+            totalDuration += ttsResult.duration
+        }
+        
+        const finalBuffer = Buffer.concat(audioBuffers)
 
         // Step 3: Upload audio to Supabase Storage
         const audioPath = `podcasts/${userId}/${podcastId}.mp3`
         const { error: uploadError } = await supabase.storage
             .from("course-media") // Reuse existing bucket
-            .upload(audioPath, ttsResult.buffer, {
+            .upload(audioPath, finalBuffer, {
                 contentType: "audio/mpeg",
                 upsert: true,
             })
@@ -174,7 +201,7 @@ Return ONLY the full script text, no JSON or formatting markers. Use "---" on it
             .update({
                 status: "completed",
                 audio_url: publicUrl,
-                duration: Math.round(ttsResult.duration),
+                duration: Math.round(totalDuration),
                 updated_at: new Date().toISOString(),
             })
             .eq("id", podcastId)
