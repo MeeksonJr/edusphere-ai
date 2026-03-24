@@ -31,7 +31,8 @@ export const CourseVideo: React.FC<CourseVideoProps> = ({
 
   chapters.forEach((chapter) => {
     chapter.slides?.forEach((slide: any) => {
-      const slideDuration = (slide.estimatedDuration || 30) * fps // Convert seconds to frames
+      const slideDurationSeconds = slide.audioDuration || slide.estimatedDuration || 30
+      const slideDuration = Math.round(slideDurationSeconds * fps) // Convert seconds to frames
 
       sequences.push({
         from: currentFrame,

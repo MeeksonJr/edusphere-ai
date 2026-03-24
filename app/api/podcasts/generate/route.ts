@@ -62,8 +62,8 @@ export async function POST(req: NextRequest) {
             )
         }
 
-        // Generate script with AI (async — don't block the response)
-        generatePodcastAsync(
+        // Generate script with AI (await to prevent Vercel terminating the process)
+        await generatePodcastAsync(
             podcast.id,
             user.id,
             topic,
@@ -71,15 +71,13 @@ export async function POST(req: NextRequest) {
             voiceId,
             voiceProvider as TTSProvider | undefined,
             req.headers.get("Cookie") || ""
-        ).catch((err) => {
-            console.error("Podcast generation failed:", err)
-        })
+        )
 
         return NextResponse.json({
             success: true,
             podcastId: podcast.id,
-            status: "generating",
-            message: "Podcast generation started. Check back shortly.",
+            status: "completed",
+            message: "Podcast generated successfully.",
         })
     } catch (error: any) {
         console.error("Podcast API error:", error)

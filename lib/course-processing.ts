@@ -101,8 +101,8 @@ async function processSlides(
         animations: generateSlideAnimations(slide.type),
       }
 
-      // Save slide to database
-      await supabase.from("course_slides").insert({
+      // Save slide to database using upsert to avoid duplicates if re-processing
+      await supabase.from("course_slides").upsert({
         course_id: courseId,
         chapter_id: chapter.chapterId,
         slide_id: slide.slideId,
@@ -110,7 +110,7 @@ async function processSlides(
         content: slide.content,
         template_data: templateData,
         order_index: slide.order || 0,
-      })
+      }, { onConflict: 'course_id, slide_id' })
     }
   }
 }
@@ -137,7 +137,6 @@ async function processAudio(
         const audioData = await generateTTS({
           text: slide.narrationScript,
           voice: "en-US-Neural2-D",
-          languageCode: "en-US",
         })
 
         // Upload to Supabase Storage

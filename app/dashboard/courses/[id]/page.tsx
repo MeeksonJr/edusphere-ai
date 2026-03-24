@@ -31,6 +31,10 @@ import Link from "next/link"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
 import dynamic from "next/dynamic"
 import { CourseSidePanel } from "@/components/courses/CourseSidePanel"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 // Dynamically import Remotion Player to avoid SSR issues
 const RemotionPlayer = dynamic(
@@ -53,7 +57,7 @@ const RemotionPlayer = dynamic(
 )
 
 function CourseDetailContent() {
-  const params = useParams()
+  const params = useParams() as { id: string }
   const router = useRouter()
   const { supabase } = useSupabase()
   const { toast } = useToast()
@@ -69,6 +73,12 @@ function CourseDetailContent() {
   const [sidePanelOpen, setSidePanelOpen] = useState(false)
   const [selectedChapter, setSelectedChapter] = useState<any>(null)
   const [selectedSlide, setSelectedSlide] = useState<any>(null)
+
+  // Add Chapter Modal State
+  const [isAddChapterModalOpen, setIsAddChapterModalOpen] = useState(false)
+  const [newChapterCount, setNewChapterCount] = useState(1)
+  const [newChapterContext, setNewChapterContext] = useState("")
+  const [isGeneratingChapters, setIsGeneratingChapters] = useState(false)
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -89,6 +99,30 @@ function CourseDetailContent() {
           return
         }
 
+        // Fetch slides to get audio URLs
+        const { data: slides } = await supabase
+          .from("course_slides")
+          .select("chapter_id, slide_id, audio_url, audio_duration, caption_data")
+          .eq("course_id", params.id)
+          
+        if (slides && (data.layout as any)?.chapters) {
+          (data.layout as any).chapters = (data.layout as any).chapters.map((chapter: any) => ({
+            ...chapter,
+            slides: chapter.slides?.map((slide: any) => {
+              const dbSlide = slides.find((s: any) => s.slide_id === slide.slideId && s.chapter_id === chapter.chapterId)
+              if (dbSlide) {
+                return {
+                  ...slide,
+                  audioUrl: dbSlide.audio_url,
+                  audioDuration: dbSlide.audio_duration,
+                  captionData: dbSlide.caption_data
+                }
+              }
+              return slide
+            })
+          }))
+        }
+
         setCourse(data)
       } catch (err: any) {
         console.error("Error fetching course:", err)
@@ -107,32 +141,34 @@ function CourseDetailContent() {
     fetchCourse()
 
     // Poll for updates if course is pending or processing
-    const pollInterval = setInterval(() => {
+    const pollInterval = setInterval(async () => {
       if (!supabase || !params.id) return
       
-      supabase
-        .from("courses")
-        .select("*")
-        .eq("id", params.id)
-        .single()
-        .then(({ data, error }) => {
-          if (!error && data) {
-            setCourse((prevCourse: any) => {
-              // Only update if status changed or layout was updated
-              if (!prevCourse || prevCourse.status !== data.status || 
-                  JSON.stringify(prevCourse.layout) !== JSON.stringify(data.layout)) {
-                return data
-              }
-              return prevCourse
-            })
-            
-            // Stop polling if course is completed or failed
-            if (data.status === "completed" || data.status === "failed") {
-              clearInterval(pollInterval)
+      try {
+        const { data, error } = await supabase
+          .from("courses")
+          .select("*")
+          .eq("id", params.id)
+          .single()
+          
+        if (!error && data) {
+          setCourse((prevCourse: any) => {
+            // Only update if status changed or layout was updated
+            if (!prevCourse || prevCourse.status !== data.status || 
+                JSON.stringify(prevCourse.layout) !== JSON.stringify(data.layout)) {
+              return data
             }
+            return prevCourse
+          })
+          
+          // Stop polling if course is completed or failed
+          if (data.status === "completed" || data.status === "failed") {
+            clearInterval(pollInterval)
           }
-        })
-        .catch((err) => console.error("Polling error:", err))
+        }
+      } catch (err) {
+        console.error("Polling error:", err)
+      }
     }, 3000) // Poll every 3 seconds
 
     // Cleanup interval on unmount
@@ -156,12 +192,15 @@ function CourseDetailContent() {
           setQuestions(questionsData)
         }
 
+        const userId = (await supabase.auth.getUser()).data.user?.id
+        if (!userId) return
+
         // Fetch progress
         const { data: progressData } = await supabase
           .from("course_progress")
           .select("*")
           .eq("course_id", params.id)
-          .eq("user_id", (await supabase.auth.getUser()).data.user?.id)
+          .eq("user_id", userId)
 
         if (progressData && progressData.length > 0) {
           const totalSlides = course.layout?.chapters?.reduce(
@@ -322,6 +361,37 @@ function CourseDetailContent() {
       })
     } finally {
       setEnhancing(false)
+    }
+  }
+
+  const handleGenerateChapters = async () => {
+    if (!supabase || !params.id) return
+    setIsGeneratingChapters(true)
+    try {
+      const response = await fetch(`/api/courses/${params.id}/chapters/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ count: newChapterCount, context: newChapterContext }),
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || "Failed to add chapters")
+      
+      toast({
+        id: `chapters-added-${Date.now()}`,
+        title: "Success",
+        description: result.message || `Added ${newChapterCount} new chapters.`,
+      })
+      
+      setIsAddChapterModalOpen(false)
+      setNewChapterContext("")
+      setNewChapterCount(1)
+      
+      // Refresh course data
+      setTimeout(() => window.location.reload(), 1500)
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" })
+    } finally {
+      setIsGeneratingChapters(false)
     }
   }
 
@@ -489,55 +559,7 @@ function CourseDetailContent() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-foreground">Course Structure</h2>
               <Button
-                onClick={async () => {
-                  if (!supabase || !params.id) return
-
-                  const title = prompt("Enter chapter title:")
-                  if (!title) return
-
-                  let topicCountInput = prompt("Enter number of topics (1-5):")
-                  if (!topicCountInput) return
-
-                  // Parse and validate topic count
-                  let topicCount = parseInt(topicCountInput, 10)
-                  if (isNaN(topicCount) || topicCount < 1) {
-                    topicCount = 1
-                  } else if (topicCount > 5) {
-                    topicCount = 5
-                  }
-
-                  try {
-                    const response = await fetch(`/api/courses/${params.id}/chapters`, {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ title, topicCount }),
-                    })
-
-                    const result = await response.json()
-
-                    if (!response.ok) {
-                      throw new Error(result.error || "Failed to add chapter")
-                    }
-
-                    toast({
-                      id: `chapter-added-${Date.now()}`,
-                      title: "Chapter Added!",
-                      description: `Successfully added "${title}" with ${result.chapter?.slides?.length || 0} slides across ${topicCount} topics.`,
-                    })
-
-                    // Refresh the page to show the new chapter
-                    setTimeout(() => {
-                      window.location.reload()
-                    }, 1000)
-                  } catch (err: any) {
-                    toast({
-                      id: `chapter-error-${Date.now()}`,
-                      title: "Error",
-                      description: err.message || "Failed to add chapter",
-                      variant: "destructive",
-                    })
-                  }
-                }}
+                onClick={() => setIsAddChapterModalOpen(true)}
                 variant="outline"
                 size="sm"
                 className="border-foreground/20 text-white hover:bg-foreground/10"
@@ -697,6 +719,64 @@ function CourseDetailContent() {
         slide={selectedSlide}
         courseTitle={course?.title}
       />
+
+      {/* Add Chapter Dialog */}
+      <Dialog open={isAddChapterModalOpen} onOpenChange={setIsAddChapterModalOpen}>
+        <DialogContent className="glass-surface border-foreground/20 text-foreground sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-purple-400" />
+              Add AI Chapters
+            </DialogTitle>
+            <DialogDescription className="text-foreground/70">
+              Our AI will analyze the existing course content and intelligently generate continuation chapters.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="count" className="text-right">
+                Chapters
+              </Label>
+              <Input
+                id="count"
+                type="number"
+                min={1}
+                max={3}
+                value={newChapterCount}
+                onChange={(e) => setNewChapterCount(parseInt(e.target.value) || 1)}
+                className="col-span-3 glass-surface border-foreground/20 text-white"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-start gap-4">
+              <Label htmlFor="context" className="text-right mt-2">
+                Instructions
+              </Label>
+              <Textarea
+                id="context"
+                placeholder="What should the AI focus on next? (Optional)"
+                value={newChapterContext}
+                onChange={(e) => setNewChapterContext(e.target.value)}
+                className="col-span-3 glass-surface border-foreground/20 text-white min-h-[100px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddChapterModalOpen(false)} disabled={isGeneratingChapters}>
+              Cancel
+            </Button>
+            <Button onClick={handleGenerateChapters} disabled={isGeneratingChapters} className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 text-white">
+              {isGeneratingChapters ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                "Generate Chapters"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

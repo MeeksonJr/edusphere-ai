@@ -41,11 +41,36 @@ import { useSettings } from "@/contexts/settings-context";
 import { cn } from "@/lib/utils";
 
 
-export function DashboardSidebar({ mobileOpen, setMobileOpen }: { mobileOpen: boolean; setMobileOpen: (open: boolean) => void }) {
+export function DashboardSidebar({ 
+  mobileOpen, 
+  setMobileOpen,
+  collapsed,
+  setCollapsed
+}: { 
+  mobileOpen: boolean; 
+  setMobileOpen: (open: boolean) => void;
+  collapsed: boolean;
+  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const pathname = usePathname();
   const { settings } = useSettings();
-  const [collapsed, setCollapsed] = useState(false);
+  const { supabase } = useSupabase();
   const [isMobile, setIsMobile] = useState(false);
+  const [subscriptionTier, setSubscriptionTier] = useState<string>("free");
+
+  useEffect(() => {
+    const fetchPlan = async () => {
+      if (!supabase) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase.from('profiles').select('subscription_tier').eq('id', user.id).single();
+        if (data && data.subscription_tier) {
+          setSubscriptionTier(data.subscription_tier);
+        }
+      }
+    };
+    if (supabase) fetchPlan();
+  }, [supabase]);
 
   // Hydration fix
   useEffect(() => {
@@ -80,32 +105,73 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen }: { mobileOpen: bo
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isMobile, settings]);
 
-  const navItems = [
-    { name: "Dashboard", href: "/dashboard", icon: Home },
-    { name: "Courses", href: "/dashboard/courses", icon: Sparkles },
-    { name: "Assignments", href: "/dashboard/assignments", icon: CheckSquare },
-    { name: "AI Lab", href: "/dashboard/ai-lab", icon: Beaker },
-    { name: "AI Tutor", href: "/dashboard/ai-tutor", icon: Brain },
-    { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit },
-    { name: "Podcasts", href: "/dashboard/podcasts", icon: Mic },
-    { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
-    { name: "Study Resources", href: "/dashboard/resources", icon: BookOpen },
-    { name: "Notes", href: "/dashboard/notes", icon: StickyNote },
-    { name: "Skills", href: "/dashboard/skills", icon: Target },
-    { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-    { name: "Leaderboard", href: "/dashboard/leaderboard", icon: Trophy },
-    { name: "Certificates", href: "/dashboard/certificates", icon: Award },
-    { name: "Family Hub", href: "/dashboard/family", icon: Users },
-    { name: "Parent Portal", href: "/dashboard/parent", icon: Heart },
-    { name: "Teacher Portal", href: "/dashboard/teacher", icon: GraduationCap },
-    { name: "Join Classroom", href: "/dashboard/classrooms/join", icon: GraduationCap },
-    { name: "Study Groups", href: "/dashboard/groups", icon: Users },
-    { name: "Developer", href: "/dashboard/developer", icon: Code2 },
-    { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
-    { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
-    { name: "Profile", href: "/dashboard/profile", icon: User },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  // Need user plan maybe? Let's just group them into objects right now
+  const navGroups = [
+    {
+      title: "Learning",
+      items: [
+        { name: "Dashboard", href: "/dashboard", icon: Home },
+        { name: "Courses", href: "/dashboard/courses", icon: Sparkles },
+        { name: "Assignments", href: "/dashboard/assignments", icon: CheckSquare },
+        { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
+        { name: "Leaderboard", href: "/dashboard/leaderboard", icon: Trophy },
+      ]
+    },
+    {
+      title: "AI Tools",
+      items: [
+        { name: "AI Tutor", href: "/dashboard/ai-tutor", icon: Brain },
+        { name: "AI Lab", href: "/dashboard/ai-lab", icon: Beaker },
+        { name: "Flashcards", href: "/dashboard/flashcards", icon: BrainCircuit },
+        { name: "Podcasts", href: "/dashboard/podcasts", icon: Mic },
+      ]
+    },
+    {
+      title: "Resources & Social",
+      items: [
+        { name: "Study Resources", href: "/dashboard/resources", icon: BookOpen },
+        { name: "Notes", href: "/dashboard/notes", icon: StickyNote },
+        { name: "Study Groups", href: "/dashboard/groups", icon: Users },
+        { name: "Join Classroom", href: "/dashboard/classrooms/join", icon: GraduationCap },
+      ]
+    },
+    {
+      title: "Portals",
+      items: [
+        { name: "Teacher Portal", href: "/dashboard/teacher", icon: GraduationCap },
+        { name: "Parent Portal", href: "/dashboard/parent", icon: Heart, restricted: "family" },
+        { name: "Family Hub", href: "/dashboard/family", icon: Users, restricted: "family" },
+      ]
+    },
+    {
+      title: "Platform",
+      items: [
+        { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+        { name: "Skills", href: "/dashboard/skills", icon: Target },
+        { name: "Certificates", href: "/dashboard/certificates", icon: Award },
+        { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
+      ]
+    },
+    {
+      title: "Account",
+      items: [
+        { name: "Developer", href: "/dashboard/developer", icon: Code2 },
+        { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard },
+        { name: "Profile", href: "/dashboard/profile", icon: User },
+        { name: "Settings", href: "/dashboard/settings", icon: Settings },
+      ]
+    }
   ];
+
+  const filteredNavGroups = navGroups.map(group => ({
+    ...group,
+    items: group.items.filter(item => {
+      if (item.restricted === "family") {
+        return subscriptionTier === "family" || subscriptionTier === "pro";
+      }
+      return true;
+    })
+  })).filter(group => group.items.length > 0);
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
@@ -145,43 +211,52 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen }: { mobileOpen: bo
                 </Link>
               </div>
 
-              {/* Navigation Items */}
-              <nav className="flex-1 overflow-y-auto p-3 space-y-1.5 scrollbar-thin scrollbar-thumb-foreground/10" aria-label="Main navigation">
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  const active = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                        "flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative overflow-hidden",
-                        active
-                          ? "bg-cyan-500/10 text-cyan-500 font-medium"
-                          : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
-                      )}
-                      // Close mobile menu on click
-                      onClick={() => isMobile && setMobileOpen(false)}
-                    >
-                      {active && (
-                        <motion.div
-                          layoutId="active-nav"
-                          className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500 rounded-r-full"
-                        />
-                      )}
-                      <Icon
-                        className={cn(
-                          "h-5 w-5 flex-shrink-0 transition-colors",
-                          active ? "text-cyan-500" : "text-foreground/50 group-hover:text-foreground/80"
-                        )}
-                        aria-hidden="true"
-                      />
-                      {!collapsed && (
-                        <span className="text-sm flex-1">{item.name}</span>
-                      )}
-                    </Link>
-                  );
-                })}
+              <nav className="flex-1 overflow-y-auto p-3 space-y-4 scrollbar-thin scrollbar-thumb-foreground/10 pb-20" aria-label="Main navigation">
+                {filteredNavGroups.map((group, groupIdx) => (
+                  <div key={groupIdx} className="space-y-1">
+                    {!collapsed && (
+                      <h4 className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-foreground/40 mt-1">
+                        {group.title}
+                      </h4>
+                    )}
+                    {group.items.map((item) => {
+                      const Icon = item.icon;
+                      const active = isActive(item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={cn(
+                            "flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative overflow-hidden",
+                            active
+                              ? "bg-cyan-500/10 text-cyan-500 font-medium"
+                              : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
+                          )}
+                          // Close mobile menu on click
+                          onClick={() => isMobile && setMobileOpen(false)}
+                          title={collapsed ? item.name : undefined}
+                        >
+                          {active && (
+                            <motion.div
+                              layoutId="active-nav"
+                              className="absolute left-0 top-0 bottom-0 w-1 bg-cyan-500 rounded-r-full"
+                            />
+                          )}
+                          <Icon
+                            className={cn(
+                              "h-5 w-5 flex-shrink-0 transition-colors",
+                              active ? "text-cyan-500" : "text-foreground/50 group-hover:text-foreground/80"
+                            )}
+                            aria-hidden="true"
+                          />
+                          {!collapsed && (
+                            <span className="text-sm flex-1 truncate">{item.name}</span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ))}
               </nav>
 
               {/* Collapse Toggle (Desktop Only) */}

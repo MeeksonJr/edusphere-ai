@@ -12,16 +12,22 @@ import { AITutorWidget } from "@/components/dashboard/AITutorWidget"
 
 export function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
     const [mobileOpen, setMobileOpen] = useState(false)
+    const [collapsed, setCollapsed] = useState(false)
 
     return (
         <div className="min-h-screen bg-background text-foreground flex">
             <OnboardingModal />
 
             {/* Sidebar */}
-            <DashboardSidebar mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+            <DashboardSidebar 
+                mobileOpen={mobileOpen} 
+                setMobileOpen={setMobileOpen} 
+                collapsed={collapsed} 
+                setCollapsed={setCollapsed} 
+            />
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 md:pl-64 sidebar-collapsed:md:pl-16 relative">
+            <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 relative ${collapsed ? 'md:pl-16' : 'md:pl-64'}`}>
                 <DashboardNavbar onMenuClick={() => setMobileOpen(true)} />
                 <main id="main-content" className="flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-8">
                     {children}
