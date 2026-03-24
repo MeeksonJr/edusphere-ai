@@ -152,8 +152,8 @@ async function generateCaptionsGoogle(audioUrl: string): Promise<CaptionData> {
         let currentSegment: CaptionSegment | null = null
 
         alternative.words.forEach((word) => {
-          const start = word.startTime?.seconds || 0
-          const end = word.endTime?.seconds || 0
+          const start = Number(word.startTime?.seconds || 0)
+          const end = Number(word.endTime?.seconds || 0)
 
           if (!currentSegment || start - (currentSegment.end || 0) > 2) {
             // Start new segment
@@ -162,8 +162,8 @@ async function generateCaptionsGoogle(audioUrl: string): Promise<CaptionData> {
             }
             currentSegment = {
               id: segmentId++,
-              start,
-              end,
+              start: Number(start),
+              end: Number(end),
               text: word.word || "",
               words: [],
             }
@@ -171,11 +171,11 @@ async function generateCaptionsGoogle(audioUrl: string): Promise<CaptionData> {
             // Add to current segment
             if (currentSegment) {
               currentSegment.text += " " + (word.word || "")
-              currentSegment.end = end
+              currentSegment.end = Number(end)
               currentSegment.words?.push({
                 word: word.word || "",
-                start,
-                end,
+                start: Number(start),
+                end: Number(end),
               })
             }
           }

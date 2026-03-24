@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ valid: false, error: "Missing verification code" }, { status: 400 })
         }
 
-        const supabase = await createClient()
+        const supabase = await createClient() as any
 
         const { data: cert, error } = await supabase
             .from("certificates")

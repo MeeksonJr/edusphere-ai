@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const plan = requestUrl.searchParams.get("plan") || "free"
 
   if (code) {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     // Support both old anon key and new publishable key format
     const supabaseAnonKey =
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
           },
         },
       }
-    )
+    ) as any
 
     // Exchange the code for a session
     const { data: sessionData, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)

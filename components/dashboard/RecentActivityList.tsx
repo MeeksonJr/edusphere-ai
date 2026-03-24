@@ -10,9 +10,9 @@ async function getItemDetails(supabase: any, activity: any) {
 }
 
 export async function RecentActivityList({ userId }: { userId: string }) {
-    const supabase = createClient()
+    const supabase = await createClient()
 
-    const { data: activities } = await supabase
+    const { data: activities } = await (supabase as any)
         .from("course_analytics")
         .select("*")
         .eq("user_id", userId)
@@ -32,7 +32,7 @@ export async function RecentActivityList({ userId }: { userId: string }) {
     const enrichedActivities = await Promise.all(activities.map(async (activity: any) => {
         let title = "Unknown Course"
         if (activity.course_id) {
-            const { data } = await supabase.from("courses").select("title").eq("id", activity.course_id).single() as { data: any }
+            const { data } = await (supabase as any).from("courses").select("title").eq("id", activity.course_id).single() as { data: any }
             title = data?.title || "Unknown Course"
         }
         return { ...activity, courseTitle: title }

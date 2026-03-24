@@ -33,7 +33,7 @@ export function DashboardGrid({ userId, initialWidgets }: DashboardGridProps) {
     const loadLayout = async () => {
       if (!supabase) return;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("user_dashboard_preferences")
         .select("layout_config")
         .eq("user_id", userId)
@@ -88,7 +88,7 @@ export function DashboardGrid({ userId, initialWidgets }: DashboardGridProps) {
       sidebar: newColumns["col-sidebar"].map(w => w.id)
     }
 
-    await supabase.from("user_dashboard_preferences").upsert({
+    await (supabase as any).from("user_dashboard_preferences").upsert({
       user_id: userId,
       layout_config
     })

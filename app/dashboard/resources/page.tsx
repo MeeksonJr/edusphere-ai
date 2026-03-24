@@ -114,7 +114,7 @@ export default function ResourcesPage() {
   const fetchResources = async () => {
     try {
       setLoading(true)
-      let query = supabase.from("study_resources").select("*").eq("user_id", user.id)
+      let query = supabase!.from("study_resources").select("*").eq("user_id", user.id)
 
       if (subjectFilter !== "all") {
         query = query.eq("subject", subjectFilter)
@@ -194,7 +194,7 @@ export default function ResourcesPage() {
         }
       }
 
-      const { data, error } = await supabase.from("study_resources").insert([
+      const { data, error } = await supabase!.from("study_resources").insert([
         {
           user_id: user.id,
           title: newResource.title,
@@ -290,7 +290,7 @@ export default function ResourcesPage() {
 
   const handleDeleteResource = async (id: string) => {
     try {
-      const { error } = await supabase.from("study_resources").delete().eq("id", id)
+      const { error } = await supabase!.from("study_resources").delete().eq("id", id)
 
       if (error) throw error
 

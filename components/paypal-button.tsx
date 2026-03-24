@@ -74,7 +74,7 @@ export function PayPalButton({ planId, tier, onSuccess, onError }: PayPalButtonP
         const {
           data: { user },
           error: userError,
-        } = await supabase.auth.getUser()
+        } = await supabase!.auth.getUser()
 
         if (userError || !user) {
           throw new Error("User not authenticated")

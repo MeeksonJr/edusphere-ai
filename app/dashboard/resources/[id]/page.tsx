@@ -78,7 +78,7 @@ export default function ResourceDetailPage() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser()
+      const { data } = await supabase!.auth.getUser()
       if (data.user) {
         const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
         setUser({ ...data.user, profile })
@@ -97,7 +97,7 @@ export default function ResourceDetailPage() {
   const fetchResource = async () => {
     try {
       setLoading(true)
-      const { data, error } = await supabase.from("study_resources").select("*").eq("id", params.id).single()
+      const { data, error } = await supabase!.from("study_resources").select("*").eq("id", params.id as string).single()
 
       if (error) throw error
 
@@ -135,7 +135,7 @@ export default function ResourceDetailPage() {
         return
       }
 
-      const { error } = await supabase
+      const { error } = await supabase!
         .from("study_resources")
         .update({
           title: editedResource.title,
@@ -146,7 +146,7 @@ export default function ResourceDetailPage() {
           tags: editedResource.tags,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", params.id)
+        .eq("id", params.id as string)
 
       if (error) throw error
 
@@ -177,7 +177,7 @@ export default function ResourceDetailPage() {
     try {
       setSaving(true)
 
-      const { error } = await supabase.from("study_resources").delete().eq("id", params.id)
+      const { error } = await supabase!.from("study_resources").delete().eq("id", params.id as string)
 
       if (error) throw error
 
@@ -267,7 +267,6 @@ ${resource.content}
         resource.subject,
         resource.title,
         resourceTypeLabel,
-        huggingFaceModel,
       )
 
       // Update the resource with enhanced content
