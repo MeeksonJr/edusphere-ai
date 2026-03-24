@@ -30,6 +30,7 @@ import {
   CreditCard,
   GraduationCap,
   Heart,
+  Trophy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/components/supabase-provider";
@@ -92,6 +93,7 @@ export function DashboardSidebar({ mobileOpen, setMobileOpen }: { mobileOpen: bo
     { name: "Notes", href: "/dashboard/notes", icon: StickyNote },
     { name: "Skills", href: "/dashboard/skills", icon: Target },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+    { name: "Leaderboard", href: "/dashboard/leaderboard", icon: Trophy },
     { name: "Certificates", href: "/dashboard/certificates", icon: Award },
     { name: "Family Hub", href: "/dashboard/family", icon: Users },
     { name: "Parent Portal", href: "/dashboard/parent", icon: Heart },

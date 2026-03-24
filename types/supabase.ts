@@ -727,6 +727,51 @@ export type Database = {
           },
         ]
       }
+      classroom_announcements: {
+        Row: {
+          classroom_id: string
+          content: string | null
+          created_at: string
+          id: string
+          is_pinned: boolean | null
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          classroom_id: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_pinned?: boolean | null
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          classroom_id?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_pinned?: boolean | null
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_announcements_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classroom_announcements_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classroom_assignments: {
         Row: {
           assignment_type: string | null

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   ArrowLeft, Users, Copy, TrendingUp, Flame, BookOpen, 
-  UserMinus, GraduationCap, Loader2, ClipboardList, BarChart3
+  UserMinus, GraduationCap, Loader2, ClipboardList, BarChart3, Megaphone
 } from "lucide-react"
 import { useSupabase } from "@/components/supabase-provider"
 import { GlassSurface } from "@/components/shared/GlassSurface"
@@ -184,7 +184,7 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ id: 
 
       {/* Quick Actions */}
       <ScrollReveal direction="up" delay={0.07}>
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-4 mb-8">
           <Link href={`/dashboard/teacher/classrooms/${id}/assignments`}>
             <GlassSurface className="p-4 text-center hover:border-violet-500/20 transition-all cursor-pointer">
               <ClipboardList className="h-6 w-6 text-violet-400 mx-auto mb-2" />
@@ -197,6 +197,13 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ id: 
               <BarChart3 className="h-6 w-6 text-fuchsia-400 mx-auto mb-2" />
               <p className="font-semibold text-foreground text-sm">Gradebook</p>
               <p className="text-xs text-foreground/50">View all grades</p>
+            </GlassSurface>
+          </Link>
+          <Link href={`/dashboard/teacher/classrooms/${id}/announcements`}>
+            <GlassSurface className="p-4 text-center hover:border-amber-500/20 transition-all cursor-pointer">
+              <Megaphone className="h-6 w-6 text-amber-400 mx-auto mb-2" />
+              <p className="font-semibold text-foreground text-sm">Announcements</p>
+              <p className="text-xs text-foreground/50">Post updates</p>
             </GlassSurface>
           </Link>
         </div>
