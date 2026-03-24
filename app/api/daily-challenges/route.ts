@@ -5,14 +5,14 @@ import { awardXP } from "@/lib/gamification"
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
-// Define possible daily challenge pools
+// Define possible daily challenge pools (Must match daily_challenges_challenge_type_check constraint)
 const CHALLENGE_POOL = [
     { type: "flashcard_review", title: "Review 20 Flashcards", target: 20, xp: 30, desc: "Test your memory with flashcards." },
-    { type: "pomodoro_session", title: "Complete 2 Focus Sessions", target: 2, xp: 30, desc: "Stay focused with Pomodoro." },
-    { type: "note_taking", title: "Write 3 Study Notes", target: 3, xp: 30, desc: "Summarize your learnings." },
-    { type: "quiz_attempt", title: "Attempt a Quiz", target: 1, xp: 30, desc: "Check your understanding." },
-    { type: "add_bookmarks", title: "Save 3 Bookmarks", target: 3, xp: 30, desc: "Gather useful resources." },
-    { type: "daily_login", title: "Log in today", target: 1, xp: 10, desc: "Consistency is key." },
+    { type: "study_time", title: "Complete 2 Focus Sessions", target: 2, xp: 30, desc: "Stay focused with Pomodoro." },
+    { type: "note_create", title: "Write 3 Study Notes", target: 3, xp: 30, desc: "Summarize your learnings." },
+    { type: "quiz_complete", title: "Complete a Quiz", target: 1, xp: 30, desc: "Check your understanding." },
+    { type: "resource_add", title: "Save 3 Bookmarks", target: 3, xp: 30, desc: "Gather useful resources." },
+    { type: "course_progress", title: "Complete 1 Course Chapter", target: 1, xp: 10, desc: "Consistency is key." },
 ]
 
 /**

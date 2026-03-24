@@ -49,13 +49,12 @@ export async function POST(
     let newChapters: any[] = []
 
     try {
-      const aiResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "https://localhost:3000"}/api/ai`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "generateAIResponse",
-          provider: "gemini",
-          prompt: `You are an expert course content creator. Generate ${validCount} NEW chapters for the course "${course.title}".
+      // Import AI wrapper dynamically or at top-level
+      const { generateAIResponse } = await import("@/lib/ai-service-wrapper")
+
+      const result = await generateAIResponse({
+        provider: "gemini",
+        prompt: `You are an expert course content creator. Generate ${validCount} NEW chapters for the course "${course.title}".
 
 Existing Chapters so far:
 ${previousChaptersSummary || "None (this is the start of the course)"}
@@ -92,17 +91,15 @@ Return a JSON array of chapter objects with this structure (no markdown fences, 
   }
 ]
 `,
-          systemPrompt: "You are an expert course AI. Generate structured JSON arrays of chapters containing real educational content. Output strictly JSON.",
-          maxTokens: 5000,
-        }),
+        systemPrompt: "You are an expert course AI. Generate structured JSON arrays of chapters containing real educational content. Output strictly JSON.",
+        maxTokens: 5000,
       })
 
-      const result = await aiResponse.json()
-      if (!aiResponse.ok || !result.success) {
-        throw new Error(result.error || "AI generation failed")
+      if (!result || !result.text) {
+        throw new Error("AI generation failed or returned empty")
       }
 
-      const jsonStr = result.data?.text?.match(/\[[\s\S]*\]/)?.[0] || "[]"
+      const jsonStr = result.text.match(/\[[\s\S]*\]/)?.[0] || "[]"
       newChapters = JSON.parse(jsonStr)
 
       // Validate chapters
