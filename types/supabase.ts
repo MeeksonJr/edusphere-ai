@@ -80,6 +80,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_tutor_chats: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          message_role: string
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          message_role: string
+          session_id: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          message_role?: string
+          session_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           created_at: string | null
@@ -696,6 +723,74 @@ export type Database = {
             columns: ["institution_id"]
             isOneToOne: false
             referencedRelation: "institutions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classroom_students: {
+        Row: {
+          classroom_id: string
+          joined_at: string
+          student_id: string
+        }
+        Insert: {
+          classroom_id: string
+          joined_at?: string
+          student_id: string
+        }
+        Update: {
+          classroom_id?: string
+          joined_at?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_students_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classroom_students_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classrooms: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          invite_code: string
+          name: string
+          teacher_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          invite_code: string
+          name: string
+          teacher_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          invite_code?: string
+          name?: string
+          teacher_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classrooms_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1822,6 +1917,45 @@ export type Database = {
         }
         Relationships: []
       }
+      parent_student_links: {
+        Row: {
+          created_at: string
+          id: string
+          parent_id: string
+          status: string | null
+          student_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          parent_id: string
+          status?: string | null
+          student_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          parent_id?: string
+          status?: string | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_student_links_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_student_links_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       podcasts: {
         Row: {
           audio_url: string | null
@@ -1872,6 +2006,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_type: string | null
           ai_requests_count: number | null
           avatar_url: string | null
           bio: string | null
@@ -1883,6 +2018,7 @@ export type Database = {
           institution_id: string | null
           institution_role: string | null
           is_developer: boolean | null
+          is_public: boolean | null
           last_active_at: string | null
           learning_goals: string[] | null
           level: number | null
@@ -1903,6 +2039,7 @@ export type Database = {
           xp: number | null
         }
         Insert: {
+          account_type?: string | null
           ai_requests_count?: number | null
           avatar_url?: string | null
           bio?: string | null
@@ -1914,6 +2051,7 @@ export type Database = {
           institution_id?: string | null
           institution_role?: string | null
           is_developer?: boolean | null
+          is_public?: boolean | null
           last_active_at?: string | null
           learning_goals?: string[] | null
           level?: number | null
@@ -1934,6 +2072,7 @@ export type Database = {
           xp?: number | null
         }
         Update: {
+          account_type?: string | null
           ai_requests_count?: number | null
           avatar_url?: string | null
           bio?: string | null
@@ -1945,6 +2084,7 @@ export type Database = {
           institution_id?: string | null
           institution_role?: string | null
           is_developer?: boolean | null
+          is_public?: boolean | null
           last_active_at?: string | null
           learning_goals?: string[] | null
           level?: number | null
@@ -2444,54 +2584,6 @@ export type Database = {
           },
         ]
       }
-      learning_analytics: {
-        Row: {
-          created_at: string
-          id: string
-          last_studied: string
-          mastery_score: number
-          time_spent_minutes: number
-          topic: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          last_studied?: string
-          mastery_score?: number
-          time_spent_minutes?: number
-          topic: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          last_studied?: string
-          mastery_score?: number
-          time_spent_minutes?: number
-          topic?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_dashboard_preferences: {
-        Row: {
-          layout_config: Json
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          layout_config?: Json
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          layout_config?: Json
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       user_streaks: {
         Row: {
           activities_today: Json | null
@@ -2578,7 +2670,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      join_classroom_by_code: {
+        Args: { p_invite_code: string; p_student_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
@@ -2711,3 +2806,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+
