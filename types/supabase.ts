@@ -727,6 +727,63 @@ export type Database = {
           },
         ]
       }
+      classroom_assignments: {
+        Row: {
+          assignment_type: string | null
+          classroom_id: string
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          is_published: boolean | null
+          max_points: number | null
+          teacher_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assignment_type?: string | null
+          classroom_id: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_published?: boolean | null
+          max_points?: number | null
+          teacher_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assignment_type?: string | null
+          classroom_id?: string
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          is_published?: boolean | null
+          max_points?: number | null
+          teacher_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_assignments_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classroom_assignments_teacher_id_fkey"
+            columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classroom_students: {
         Row: {
           classroom_id: string
@@ -753,6 +810,60 @@ export type Database = {
           },
           {
             foreignKeyName: "classroom_students_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classroom_submissions: {
+        Row: {
+          assignment_id: string
+          content: string | null
+          feedback: string | null
+          file_url: string | null
+          grade: number | null
+          graded_at: string | null
+          id: string
+          status: string | null
+          student_id: string
+          submitted_at: string
+        }
+        Insert: {
+          assignment_id: string
+          content?: string | null
+          feedback?: string | null
+          file_url?: string | null
+          grade?: number | null
+          graded_at?: string | null
+          id?: string
+          status?: string | null
+          student_id: string
+          submitted_at?: string
+        }
+        Update: {
+          assignment_id?: string
+          content?: string | null
+          feedback?: string | null
+          file_url?: string | null
+          grade?: number | null
+          graded_at?: string | null
+          id?: string
+          status?: string | null
+          student_id?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_submissions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "classroom_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classroom_submissions_student_id_fkey"
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"

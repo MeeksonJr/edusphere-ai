@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   ArrowLeft, Users, Copy, TrendingUp, Flame, BookOpen, 
-  UserMinus, GraduationCap, Loader2
+  UserMinus, GraduationCap, Loader2, ClipboardList, BarChart3
 } from "lucide-react"
 import { useSupabase } from "@/components/supabase-provider"
 import { GlassSurface } from "@/components/shared/GlassSurface"
@@ -179,6 +179,26 @@ export default function ClassroomDetailPage({ params }: { params: Promise<{ id: 
             <p className="text-2xl font-bold text-foreground">{avgStreak}</p>
             <p className="text-xs text-foreground/50">Avg Streak</p>
           </GlassSurface>
+        </div>
+      </ScrollReveal>
+
+      {/* Quick Actions */}
+      <ScrollReveal direction="up" delay={0.07}>
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <Link href={`/dashboard/teacher/classrooms/${id}/assignments`}>
+            <GlassSurface className="p-4 text-center hover:border-violet-500/20 transition-all cursor-pointer">
+              <ClipboardList className="h-6 w-6 text-violet-400 mx-auto mb-2" />
+              <p className="font-semibold text-foreground text-sm">Assignments</p>
+              <p className="text-xs text-foreground/50">Create & manage</p>
+            </GlassSurface>
+          </Link>
+          <Link href={`/dashboard/teacher/classrooms/${id}/gradebook`}>
+            <GlassSurface className="p-4 text-center hover:border-fuchsia-500/20 transition-all cursor-pointer">
+              <BarChart3 className="h-6 w-6 text-fuchsia-400 mx-auto mb-2" />
+              <p className="font-semibold text-foreground text-sm">Gradebook</p>
+              <p className="text-xs text-foreground/50">View all grades</p>
+            </GlassSurface>
+          </Link>
         </div>
       </ScrollReveal>
 
