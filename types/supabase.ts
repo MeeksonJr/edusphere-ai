@@ -829,6 +829,51 @@ export type Database = {
           },
         ]
       }
+      classroom_discussions: {
+        Row: {
+          author_id: string
+          classroom_id: string
+          content: string | null
+          created_at: string
+          id: string
+          is_pinned: boolean | null
+          title: string
+        }
+        Insert: {
+          author_id: string
+          classroom_id: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_pinned?: boolean | null
+          title: string
+        }
+        Update: {
+          author_id?: string
+          classroom_id?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_pinned?: boolean | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "classroom_discussions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "classroom_discussions_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       classroom_students: {
         Row: {
           classroom_id: string
@@ -1450,6 +1495,45 @@ export type Database = {
           xp_reward?: number
         }
         Relationships: []
+      }
+      discussion_replies: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          discussion_id: string
+          id: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          discussion_id: string
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          discussion_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_replies_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discussion_replies_discussion_id_fkey"
+            columns: ["discussion_id"]
+            isOneToOne: false
+            referencedRelation: "classroom_discussions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       flashcard_sets: {
         Row: {
