@@ -124,9 +124,23 @@ export default function AssignmentSubmissionsPage({ params }: { params: Promise<
         <h1 className="text-2xl font-bold mb-1">
           <span className="bg-gradient-to-r from-violet-400 to-purple-400 text-transparent bg-clip-text">{assignment?.title}</span>
         </h1>
-        <p className="text-foreground/50 text-sm mb-6">
+        <p className="text-foreground/50 text-sm mb-4">
           {assignment?.max_points} pts · {assignment?.assignment_type} · {submissions.length} submission{submissions.length !== 1 ? "s" : ""}
         </p>
+        {assignment?.assignment_type === "quiz" && (
+          <div className="flex gap-2 mb-6">
+            <Link href={`/dashboard/teacher/classrooms/${classroomId}/assignments/${assignmentId}/quiz-builder`}>
+              <Button size="sm" variant="outline" className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">
+                Quiz Builder
+              </Button>
+            </Link>
+            <Link href={`/dashboard/teacher/classrooms/${classroomId}/assignments/${assignmentId}/quiz-results`}>
+              <Button size="sm" variant="outline" className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10">
+                Quiz Results
+              </Button>
+            </Link>
+          </div>
+        )}
       </ScrollReveal>
 
       {submissions.length === 0 ? (

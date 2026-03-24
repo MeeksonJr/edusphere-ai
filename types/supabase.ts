@@ -2354,6 +2354,92 @@ export type Database = {
           },
         ]
       }
+      quiz_questions: {
+        Row: {
+          assignment_id: string
+          correct_answer: string
+          created_at: string
+          id: string
+          options: Json | null
+          order_num: number | null
+          points: number | null
+          question_text: string
+          question_type: string | null
+        }
+        Insert: {
+          assignment_id: string
+          correct_answer: string
+          created_at?: string
+          id?: string
+          options?: Json | null
+          order_num?: number | null
+          points?: number | null
+          question_text: string
+          question_type?: string | null
+        }
+        Update: {
+          assignment_id?: string
+          correct_answer?: string
+          created_at?: string
+          id?: string
+          options?: Json | null
+          order_num?: number | null
+          points?: number | null
+          question_text?: string
+          question_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_questions_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "classroom_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_responses: {
+        Row: {
+          id: string
+          is_correct: boolean | null
+          points_earned: number | null
+          question_id: string
+          student_answer: string | null
+          submission_id: string
+        }
+        Insert: {
+          id?: string
+          is_correct?: boolean | null
+          points_earned?: number | null
+          question_id: string
+          student_answer?: string | null
+          submission_id: string
+        }
+        Update: {
+          id?: string
+          is_correct?: boolean | null
+          points_earned?: number | null
+          question_id?: string
+          student_answer?: string | null
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_responses_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_responses_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "classroom_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       render_jobs: {
         Row: {
           completed_at: string | null
