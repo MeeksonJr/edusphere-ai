@@ -4,7 +4,7 @@ import { generateTTS } from "@/lib/tts-service"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
-export const maxDuration = 300 // 5 min — needs time for all slides
+export const maxDuration = 60 // Vercel hobby plan max
 
 // Get a supabase client — tries service role first (bypasses RLS), falls back to anon
 function getSupabaseAdmin() {
