@@ -52,16 +52,22 @@ export async function generateTTS(options: TTSOptions): Promise<TTSResult> {
   type ProviderAttempt = { name: TTSProvider; fn: () => Promise<TTSResult> }
   const providers: ProviderAttempt[] = []
 
-  const tryElevenLabs = (): Promise<TTSResult> =>
-    generateElevenLabsTTS({
+  const tryElevenLabs = (): Promise<TTSResult> => {
+    // Edge-TTS voices (e.g., 'en-US-AriaNeural') are invalid for ElevenLabs.
+    // If the provided voice looks like an Edge TTS voice, fallback to undefined
+    // so it uses the DEFAULT_VOICE_ID inside ElevenLabs wrapper.
+    const isEdgeVoice = voice && (voice.includes("-") || voice.includes("Neural"));
+    
+    return generateElevenLabsTTS({
       text,
-      voiceId: voice,
+      voiceId: isEdgeVoice ? undefined : voice,
     }).then((result) => ({
       buffer: result.buffer,
       duration: estimatedDuration,
       format: "mp3" as const,
       provider: "elevenlabs" as TTSProvider,
     }))
+  }
 
   const tryEdgeTTS = (): Promise<TTSResult> =>
     generateEdgeTTS({
