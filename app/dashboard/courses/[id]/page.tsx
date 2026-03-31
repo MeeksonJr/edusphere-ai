@@ -26,6 +26,9 @@ import {
   ChevronUp,
   Sparkles,
   Zap,
+  Volume2,
+  VolumeX,
+  Music,
 } from "lucide-react"
 import Link from "next/link"
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner"
@@ -156,12 +159,17 @@ function CourseDetailContent() {
 
     fetchCourse()
 
-    // Poll for updates if course is pending or processing mapping slides directly
+    // Poll for updates if course is pending/processing OR if audio is still generating
     const pollInterval = setInterval(async () => {
       try {
         const updatedCourse = await fetchCourse(true)
-        if (updatedCourse && (updatedCourse.status === "completed" || updatedCourse.status === "failed")) {
-          clearInterval(pollInterval)
+        if (updatedCourse) {
+          const courseDone = updatedCourse.status === "completed" || updatedCourse.status === "failed"
+          const audioDone = updatedCourse.audio_status === "completed" || updatedCourse.audio_status === "failed"
+          // Stop polling only when BOTH course layout AND audio are done
+          if (courseDone && audioDone) {
+            clearInterval(pollInterval)
+          }
         }
       } catch (err) {
         console.error("Polling error:", err)
@@ -479,7 +487,7 @@ function CourseDetailContent() {
           </Link>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
                 {getStatusBadge(course.status)}
                 <Badge variant="outline" className="border-foreground/20 text-foreground/70">
                   {course.type?.replace("-", " ")}
@@ -488,6 +496,30 @@ function CourseDetailContent() {
                   <Badge variant="outline" className="border-foreground/20 text-foreground/70">
                     {course.style}
                   </Badge>
+                )}
+                {/* Audio Status Badge */}
+                {course.status === "completed" && (
+                  course.audio_status === "completed" ? (
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 flex items-center gap-1">
+                      <Volume2 className="h-3 w-3" />
+                      Audio Ready
+                    </Badge>
+                  ) : course.audio_status === "processing" ? (
+                    <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 flex items-center gap-1">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Generating Audio...
+                    </Badge>
+                  ) : course.audio_status === "failed" ? (
+                    <Badge className="bg-red-500/20 text-red-400 border-red-500/30 flex items-center gap-1">
+                      <VolumeX className="h-3 w-3" />
+                      Audio Failed
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 flex items-center gap-1">
+                      <Music className="h-3 w-3 animate-pulse" />
+                      Audio Queued
+                    </Badge>
+                  )
                 )}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground">

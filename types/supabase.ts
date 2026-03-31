@@ -1371,6 +1371,7 @@ export type Database = {
           final_video_url: string | null
           id: string
           layout: Json
+          audio_status: string | null
           status: string | null
           style: string | null
           thumbnail_url: string | null
@@ -1385,6 +1386,7 @@ export type Database = {
           final_video_url?: string | null
           id?: string
           layout?: Json
+          audio_status?: string | null
           status?: string | null
           style?: string | null
           thumbnail_url?: string | null
@@ -1399,6 +1401,7 @@ export type Database = {
           final_video_url?: string | null
           id?: string
           layout?: Json
+          audio_status?: string | null
           status?: string | null
           style?: string | null
           thumbnail_url?: string | null

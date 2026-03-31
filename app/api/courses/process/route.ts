@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { generateAIResponse } from "@/lib/ai-service-wrapper"
 import { generateSlideQuestions } from "@/lib/question-service"
+import { createClient as createServiceClient } from "@supabase/supabase-js"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -36,6 +37,7 @@ interface CourseLayout {
  * This handles AI generation asynchronously to avoid timeouts
  */
 export async function POST(request: NextRequest) {
+  const requestUrl = new URL(request.url)
   let body: any = {}
   try {
     console.log("Process route called - starting course generation")
@@ -263,7 +265,7 @@ Return the JSON in this exact format:
       .from("courses")
       .update({
         title: layoutJson.title,
-        layout: layoutJson,
+        layout: layoutJson as any,
         estimated_duration: totalDuration,
         status: "completed",
       })
@@ -282,6 +284,61 @@ Return the JSON in this exact format:
     }
 
     console.log("Course updated successfully, status set to completed")
+
+    // --- Stage 2: Persist slide metadata into course_slides table ---
+    // This is fast (~1-2s, no external APIs) and must run before generate-audio
+    try {
+      const serviceSupabase = createServiceClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY! || process.env.SUPABASE_SECRET_KEY!
+      )
+      const slideRows: any[] = []
+      let slideOrder = 0
+      for (const chapter of layoutJson.chapters) {
+        for (const slide of chapter.slides || []) {
+          slideRows.push({
+            course_id: courseId,
+            chapter_id: chapter.chapterId,
+            slide_id: slide.slideId,
+            slide_type: slide.type,
+            content: slide.content,
+            template_data: {
+              type: slide.type,
+              content: slide.content,
+              style: layoutJson.style || "professional",
+            },
+            order_index: slideOrder++,
+          })
+        }
+      }
+      if (slideRows.length > 0) {
+        const { error: slideError } = await serviceSupabase
+          .from("course_slides")
+          .upsert(slideRows, { onConflict: "slide_id", ignoreDuplicates: false })
+        if (slideError) {
+          console.error("processSlides error:", slideError.message)
+        } else {
+          console.log(`Inserted ${slideRows.length} slide rows for course ${courseId}`)
+        }
+      }
+    } catch (slideErr: any) {
+      console.error("Non-fatal: slide persistence failed:", slideErr.message)
+      // Don't fail the request — course layout is already saved
+    }
+
+    // --- Stage 3: Fire generate-audio as background task (non-blocking) ---
+    // Don't await — the client already received success and is polling
+    fetch(`${requestUrl.origin}/api/courses/${courseId}/generate-audio`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: request.headers.get("Cookie") || "",
+        Authorization: request.headers.get("Authorization") || "",
+      },
+      body: JSON.stringify({ courseId }),
+    }).catch((err) => {
+      console.error("generate-audio trigger error:", err.message)
+    })
 
     // Generate questions for each slide (background task - don't await)
     generateQuestionsForCourse(supabase, courseId, layoutJson).catch((error) => {
