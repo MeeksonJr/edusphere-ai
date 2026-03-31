@@ -46,7 +46,7 @@ const RemotionPlayer = dynamic(
       return ({ inputProps, ...props }: any) => {
         const { Player } = mod
         const { CourseVideo } = require("@/remotion/components/CourseVideo")
-        return <Player component={CourseVideo} inputProps={inputProps} {...props} />
+        return <Player acknowledgeRemotionLicense component={CourseVideo} inputProps={inputProps} {...props} />
       }
     }),
   {
@@ -238,6 +238,48 @@ function CourseDetailContent() {
 
     fetchAdditionalData()
   }, [supabase, params.id, course])
+
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false)
+
+  const generateAudio = async () => {
+    if (!params.id || isGeneratingAudio) return
+    
+    setIsGeneratingAudio(true)
+    try {
+      toast({
+        id: `audio-start-${Date.now()}`,
+        title: "Starting Audio Generation",
+        description: "Voiceover generation has been initiated.",
+      })
+      
+      const response = await fetch(`/api/courses/${params.id}/generate-audio`, {
+        method: "POST"
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate audio")
+      }
+      
+      toast({
+        id: `audio-success-${Date.now()}`,
+        title: "Generation Triggered",
+        description: `Successfully processed ${data.slidesProcessed} slides.`,
+      })
+      
+      // The polling in the useEffect will pick up the new audio_status!
+    } catch (err: any) {
+      toast({
+        id: `audio-error-${Date.now()}`,
+        title: "Audio Generation Error",
+        description: err.message,
+        variant: "destructive",
+      })
+    } finally {
+      setIsGeneratingAudio(false)
+    }
+  }
 
   const toggleSection = (sectionId: string) => {
     setExpandedSections((prev) => ({
@@ -500,25 +542,25 @@ function CourseDetailContent() {
                 {/* Audio Status Badge */}
                 {course.status === "completed" && (
                   course.audio_status === "completed" ? (
-                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 flex items-center gap-1">
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 flex items-center gap-1 cursor-default">
                       <Volume2 className="h-3 w-3" />
                       Audio Ready
                     </Badge>
-                  ) : course.audio_status === "processing" ? (
-                    <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 flex items-center gap-1">
+                  ) : course.audio_status === "processing" || isGeneratingAudio ? (
+                    <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 flex items-center gap-1 cursor-wait">
                       <Loader2 className="h-3 w-3 animate-spin" />
                       Generating Audio...
                     </Badge>
                   ) : course.audio_status === "failed" ? (
-                    <Badge className="bg-red-500/20 text-red-400 border-red-500/30 flex items-center gap-1">
+                    <button onClick={generateAudio} disabled={isGeneratingAudio} className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30 gap-1 cursor-pointer">
                       <VolumeX className="h-3 w-3" />
-                      Audio Failed
-                    </Badge>
+                      Audio Failed - Click to Retry
+                    </button>
                   ) : (
-                    <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 flex items-center gap-1">
+                    <button onClick={generateAudio} disabled={isGeneratingAudio} className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-amber-500/20 text-amber-400 border-amber-500/30 hover:bg-amber-500/30 gap-1 cursor-pointer">
                       <Music className="h-3 w-3 animate-pulse" />
-                      Audio Queued
-                    </Badge>
+                      Audio Queued - Click to Generate
+                    </button>
                   )
                 )}
               </div>

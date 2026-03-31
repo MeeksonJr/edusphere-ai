@@ -23,7 +23,7 @@ const RemotionPlayer = dynamic(
       return ({ inputProps, ...props }: any) => {
         const { Player } = mod
         const { CourseVideo } = require("@/remotion/components/CourseVideo")
-        return <Player component={CourseVideo} inputProps={inputProps} {...props} />
+        return <Player acknowledgeRemotionLicense component={CourseVideo} inputProps={inputProps} {...props} />
       }
     }),
   {
