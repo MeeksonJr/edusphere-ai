@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server"
 import { generateAIResponse } from "@/lib/ai-service-wrapper"
 import { generateSlideQuestions } from "@/lib/question-service"
 import { createClient as createServiceClient } from "@supabase/supabase-js"
+import crypto from "crypto"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -246,19 +247,21 @@ Return the JSON in this exact format:
       )
     }
 
-    // Calculate total duration
-    const totalDuration = layoutJson.chapters.reduce((total, chapter) => {
-      return (
-        total +
-        (chapter.slides?.reduce((chapterTotal, slide) => {
-          return chapterTotal + (slide.estimatedDuration || 30)
-        }, 0) || 0)
-      )
-    }, 0)
+    // Calculate total duration and enforce valid UUIDs for postgres insertion
+    let totalDuration = 0
+    for (const chapter of layoutJson.chapters) {
+      chapter.chapterId = crypto.randomUUID()
+      let chapterTotal = 0
+      for (const slide of chapter.slides || []) {
+        slide.slideId = crypto.randomUUID()
+        chapterTotal += (slide.estimatedDuration || 30)
+      }
+      totalDuration += chapterTotal
+    }
 
     layoutJson.estimatedDuration = totalDuration
 
-    console.log("Updating course with layout, duration:", totalDuration)
+    console.log("Updating course with valid layout UUIDs, duration:", totalDuration)
 
     // Update course with generated layout
     const { error: updateError } = await supabase
