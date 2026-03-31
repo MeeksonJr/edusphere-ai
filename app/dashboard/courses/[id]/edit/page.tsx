@@ -55,7 +55,7 @@ function CourseEditContent() {
         const { data, error: fetchError } = await supabase
           .from("courses")
           .select("*")
-          .eq("id", params.id)
+          .eq("id", params.id as string)
           .single()
 
         if (fetchError) throw fetchError

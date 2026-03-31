@@ -178,11 +178,11 @@ export default function NewAssignmentPage() {
     try {
       const {
         data: { user },
-      } = await supabase.auth.getUser()
+      } = await supabase!.auth.getUser()
 
       if (!user) throw new Error("You must be logged in")
 
-      const { error: insertError } = await supabase.from("assignments").insert([
+      const { error: insertError } = await supabase!.from("assignments").insert([
         {
           user_id: user.id,
           title: formData.title,
