@@ -179,6 +179,8 @@ export default function PodcastDetailPage() {
                         title={podcast.title}
                         duration={podcast.duration}
                         script={podcast.script}
+                        coverImageUrl={podcast.cover_image_url}
+                        backgroundMusic={podcast.background_music}
                         className="mb-6"
                     />
 

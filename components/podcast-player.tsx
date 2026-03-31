@@ -8,6 +8,8 @@ interface PodcastPlayerProps {
     title: string
     duration?: number
     script?: string
+    coverImageUrl?: string
+    backgroundMusic?: string
     className?: string
 }
 
@@ -23,9 +25,12 @@ export function PodcastPlayer({
     title,
     duration: estimatedDuration,
     script,
+    coverImageUrl,
+    backgroundMusic = "none",
     className = "",
 }: PodcastPlayerProps) {
     const audioRef = useRef<HTMLAudioElement>(null)
+    const bgAudioRef = useRef<HTMLAudioElement>(null)
     const [isPlaying, setIsPlaying] = useState(false)
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(estimatedDuration || 0)
@@ -33,6 +38,15 @@ export function PodcastPlayer({
     const [isMuted, setIsMuted] = useState(false)
     const [playbackRate, setPlaybackRate] = useState(1)
     const [showTranscript, setShowTranscript] = useState(false)
+
+    // Map background music styles to known royalty-free tracks for demo purposes
+    const bgMusicMap: Record<string, string> = {
+        ambient: "https://cdn.pixabay.com/download/audio/2022/02/07/audio_6772740261.mp3",
+        lofi: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf7f6.mp3",
+        jazz: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3",
+        upbeat: "https://cdn.pixabay.com/download/audio/2021/08/04/audio_33bc4eab13.mp3"
+    }
+    const bgMusicUrl = bgMusicMap[backgroundMusic] || ""
 
     useEffect(() => {
         const audio = audioRef.current
@@ -44,6 +58,12 @@ export function PodcastPlayer({
                 setDuration(audio.duration)
             }
         }
+        
+        const bgAudio = bgAudioRef.current
+        if (bgAudio) {
+            bgAudio.volume = 0.15
+        }
+        
         const onEnded = () => setIsPlaying(false)
 
         audio.addEventListener("timeupdate", onTimeUpdate)
@@ -59,11 +79,15 @@ export function PodcastPlayer({
 
     const togglePlay = useCallback(() => {
         const audio = audioRef.current
+        const bgAudio = bgAudioRef.current
         if (!audio) return
+        
         if (isPlaying) {
             audio.pause()
+            if (bgAudio) bgAudio.pause()
         } else {
             audio.play()
+            if (bgAudio) bgAudio.play()
         }
         setIsPlaying(!isPlaying)
     }, [isPlaying])
@@ -83,8 +107,12 @@ export function PodcastPlayer({
 
     const toggleMute = useCallback(() => {
         const audio = audioRef.current
+        const bgAudio = bgAudioRef.current
         if (!audio) return
+        
         audio.muted = !isMuted
+        if (bgAudio) bgAudio.muted = !isMuted
+        
         setIsMuted(!isMuted)
     }, [isMuted])
 
@@ -103,11 +131,32 @@ export function PodcastPlayer({
     return (
         <div className={`rounded-xl overflow-hidden ${className}`}>
             <audio ref={audioRef} src={audioUrl} preload="metadata" />
+            {bgMusicUrl && (
+                <audio ref={bgAudioRef} src={bgMusicUrl} preload="auto" loop />
+            )}
 
             {/* Main player */}
             <div className="bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-pink-600/20 border border-white/10 rounded-xl p-5 backdrop-blur-sm">
-                {/* Title */}
-                <p className="text-sm font-medium text-white/90 mb-4 truncate">{title}</p>
+                
+                {/* Visual Header (Cover Image & Title) */}
+                <div className="flex items-center gap-4 mb-4">
+                    {coverImageUrl && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img 
+                            src={coverImageUrl} 
+                            alt="Podcast Cover" 
+                            className="w-16 h-16 rounded-xl object-cover shadow-md border border-white/10"
+                        />
+                    )}
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white/90 truncate">{title}</p>
+                        {backgroundMusic && backgroundMusic !== 'none' && (
+                            <p className="text-[10px] text-white/50 uppercase tracking-wider mt-1">
+                                ♪ {backgroundMusic} music
+                            </p>
+                        )}
+                    </div>
+                </div>
 
                 {/* Progress bar */}
                 <div className="mb-3">

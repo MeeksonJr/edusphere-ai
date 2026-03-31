@@ -154,7 +154,9 @@ Return the JSON in this exact format:
           .from("courses")
           .update({ status: "failed" })
           .eq("id", course.id)
-          .catch(console.error)
+          .then(({ error }) => {
+            if (error) console.error("Could not set course to failed:", error)
+          })
       })
 
     // Don't await the processing - return immediately

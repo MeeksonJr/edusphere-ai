@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json()
-        const { topic, speakers = [], duration = "short" } = body
+        const { topic, speakers = [], duration = "short", backgroundMusic = "none", speakingRate = "1.0" } = body
 
         if (!topic || typeof topic !== "string" || !topic.trim()) {
             return NextResponse.json({ error: "Topic is required" }, { status: 400 })
@@ -43,6 +43,10 @@ export async function POST(req: NextRequest) {
         if (speakers.length === 0) {
             speakers.push({ name: "Host", voiceId: "", provider: "edge-tts" })
         }
+
+        // Step 1.5: Generate cover image
+        const { generatePodcastImageUrl } = await import("@/lib/pollinations")
+        const coverImageUrl = generatePodcastImageUrl(topic)
 
         // Create podcast record in "generating" state
         const { data: podcast, error: insertError } = await (supabase as any)
@@ -54,6 +58,9 @@ export async function POST(req: NextRequest) {
                 status: "generating",
                 voice_id: speakers[0].voiceId || null,
                 voice_provider: speakers[0].provider || "edge-tts",
+                background_music: backgroundMusic,
+                speaking_rate: speakingRate,
+                cover_image_url: coverImageUrl
             })
             .select()
             .single()
@@ -73,6 +80,7 @@ export async function POST(req: NextRequest) {
             topic,
             duration,
             speakers,
+            speakingRate,
             req.headers.get("Cookie") || ""
         )
 
@@ -99,6 +107,7 @@ async function generatePodcastAsync(
     topic: string,
     duration: "short" | "medium" | "long",
     speakers: any[],
+    speakingRate: string,
     cookie?: string
 ) {
     // Admin client for background updates
@@ -161,6 +170,12 @@ REQUIRED JSON FORMAT:
         let audioBuffers: Buffer[] = []
         let totalDuration = 0
 
+        // Convert speaking rate to Edge-TTS format
+        let rateStr = "+0%"
+        if (speakingRate === "0.75") rateStr = "-25%"
+        if (speakingRate === "1.25") rateStr = "+25%"
+        if (speakingRate === "1.5") rateStr = "+50%"
+
         for (const line of scriptJson) {
             const speakerInfo = speakers.find((s: any) => s.name.toLowerCase().includes(line.speaker.toLowerCase()) || line.speaker.toLowerCase().includes(s.name.toLowerCase())) || speakers[0]
             
@@ -168,6 +183,7 @@ REQUIRED JSON FORMAT:
                 text: line.text.substring(0, 3000), // Safety clip
                 voice: speakerInfo.voiceId,
                 provider: speakerInfo.provider,
+                rate: rateStr
             })
             
             audioBuffers.push(ttsResult.buffer)

@@ -22,6 +22,8 @@ export default function CreatePodcastPage() {
         { id: 1, name: "Host", voiceId: "", provider: "edge-tts" }
     ])
     const [generating, setGenerating] = useState(false)
+    const [backgroundMusic, setBackgroundMusic] = useState("none")
+    const [speakingRate, setSpeakingRate] = useState("1.0")
 
     const handleGenerate = async () => {
         if (!topic.trim()) {
@@ -46,6 +48,8 @@ export default function CreatePodcastPage() {
                         voiceId: s.voiceId || undefined,
                         provider: s.provider || undefined
                     })),
+                    backgroundMusic,
+                    speakingRate,
                 }),
             })
 
@@ -168,6 +172,46 @@ export default function CreatePodcastPage() {
                                 </SelectItem>
                             </SelectContent>
                         </Select>
+                    </div>
+
+                    {/* Background Music & Pacing */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Background Music */}
+                        <div>
+                            <Label className="text-foreground mb-2 block text-sm font-medium">
+                                Background Music
+                            </Label>
+                            <Select value={backgroundMusic} onValueChange={setBackgroundMusic}>
+                                <SelectTrigger className="glass-surface border-foreground/20 text-foreground w-full">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="glass-surface border-foreground/20">
+                                    <SelectItem value="none" className="text-foreground">None</SelectItem>
+                                    <SelectItem value="ambient" className="text-foreground">Ambient Learning</SelectItem>
+                                    <SelectItem value="lofi" className="text-foreground">Lo-Fi Focus</SelectItem>
+                                    <SelectItem value="jazz" className="text-foreground">Smooth Jazz</SelectItem>
+                                    <SelectItem value="upbeat" className="text-foreground">Upbeat Motivation</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Speaking Rate */}
+                        <div>
+                            <Label className="text-foreground mb-2 block text-sm font-medium">
+                                Speaking Pacing
+                            </Label>
+                            <Select value={speakingRate} onValueChange={setSpeakingRate}>
+                                <SelectTrigger className="glass-surface border-foreground/20 text-foreground w-full">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="glass-surface border-foreground/20">
+                                    <SelectItem value="0.75" className="text-foreground">Slow (0.75x)</SelectItem>
+                                    <SelectItem value="1.0" className="text-foreground">Normal (1.0x)</SelectItem>
+                                    <SelectItem value="1.25" className="text-foreground">Fast (1.25x)</SelectItem>
+                                    <SelectItem value="1.5" className="text-foreground">Very Fast (1.5x)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     {/* Speakers Configuration */}
