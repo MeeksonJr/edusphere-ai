@@ -314,7 +314,7 @@ Return the JSON in this exact format:
       if (slideRows.length > 0) {
         const { error: slideError } = await serviceSupabase
           .from("course_slides")
-          .upsert(slideRows, { onConflict: "slide_id", ignoreDuplicates: false })
+          .insert(slideRows)
         if (slideError) {
           console.error("processSlides error:", slideError.message)
         } else {
