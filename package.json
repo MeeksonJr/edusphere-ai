@@ -60,6 +60,7 @@
     "edge-tts": "^1.0.1",
     "embla-carousel-react": "8.5.1",
     "framer-motion": "latest",
+    "google-tts-api": "^2.0.2",
     "groq-sdk": "^0.37.0",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",

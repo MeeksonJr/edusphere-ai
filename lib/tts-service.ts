@@ -1,15 +1,9 @@
-/**
- * Text-to-Speech Service
- * Unified TTS interface with provider priority:
- *   1. ElevenLabs (Pro+ tiers) — premium voices
- *   2. Edge-TTS (all tiers) — free Microsoft voices, no API key
- *   3. Google Cloud TTS — legacy fallback (if credentials exist)
- */
-
 import { generateElevenLabsTTS, getElevenLabsVoices } from "./elevenlabs"
 import { generateEdgeTTS, getEdgeTTSVoices, EDGE_TTS_POPULAR_VOICES } from "./edge-tts"
+import { generateGoogleTTS } from "./google-tts"
+import { generateHuggingFaceTTS } from "./huggingface-tts"
 
-export type TTSProvider = "elevenlabs" | "edge-tts" | "google-cloud"
+export type TTSProvider = "google-tts" | "huggingface" | "edge-tts" | "elevenlabs" | "google-cloud"
 
 export interface TTSOptions {
   text: string
@@ -22,7 +16,7 @@ export interface TTSOptions {
 export interface TTSResult {
   buffer: Buffer
   duration: number // estimated seconds
-  format: "mp3" | "wav"
+  format: "mp3" | "wav" | "flac"
   provider: TTSProvider
 }
 
@@ -52,12 +46,19 @@ export async function generateTTS(options: TTSOptions): Promise<TTSResult> {
   type ProviderAttempt = { name: TTSProvider; fn: () => Promise<TTSResult> }
   const providers: ProviderAttempt[] = []
 
+  const tryGoogleTTS = (): Promise<TTSResult> => 
+    generateGoogleTTS({ text, lang: "en", slow: false }).then(res => ({
+      buffer: res.buffer, duration: res.duration, format: res.format, provider: "google-tts" as TTSProvider
+    }))
+
+  const tryHuggingFace = (): Promise<TTSResult> => 
+    generateHuggingFaceTTS({ text }).then(res => ({
+      buffer: res.buffer, duration: res.duration, format: res.format, provider: "huggingface" as TTSProvider
+    }))
+
   const tryElevenLabs = (): Promise<TTSResult> => {
     // Edge-TTS voices (e.g., 'en-US-AriaNeural') are invalid for ElevenLabs.
-    // If the provided voice looks like an Edge TTS voice, fallback to undefined
-    // so it uses the DEFAULT_VOICE_ID inside ElevenLabs wrapper.
     const isEdgeVoice = voice && (voice.includes("-") || voice.includes("Neural"));
-    
     return generateElevenLabsTTS({
       text,
       voiceId: isEdgeVoice ? undefined : voice,
@@ -82,36 +83,31 @@ export async function generateTTS(options: TTSOptions): Promise<TTSResult> {
       provider: "edge-tts" as TTSProvider,
     }))
 
-  // Determine provider priority
-  if (provider === "elevenlabs") {
-    if (process.env.ELEVENLABS_API_KEY) providers.push({ name: "elevenlabs", fn: tryElevenLabs })
+  // Set the specific order: 
+  // 1. google-tts
+  // 2. huggingface
+  // 3. edge-tts
+  // 4. elevenlabs
+
+  if (provider === "google-tts") { providers.push({ name: "google-tts", fn: tryGoogleTTS }) }
+  else if (provider === "huggingface") { providers.push({ name: "huggingface", fn: tryHuggingFace }) }
+  else if (provider === "edge-tts") { providers.push({ name: "edge-tts", fn: tryEdgeTTS }) }
+  else if (provider === "elevenlabs") { providers.push({ name: "elevenlabs", fn: tryElevenLabs }) }
+  else {
+    // Default fallback waterfall
+    providers.push({ name: "google-tts", fn: tryGoogleTTS })
+    if (process.env.HUGGING_FACE_API_KEY || process.env.HUGGINGFACE_API_KEY) providers.push({ name: "huggingface", fn: tryHuggingFace })
     providers.push({ name: "edge-tts", fn: tryEdgeTTS })
-  } else if (provider === "edge-tts") {
-    providers.push({ name: "edge-tts", fn: tryEdgeTTS })
     if (process.env.ELEVENLABS_API_KEY) providers.push({ name: "elevenlabs", fn: tryElevenLabs })
-  } else {
-    // No provider specified — try ElevenLabs first if key available, then edge-tts
-    if (process.env.ELEVENLABS_API_KEY) providers.push({ name: "elevenlabs", fn: tryElevenLabs })
-    providers.push({ name: "edge-tts", fn: tryEdgeTTS })
   }
 
   // Try each provider in order
   for (const p of providers) {
     try {
+      console.log(`[generate-audio] Attempting ${p.name}...`)
       return await p.fn()
     } catch (error: any) {
       const msg = `${p.name} failed: ${error?.message || error}`
-      console.warn(msg)
-      errors.push(msg)
-    }
-  }
-
-  // Google Cloud TTS (legacy fallback — last resort)
-  if (process.env.GOOGLE_CLOUD_TTS_KEY || process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    try {
-      return await generateTTSGoogleCloud(text, voice, estimatedDuration)
-    } catch (error: any) {
-      const msg = `Google Cloud TTS failed: ${error?.message || error}`
       console.warn(msg)
       errors.push(msg)
     }

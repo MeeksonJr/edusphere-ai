@@ -105,8 +105,8 @@ export async function POST(
         // Generate TTS audio
         const ttsResult = await generateTTS({
           text: narration.slice(0, 3000), // Cap to avoid TTS limits
-          voice: "en-US-AriaNeural",      // Edge-TTS native voice name
-          provider: "edge-tts",           // Use Edge-TTS directly (free, no API key)
+          voice: "en-US-AriaNeural",      // Voice config parameter
+          // Provider omitted to let tts-service fallback logic handle priorities automatically
         })
 
         if (!ttsResult.buffer || ttsResult.buffer.length === 0) {
