@@ -499,12 +499,12 @@ function CourseDetailContent() {
           <XCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-2">Course Not Found</h2>
           <p className="text-foreground/70 mb-6">{error || "The course you're looking for doesn't exist."}</p>
-          <Link href="/dashboard/courses">
-            <Button variant="outline" className="border-foreground/20 text-white hover:bg-foreground/10">
+          <Button variant="outline" className="border-foreground/20 text-white hover:bg-foreground/10" asChild>
+            <Link href="/dashboard/courses">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Courses
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </GlassSurface>
       </div>
     )
@@ -518,15 +518,16 @@ function CourseDetailContent() {
       {/* Header */}
       <ScrollReveal direction="up">
         <div className="mb-6">
-          <Link href="/dashboard/courses">
-            <Button
-              variant="ghost"
-              className="text-foreground/70 hover:text-foreground mb-4"
-            >
+          <Button
+            variant="ghost"
+            className="text-foreground/70 hover:text-foreground mb-4"
+            asChild
+          >
+            <Link href="/dashboard/courses">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Courses
-            </Button>
-          </Link>
+            </Link>
+          </Button>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2 flex-wrap">
@@ -581,15 +582,16 @@ function CourseDetailContent() {
               </div>
             </div>
             {course.status === "completed" && (
-              <Link href={`/dashboard/courses/${course.id}/edit`}>
-                <Button
-                  variant="outline"
-                  className="border-foreground/20 text-white hover:bg-foreground/10"
-                >
+              <Button
+                variant="outline"
+                className="border-foreground/20 text-white hover:bg-foreground/10"
+                asChild
+              >
+                <Link href={`/dashboard/courses/${course.id}/edit`}>
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
           </div>
         </div>
