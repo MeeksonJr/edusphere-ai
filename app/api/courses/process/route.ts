@@ -111,14 +111,14 @@ Requirements:
 - Each slide should have: title, content (in markdown), narration script, and estimated duration
 - Return ONLY valid JSON, no markdown formatting or code blocks
 
-Course structure (MINIMAL - for fast generation, can be enhanced later):
+Course structure:
 - For "quick-explainer": 1-2 chapters, 2-3 slides per chapter
-- For "full-course": 4-6 chapters, 4-6 slides per chapter (CRITICAL: Do not just make 2 chapters, create a truly comprehensive full course)
-- For "tutorial": 2-4 chapters, 2-4 slides per chapter
+- For "full-course": 8-12 chapters, 5-8 slides per chapter (CRITICAL: Be as comprehensive as possible. Cover introduction, historical context, core concepts, advanced applications, future trends, and conclusion.)
+- For "tutorial": 3-6 chapters, 4-6 slides per chapter
 
 NARRATION SCRIPT RULES (THIS IS CRITICAL):
 The "narrationScript" field is THE MOST IMPORTANT part. It will be read aloud by a text-to-speech engine and is the primary learning experience for the student. Follow these rules strictly:
-1. Write 80-150 words per slide. Never write less than 60 words.
+1. Write 100-200 words per slide. Never write less than 80 words.
 2. Write in flowing, natural paragraphs — NOT bullet points or lists.
 3. ${toneInstruction}
 4. Expand well beyond the slide "body" content. The narration should teach, explain, give examples, and add context that the slide text alone doesn't provide.
@@ -129,8 +129,8 @@ The "narrationScript" field is THE MOST IMPORTANT part. It will be read aloud by
 IMPORTANT: Generate a COMPLETE but MINIMAL course structure. Each slide must have:
 - A clear title
 - Content body (can be brief, 2-3 sentences minimum)
-- A rich, detailed narrationScript following the rules above (80-150 words)
-- Estimated duration (45-90 seconds per slide given the longer narrations)
+- A rich, detailed narrationScript following the rules above (100-200 words)
+- Estimated duration (60-120 seconds per slide given the longer narrations)
 
 The course should be functional and complete, but can be expanded later using the "Enhance Course" feature.
 
@@ -276,18 +276,22 @@ Return the JSON in this exact format:
         slide.slideId = crypto.randomUUID()
         chapterTotal += (slide.estimatedDuration || 30)
         
-        // Inject Pollinations AI Image for every content slide
-        if (slide.type === "content-slide") {
-          const imagePrompt = `Educational illustration for ${topic}: ${slide.content.title}. clean flat art, modern ${style} style, clean background, no text, no logo`
-          const encodedPrompt = encodeURIComponent(imagePrompt)
-          const seed = Math.floor(Math.random() * 1000000)
-          const imgUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=450&model=flux&nologo=true&enhance=true&seed=${seed}`
-          
-          if (!slide.content.visualElements) {
-            slide.content.visualElements = []
-          }
-          slide.content.visualElements.push(`IMAGE_URL:${imgUrl}`)
+        // Inject Pollinations AI Image for EVERY slide type to ensure visual consistency
+        const slideContext = slide.content.body || slide.content.title || topic
+        const refinedTitle = slide.content.title || "Introduction"
+        
+        const imagePrompt = `Educational high-quality digital art for '${topic}': '${refinedTitle}'. Concept: ${slideContext.substring(0, 100)}. clean, modern ${style} style, cinematic lighting, 8k resolution, no text, no logo`
+        const encodedPrompt = encodeURIComponent(imagePrompt)
+        const seed = Math.floor(Math.random() * 1000000)
+        const imgUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=450&model=flux&nologo=true&enhance=true&seed=${seed}`
+        
+        if (!slide.content.visualElements) {
+          slide.content.visualElements = []
         }
+        
+        // Remove existing IMAGE_URL if any, then add the new high-quality one
+        slide.content.visualElements = slide.content.visualElements.filter(el => !el.startsWith("IMAGE_URL:"))
+        slide.content.visualElements.push(`IMAGE_URL:${imgUrl}`)
       }
       totalDuration += chapterTotal
     }

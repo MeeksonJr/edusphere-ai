@@ -55,7 +55,7 @@ export async function generateTTS(options: TTSOptions): Promise<TTSResult> {
 
   const tryHuggingFace = async (): Promise<TTSResult> => {
     // If user selected a male voice in EdgeTTS (Guy, William, Tony, Ryan), map to a masculine-tending model
-    const isMale = voice && (voice.toLowerCase().includes("male") || voice.includes("Guy") || voice.includes("William") || voice.includes("Tony") || voice.includes("Ryan"))
+    const isMale = voice && (voice.toLowerCase().includes("male") || voice.includes("Guy") || voice.includes("Christopher") || voice.includes("Ryan") || voice.includes("William") || voice.includes("Tony"))
     const hfModel = isMale ? "suno/bark-small" : "facebook/mms-tts-eng"
     
     // Add warning context for Bark limits if used

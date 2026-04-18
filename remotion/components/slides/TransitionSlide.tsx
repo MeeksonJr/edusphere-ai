@@ -1,14 +1,22 @@
-import React from "react"
+import React, { useState } from "react"
 import { useVideoConfig, useCurrentFrame, interpolate, Easing } from "remotion"
 
 interface TransitionSlideProps {
   title: string
   style?: string
+  visualElements?: string[]
 }
 
-export const TransitionSlide: React.FC<TransitionSlideProps> = ({ title, style = "professional" }) => {
-  const { fps } = useVideoConfig()
+export const TransitionSlide: React.FC<TransitionSlideProps> = ({ title, style = "professional", visualElements = [] }) => {
+  const { fps, durationInFrames } = useVideoConfig()
   const frame = useCurrentFrame()
+
+  // Extract Pollinations Image URL
+  const imgUrlStr = visualElements.find(el => el.startsWith("IMAGE_URL:"))
+  const imageUrl = imgUrlStr ? imgUrlStr.replace("IMAGE_URL:", "") : null
+  
+  // Track image load failure
+  const [imageFailed, setImageFailed] = useState(false)
 
   // Fade in/out animation
   const opacity = interpolate(
@@ -71,13 +79,44 @@ export const TransitionSlide: React.FC<TransitionSlideProps> = ({ title, style =
         alignItems: "center",
         justifyContent: "center",
         fontFamily: "system-ui, -apple-system, sans-serif",
+        position: "relative",
+        overflow: "hidden",
         opacity,
       }}
     >
+      {/* Background Image Effect */}
+      {(imageUrl && !imageFailed) && (
+        <div 
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 0,
+            opacity: 0.3,
+          }}
+        >
+           <img 
+            src={imageUrl} 
+            alt=""
+            onError={() => setImageFailed(true)}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              filter: "blur(15px) contrast(1.2)",
+              transform: `scale(${1.2 - interpolate(frame, [0, durationInFrames || 30], [0, 0.2])})`,
+            }}
+          />
+        </div>
+      )}
+
       <div
         style={{
           transform: `scale(${scale})`,
           textAlign: "center",
+          zIndex: 1,
         }}
       >
         <h1

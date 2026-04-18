@@ -144,7 +144,7 @@ export async function POST(
           .from("course_slides")
           .update({
             audio_url: audioUrl,
-            audio_duration: Math.round(ttsResult.duration),
+            audio_duration: ttsResult.duration, // Use high-precision float for exact sync
             updated_at: new Date().toISOString(),
           })
           .eq("id", slide.id)

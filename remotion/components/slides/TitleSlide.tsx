@@ -1,15 +1,23 @@
-import React from "react"
+import React, { useState } from "react"
 import { useVideoConfig, useCurrentFrame, interpolate, Easing } from "remotion"
 
 interface TitleSlideProps {
   title: string
   subtitle?: string
   style?: string
+  visualElements?: string[]
 }
 
-export const TitleSlide: React.FC<TitleSlideProps> = ({ title, subtitle, style = "professional" }) => {
+export const TitleSlide: React.FC<TitleSlideProps> = ({ title, subtitle, style = "professional", visualElements = [] }) => {
   const { fps, durationInFrames } = useVideoConfig()
   const frame = useCurrentFrame()
+
+  // Extract Pollinations Image URL
+  const imgUrlStr = visualElements.find(el => el.startsWith("IMAGE_URL:"))
+  const imageUrl = imgUrlStr ? imgUrlStr.replace("IMAGE_URL:", "") : null
+  
+  // Track image load failure
+  const [imageFailed, setImageFailed] = useState(false)
 
   // Fade in animation
   const opacity = interpolate(frame, [0, fps * 0.5], [0, 1], {
@@ -76,14 +84,45 @@ export const TitleSlide: React.FC<TitleSlideProps> = ({ title, subtitle, style =
         justifyContent: "center",
         padding: "4rem",
         fontFamily: "system-ui, -apple-system, sans-serif",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      {/* Background Image Overlay */}
+      {(imageUrl && !imageFailed) && (
+        <div 
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 0,
+            opacity: 0.4,
+          }}
+        >
+           <img 
+            src={imageUrl} 
+            alt=""
+            onError={() => setImageFailed(true)}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              filter: "blur(10px) brightness(0.5)",
+              transform: `scale(${1 + interpolate(frame, [0, durationInFrames || 300], [0, 0.1])})`,
+            }}
+          />
+        </div>
+      )}
+      
       <div
         style={{
           opacity,
           transform: `translateY(${translateY}px) scale(${scale})`,
           textAlign: "center",
           maxWidth: "1200px",
+          zIndex: 1,
         }}
       >
         <h1
