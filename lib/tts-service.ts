@@ -89,11 +89,28 @@ export async function generateTTS(options: TTSOptions): Promise<TTSResult> {
   // 3. edge-tts
   // 4. elevenlabs
 
-  if (provider === "google-tts") { providers.push({ name: "google-tts", fn: tryGoogleTTS }) }
-  else if (provider === "huggingface") { providers.push({ name: "huggingface", fn: tryHuggingFace }) }
-  else if (provider === "edge-tts") { providers.push({ name: "edge-tts", fn: tryEdgeTTS }) }
-  else if (provider === "elevenlabs") { providers.push({ name: "elevenlabs", fn: tryElevenLabs }) }
-  else {
+  // Build provider order: if a specific provider is requested, try it first
+  // then add remaining providers as fallbacks for resilience.
+  if (provider === "edge-tts") {
+    providers.push({ name: "edge-tts", fn: tryEdgeTTS })
+    providers.push({ name: "google-tts", fn: tryGoogleTTS })
+    if (process.env.HUGGING_FACE_API_KEY || process.env.HUGGINGFACE_API_KEY) providers.push({ name: "huggingface", fn: tryHuggingFace })
+    if (process.env.ELEVENLABS_API_KEY) providers.push({ name: "elevenlabs", fn: tryElevenLabs })
+  } else if (provider === "google-tts") {
+    providers.push({ name: "google-tts", fn: tryGoogleTTS })
+    providers.push({ name: "edge-tts", fn: tryEdgeTTS })
+    if (process.env.HUGGING_FACE_API_KEY || process.env.HUGGINGFACE_API_KEY) providers.push({ name: "huggingface", fn: tryHuggingFace })
+    if (process.env.ELEVENLABS_API_KEY) providers.push({ name: "elevenlabs", fn: tryElevenLabs })
+  } else if (provider === "huggingface") {
+    providers.push({ name: "huggingface", fn: tryHuggingFace })
+    providers.push({ name: "google-tts", fn: tryGoogleTTS })
+    providers.push({ name: "edge-tts", fn: tryEdgeTTS })
+    if (process.env.ELEVENLABS_API_KEY) providers.push({ name: "elevenlabs", fn: tryElevenLabs })
+  } else if (provider === "elevenlabs") {
+    providers.push({ name: "elevenlabs", fn: tryElevenLabs })
+    providers.push({ name: "edge-tts", fn: tryEdgeTTS })
+    providers.push({ name: "google-tts", fn: tryGoogleTTS })
+  } else {
     // Default fallback waterfall
     providers.push({ name: "google-tts", fn: tryGoogleTTS })
     if (process.env.HUGGING_FACE_API_KEY || process.env.HUGGINGFACE_API_KEY) providers.push({ name: "huggingface", fn: tryHuggingFace })

@@ -92,7 +92,17 @@ export async function POST(request: NextRequest) {
 
     // Generate course layout using AI (this can take time)
     // NOTE: Optimized for Vercel Hobby (60s max). We keep full-course reasonably small.
-    const systemPrompt = `You are an expert course designer. Generate a comprehensive course layout in JSON format based on the user's topic and requirements.
+    const voice = body.voice || "aria"
+
+    const toneGuide: Record<string, string> = {
+      professional: "Use a confident, polished, corporate tone. Be direct and authoritative while remaining approachable.",
+      academic: "Use a scholarly, structured, formal tone. Include precise terminology and logical flow as if lecturing at a university.",
+      cinematic: "Use a dramatic, storytelling tone. Build suspense, paint vivid pictures, and make every sentence feel like narration from a documentary.",
+      casual: "Use a warm, conversational, friendly tone. Speak as if chatting with a friend over coffee. Use contractions and everyday language.",
+    }
+    const toneInstruction = toneGuide[style] || toneGuide.professional
+
+    const systemPrompt = `You are an expert course designer AND a professional voice-over scriptwriter. Generate a comprehensive course layout in JSON format based on the user's topic and requirements.
 
 Requirements:
 - Course type: ${courseType}
@@ -106,11 +116,21 @@ Course structure (MINIMAL - for fast generation, can be enhanced later):
 - For "full-course": 3-5 chapters, 3-4 slides per chapter
 - For "tutorial": 2-4 chapters, 2-3 slides per chapter
 
+NARRATION SCRIPT RULES (THIS IS CRITICAL):
+The "narrationScript" field is THE MOST IMPORTANT part. It will be read aloud by a text-to-speech engine and is the primary learning experience for the student. Follow these rules strictly:
+1. Write 80-150 words per slide. Never write less than 60 words.
+2. Write in flowing, natural paragraphs — NOT bullet points or lists.
+3. ${toneInstruction}
+4. Expand well beyond the slide "body" content. The narration should teach, explain, give examples, and add context that the slide text alone doesn't provide.
+5. Avoid reading slide titles or saying "In this slide..." — jump directly into the teaching.
+6. Use smooth transitions between ideas. The listener should feel like they're in a real lecture, not reading a PowerPoint.
+7. Never include markdown, special characters, or formatting in narrationScript — only plain spoken text.
+
 IMPORTANT: Generate a COMPLETE but MINIMAL course structure. Each slide must have:
 - A clear title
 - Content body (can be brief, 2-3 sentences minimum)
-- Narration script (can be brief, 1-2 sentences minimum)
-- Estimated duration (30-60 seconds per slide)
+- A rich, detailed narrationScript following the rules above (80-150 words)
+- Estimated duration (45-90 seconds per slide given the longer narrations)
 
 The course should be functional and complete, but can be expanded later using the "Enhance Course" feature.
 
@@ -137,8 +157,8 @@ Return the JSON in this exact format:
             "body": "Slide content in markdown",
             "visualElements": ["bullet-list"]
           },
-          "narrationScript": "Full narration text for this slide",
-          "estimatedDuration": 45
+          "narrationScript": "Write 80-150 words of flowing, natural speech here. This should sound like a real teacher speaking to students, expanding on the content with examples and explanations. The tone must match the ${style} style.",
+          "estimatedDuration": 60
         }
       ]
     }

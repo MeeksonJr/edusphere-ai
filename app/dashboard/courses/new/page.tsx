@@ -9,7 +9,8 @@ import { GlassSurface } from "@/components/shared/GlassSurface"
 import { ScrollReveal } from "@/components/shared/ScrollReveal"
 import { AmbientBackground } from "@/components/shared/AmbientBackground"
 import { VisualSelect } from "@/components/shared/VisualSelect"
-import { Sparkles, Loader2, Video, BookOpen, Zap, Film, Briefcase, GraduationCap, Coffee, AlignLeft, CheckCircle2 } from "lucide-react"
+import { Sparkles, Loader2, Video, BookOpen, Zap, Film, Briefcase, GraduationCap, Coffee, AlignLeft, CheckCircle2, Mic } from "lucide-react"
+import { getVoiceSelectOptions } from "@/lib/voice-map"
 import { useToast } from "@/hooks/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
 
@@ -23,6 +24,7 @@ export default function NewCoursePage() {
     topic: "",
     courseType: "quick-explainer",
     style: "professional",
+    voice: "aria",
   })
 
   // Simulated generation steps
@@ -68,6 +70,7 @@ export default function NewCoursePage() {
           topic: formData.topic,
           courseType: formData.courseType,
           style: formData.style,
+          voice: formData.voice,
         }),
       })
 
@@ -227,6 +230,14 @@ export default function NewCoursePage() {
                   options={styles}
                   value={formData.style}
                   onChange={(val) => handleSelectChange("style", val)}
+                />
+
+                {/* Voice */}
+                <VisualSelect
+                  label="Choose Narrator Voice"
+                  options={getVoiceSelectOptions()}
+                  value={formData.voice}
+                  onChange={(val) => handleSelectChange("voice", val)}
                 />
               </div>
 

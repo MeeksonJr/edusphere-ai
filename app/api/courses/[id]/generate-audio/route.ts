@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { generateTTS } from "@/lib/tts-service"
+import { getVoiceByKey } from "@/lib/voice-map"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -61,7 +62,7 @@ export async function POST(
     // 3. Load course layout to get narration scripts (stored in layout JSON)
     const { data: course, error: courseError } = await supabase
       .from("courses")
-      .select("layout")
+      .select("layout, voice")
       .eq("id", courseId)
       .single()
 
@@ -81,6 +82,11 @@ export async function POST(
     }
 
     console.log(`[generate-audio] Processing ${slides.length} slides, narration map has ${Object.keys(narrationMap).length} entries`)
+
+    // Resolve the user's chosen voice to its Edge-TTS Neural ID
+    const voiceDef = getVoiceByKey(course.voice)
+    const edgeVoice = voiceDef.edgeTTSVoice
+    console.log(`[generate-audio] Using voice: ${voiceDef.label} (${edgeVoice})`)
 
     let successCount = 0
     let failCount = 0
@@ -105,8 +111,8 @@ export async function POST(
         // Generate TTS audio
         const ttsResult = await generateTTS({
           text: narration.slice(0, 3000), // Cap to avoid TTS limits
-          voice: "en-US-AriaNeural",      // Voice config parameter
-          // Provider omitted to let tts-service fallback logic handle priorities automatically
+          voice: edgeVoice,               // User's chosen voice
+          provider: "edge-tts",           // Prioritize Edge-TTS for named voices
         })
 
         if (!ttsResult.buffer || ttsResult.buffer.length === 0) {

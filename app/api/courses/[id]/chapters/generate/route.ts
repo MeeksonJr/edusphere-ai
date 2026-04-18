@@ -52,9 +52,20 @@ export async function POST(
       // Import AI wrapper dynamically or at top-level
       const { generateAIResponse } = await import("@/lib/ai-service-wrapper")
 
+      const courseStyle = course.style || "professional"
+      const courseType = course.type || "full-course"
+
+      const toneGuide: Record<string, string> = {
+        professional: "Use a confident, polished, corporate tone. Be direct and authoritative while remaining approachable.",
+        academic: "Use a scholarly, structured, formal tone. Include precise terminology and logical flow as if lecturing at a university.",
+        cinematic: "Use a dramatic, storytelling tone. Build suspense, paint vivid pictures, and make every sentence feel like narration from a documentary.",
+        casual: "Use a warm, conversational, friendly tone. Speak as if chatting with a friend over coffee. Use contractions and everyday language.",
+      }
+      const toneInstruction = toneGuide[courseStyle] || toneGuide.professional
+
       const result = await generateAIResponse({
         provider: "gemini",
-        prompt: `You are an expert course content creator. Generate ${validCount} NEW chapters for the course "${course.title}".
+        prompt: `You are an expert course content creator AND a professional voice-over scriptwriter. Generate ${validCount} NEW chapters for the course "${course.title}".
 
 Existing Chapters so far:
 ${previousChaptersSummary || "None (this is the start of the course)"}
@@ -62,12 +73,25 @@ ${previousChaptersSummary || "None (this is the start of the course)"}
 User Additional Instructions:
 ${context || "None"}
 
+Course Style: ${courseStyle}
+Course Type: ${courseType}
+
 CRITICAL REQUIREMENTS:
 1. Output exactly ${validCount} new chapter(s). Do NOT repeat existing chapters.
 2. The next chapter should logically continue where the last one left off.
 3. Each chapter should have 2-4 topics (slides).
 4. Each slide must have SUBSTANTIAL, DETAILED content (150-300 words).
 5. Slide content should flow logically.
+
+NARRATION SCRIPT RULES (THIS IS CRITICAL):
+The "narrationScript" field will be read aloud by a text-to-speech engine and is the primary learning experience.
+- Write 80-150 words per slide. Never write less than 60 words.
+- Write in flowing, natural paragraphs — NOT bullet points or lists.
+- ${toneInstruction}
+- Expand well beyond the slide "body" content. Teach, explain, give examples, and add context.
+- Avoid reading slide titles or saying "In this slide..." — jump directly into the teaching.
+- Use smooth transitions between ideas. The listener should feel like they're in a real lecture.
+- Never include markdown, special characters, or formatting in narrationScript — only plain spoken text.
 
 Return a JSON array of chapter objects with this structure (no markdown fences, just pure JSON array):
 [
@@ -84,14 +108,14 @@ Return a JSON array of chapter objects with this structure (no markdown fences, 
           "body": "Detailed paragraph content...",
           "visualElements": []
         },
-        "narrationScript": "Full narration script for this slide",
-        "estimatedDuration": 30
+        "narrationScript": "Write 80-150 words of flowing, natural speech here. Sound like a real teacher speaking to students.",
+        "estimatedDuration": 60
       }
     ]
   }
 ]
 `,
-        systemPrompt: "You are an expert course AI. Generate structured JSON arrays of chapters containing real educational content. Output strictly JSON.",
+        systemPrompt: "You are an expert course AI and professional scriptwriter. Generate structured JSON arrays of chapters containing real educational content with rich, spoken narration scripts. Output strictly JSON.",
         maxTokens: 5000,
       })
 

@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { topic, courseType, style } = body
+    const { topic, courseType, style, voice } = body
 
     if (!topic || !topic.trim()) {
       return NextResponse.json({ error: "Topic is required" }, { status: 400 })
@@ -105,6 +105,7 @@ Return the JSON in this exact format:
           title: `Course: ${topic.substring(0, 100)}`, // Temporary title
           type: courseType,
           style: style,
+          voice: voice || "aria",
           status: "pending",
           layout: {}, // Empty object - will be replaced in background processing
           estimated_duration: 0, // Will be calculated in background
@@ -132,6 +133,7 @@ Return the JSON in this exact format:
         topic,
         courseType,
         style,
+        voice: voice || "aria",
       }),
     })
       .then(async (response) => {
