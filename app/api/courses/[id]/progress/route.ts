@@ -166,10 +166,9 @@ export async function POST(
               user_id: user.id,
               course_id: params.id,
               title: courseData?.title || "Edusphere Course",
+              description: `Successfully completed all modules of ${courseData?.title}`,
               certificate_number: certNumber,
               template_id: "course_completion",
-              theme_color: "from-blue-500 to-cyan-500",
-              status: "active",
               metadata: {
                 recipient_name: recipientName,
                 course_title: courseData?.title,

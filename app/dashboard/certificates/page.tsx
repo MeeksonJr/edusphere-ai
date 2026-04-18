@@ -23,8 +23,8 @@ interface Certificate {
     id: string
     title: string
     description: string | null
-    type: string
-    verification_code: string
+    template_id: string
+    certificate_number: string
     metadata: any
     issued_at: string
     course_id: string | null
@@ -88,7 +88,7 @@ export default function CertificatesPage() {
     }
 
     const copyVerificationLink = (cert: Certificate) => {
-        const url = `${window.location.origin}/api/certificates/verify?code=${cert.verification_code}`
+        const url = `${window.location.origin}/api/certificates/verify?code=${cert.certificate_number}`
         navigator.clipboard.writeText(url)
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
@@ -148,7 +148,7 @@ export default function CertificatesPage() {
             ) : certificates.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {certificates.map((cert, i) => {
-                        const config = TYPE_CONFIG[cert.type] || TYPE_CONFIG.custom
+                        const config = TYPE_CONFIG[cert.template_id] || TYPE_CONFIG.custom
                         const Icon = config.icon
                         return (
                             <ScrollReveal key={cert.id} direction="up" delay={i * 0.05}>
@@ -250,7 +250,7 @@ export default function CertificatesPage() {
                                 <div className="w-16 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto mb-6" />
 
                                 <h2 className="text-amber-400 text-2xl font-bold font-serif mb-1">
-                                    Certificate of {TYPE_CONFIG[previewCert.type]?.label || "Completion"}
+                                    Certificate of {TYPE_CONFIG[previewCert.template_id]?.label || "Completion"}
                                 </h2>
                                 <p className="text-white/40 text-xs tracking-widest uppercase mb-6">THIS IS TO CERTIFY THAT</p>
 
@@ -269,7 +269,7 @@ export default function CertificatesPage() {
                                     Issued on {new Date(previewCert.issued_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                                 </p>
                                 <p className="text-white/20 text-[10px] font-mono mt-2">
-                                    Verification: {previewCert.verification_code}
+                                    Verification: {previewCert.certificate_number}
                                 </p>
                             </div>
                         </div>

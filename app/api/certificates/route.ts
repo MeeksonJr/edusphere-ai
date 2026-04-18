@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
             .eq("user_id", user.id)
             .order("issued_at", { ascending: false })
 
-        if (type) query = query.eq("type", type)
+        if (type) query = query.eq("template_id", type)
 
         const { data: certificates, error } = await query
 
@@ -61,12 +61,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid certificate type" }, { status: 400 })
         }
 
-        // Check for duplicate certificate (same user + same course/title + type)
+        // Check for duplicate certificate (same user + same course/title + template_id)
         const dupeQuery = supabase
             .from("certificates")
             .select("id")
             .eq("user_id", user.id)
-            .eq("type", type)
+            .eq("template_id", type)
             .eq("title", title)
 
         if (course_id) dupeQuery.eq("course_id", course_id)
@@ -84,8 +84,8 @@ export async function POST(request: NextRequest) {
             .eq("id", user.id)
             .single()
 
-        // Generate unique verification code
-        const verificationCode = randomBytes(16).toString("hex")
+        // Generate unique certificate_number
+        const certNumber = `EDUSPHERE-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
 
         const { data: certificate, error } = await supabase
             .from("certificates")
@@ -94,8 +94,8 @@ export async function POST(request: NextRequest) {
                 course_id: course_id || null,
                 title,
                 description: description || null,
-                type,
-                verification_code: verificationCode,
+                template_id: type,
+                certificate_number: certNumber,
                 metadata: {
                     ...(metadata || {}),
                     recipient_name: profile?.full_name || profile?.display_name || "Student",
