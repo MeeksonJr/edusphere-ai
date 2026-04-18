@@ -5,7 +5,7 @@ import { getVoiceByKey } from "@/lib/voice-map"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
-export const maxDuration = 60 // Vercel hobby plan max
+export const maxDuration = 300 // Allow up to 5 minutes on Vercel for long audio generation sequences
 
 // Get a supabase client — tries service role first (bypasses RLS), falls back to anon
 function getSupabaseAdmin() {

@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { useVideoConfig, useCurrentFrame, interpolate, Easing } from "remotion"
 
 interface ContentSlideProps {
@@ -61,6 +61,9 @@ export const ContentSlide: React.FC<ContentSlideProps> = ({
   // Extract Pollinations Image URL if available
   const imgUrlStr = visualElements.find(el => el.startsWith("IMAGE_URL:"))
   const imageUrl = imgUrlStr ? imgUrlStr.replace("IMAGE_URL:", "") : null
+  
+  // Track if Pollinations image failed to generate/load
+  const [imageFailed, setImageFailed] = useState(false)
 
   const getStyleColors = () => {
     switch (style) {
@@ -137,7 +140,7 @@ export const ContentSlide: React.FC<ContentSlideProps> = ({
         {/* Text Section */}
         <div
           style={{
-            flex: imageUrl ? 1 : 2,
+            flex: (imageUrl && !imageFailed) ? 1 : 2,
             color: colors.textColor,
             fontSize: "2rem",
             lineHeight: 1.6,
@@ -199,7 +202,7 @@ export const ContentSlide: React.FC<ContentSlideProps> = ({
         </div>
         
         {/* Image Section */}
-        {imageUrl && (
+        {(imageUrl && !imageFailed) && (
           <div
             style={{
               flex: 1,
@@ -224,12 +227,11 @@ export const ContentSlide: React.FC<ContentSlideProps> = ({
                 background: `${colors.accent}10`,
               }}
             >
-              {/* Note: since Pollinations might take a second to generate the first time, 
-                  Remotion will handle the <img/> load automatically during rendering. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
                 src={imageUrl} 
                 alt={title} 
+                onError={() => setImageFailed(true)}
                 style={{
                   width: "100%",
                   height: "100%",

@@ -54,7 +54,14 @@ export async function generateTTS(options: TTSOptions): Promise<TTSResult> {
   }
 
   const tryHuggingFace = async (): Promise<TTSResult> => {
-    const res = await generateHuggingFaceTTS({ text })
+    // If user selected a male voice in EdgeTTS (Guy, William, Tony, Ryan), map to a masculine-tending model
+    const isMale = voice && (voice.toLowerCase().includes("male") || voice.includes("Guy") || voice.includes("William") || voice.includes("Tony") || voice.includes("Ryan"))
+    const hfModel = isMale ? "suno/bark-small" : "facebook/mms-tts-eng"
+    
+    // Add warning context for Bark limits if used
+    if (isMale) console.log("[generate-audio] Warning: Using Bark on HF free tier may be slower.")
+    
+    const res = await generateHuggingFaceTTS({ text, model: hfModel })
     const duration = await mp3Duration(res.buffer)
     return { buffer: res.buffer, duration, format: res.format, provider: "huggingface" as TTSProvider }
   }
@@ -111,9 +118,9 @@ export async function generateTTS(options: TTSOptions): Promise<TTSResult> {
   // then add remaining providers as fallbacks for resilience.
   if (provider === "edge-tts") {
     providers.push({ name: "edge-tts", fn: tryEdgeTTS })
-    providers.push({ name: "google-tts", fn: tryGoogleTTS })
-    if (process.env.HUGGING_FACE_API_KEY || process.env.HUGGINGFACE_API_KEY) providers.push({ name: "huggingface", fn: tryHuggingFace })
     if (process.env.ELEVENLABS_API_KEY) providers.push({ name: "elevenlabs", fn: tryElevenLabs })
+    if (process.env.HUGGING_FACE_API_KEY || process.env.HUGGINGFACE_API_KEY) providers.push({ name: "huggingface", fn: tryHuggingFace })
+    providers.push({ name: "google-tts", fn: tryGoogleTTS }) // Absolute last resort because it only has 1 mono-gender voice
   } else if (provider === "google-tts") {
     providers.push({ name: "google-tts", fn: tryGoogleTTS })
     providers.push({ name: "edge-tts", fn: tryEdgeTTS })

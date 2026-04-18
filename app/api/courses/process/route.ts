@@ -179,7 +179,7 @@ Return the JSON in this exact format:
         prompt: userPrompt,
         systemPrompt,
         temperature: 0.6,
-        maxTokens: 5000,
+        maxTokens: 3200,
       })
       aiResponseText = groqResponse.text
       console.log("Groq generation successful, response length:", aiResponseText.length)
@@ -195,7 +195,7 @@ Return the JSON in this exact format:
           prompt: userPrompt,
           systemPrompt,
           temperature: 0.7,
-          maxTokens: 5000,
+          maxTokens: 3200,
         })
         aiResponseText = aiResponse.text
         console.log("Gemini generation successful, response length:", aiResponseText.length)
