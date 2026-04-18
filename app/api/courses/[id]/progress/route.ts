@@ -113,9 +113,89 @@ export async function POST(
       )
     }
 
+    let certificateAwarded = false
+    let newCertificate = null
+
+    // Check for course completion to trigger auto-certificates if the slide was just completed
+    if (completed) {
+      // 1. Get total slides in course
+      const { count: totalSlides } = await supabase
+        .from("course_slides")
+        .select("id", { count: "exact", head: true })
+        .eq("course_id", params.id)
+        
+      // 2. Get completed slides by user
+      const { count: completedSlides } = await supabase
+        .from("course_progress")
+        .select("id", { count: "exact", head: true })
+        .eq("course_id", params.id)
+        .eq("user_id", user.id)
+        .eq("completed", true)
+
+      if (totalSlides && totalSlides > 0 && completedSlides === totalSlides) {
+        // Course is 100% completed
+        // 3. Check if certificate already exists
+        const { data: existingCert } = await supabase
+          .from("certificates")
+          .select("id")
+          .eq("course_id", params.id)
+          .eq("user_id", user.id)
+          .single()
+
+        if (!existingCert) {
+          // 4. Time to mint a certificate! First get course and user info
+          const { data: courseData } = await supabase
+            .from("courses")
+            .select("title")
+            .eq("id", params.id)
+            .single()
+
+          const { data: userData } = await (supabase as any)
+            .from("profiles")
+            .select("full_name, avatar_url")
+            .eq("id", user.id)
+            .single()
+
+          const recipientName = userData?.full_name || user.email?.split('@')[0] || "Student"
+          const certNumber = `EDUSPHERE-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+
+          // 5. Create certificate
+          const { data: createdCert, error: certError } = await supabase
+            .from("certificates")
+            .insert({
+              user_id: user.id,
+              course_id: params.id,
+              title: courseData?.title || "Edusphere Course",
+              certificate_number: certNumber,
+              template_id: "course_completion",
+              theme_color: "from-blue-500 to-cyan-500",
+              status: "active",
+              metadata: {
+                recipient_name: recipientName,
+                course_title: courseData?.title,
+                student_avatar: userData?.avatar_url,
+                total_slides: totalSlides,
+                issue_date: new Date().toISOString()
+              }
+            })
+            .select()
+            .single()
+
+          if (!certError) {
+            certificateAwarded = true
+            newCertificate = createdCert
+          } else {
+            console.error("[generate-certificate] Failed to insert:", certError)
+          }
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       progress,
+      certificateAwarded,
+      certificate: newCertificate
     })
   } catch (error: any) {
     console.error("Progress API error:", error)

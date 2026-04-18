@@ -194,24 +194,40 @@ export default function PodcastsPage() {
                                 className="cursor-pointer group"
                             >
                                 <div
-                                    className="p-6"
+                                    className="p-0 overflow-hidden flex flex-col h-full"
                                     onClick={() => {
                                         if (podcast.status === "completed") {
                                             router.push(`/dashboard/podcasts/${podcast.id}`)
                                         }
                                     }}
                                 >
-                                    <div className="flex justify-between items-start mb-3">
-                                        <div className="flex-1 min-w-0 mr-2">
-                                            <h3 className="text-lg font-bold text-foreground mb-1 truncate group-hover:text-purple-400 transition-colors">
+                                    {/* Cover Image Area */}
+                                    <div className="relative w-full aspect-video bg-gradient-to-br from-purple-900/40 to-indigo-900/40 border-b border-foreground/10 overflow-hidden">
+                                        {podcast.cover_image_url ? (
+                                            <img 
+                                                src={podcast.cover_image_url} 
+                                                alt={podcast.title}
+                                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <Podcast className="h-10 w-10 text-foreground/20" />
+                                            </div>
+                                        )}
+                                        <div className="absolute top-3 right-3">
+                                            {statusBadge(podcast.status)}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="p-5 flex-col flex flex-1">
+                                        <div className="mb-3">
+                                            <h3 className="text-lg font-bold text-foreground mb-1 line-clamp-2 group-hover:text-purple-400 transition-colors leading-tight">
                                                 {podcast.title}
                                             </h3>
-                                            <p className="text-sm text-foreground/50 truncate">
+                                            <p className="text-sm text-foreground/50 line-clamp-1">
                                                 {podcast.topic}
                                             </p>
                                         </div>
-                                        {statusBadge(podcast.status)}
-                                    </div>
 
                                     <div className="flex items-center gap-4 text-xs text-foreground/50 mb-4">
                                         {podcast.duration > 0 && (
@@ -270,7 +286,7 @@ export default function PodcastsPage() {
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="text-red-400 hover:text-red-300"
+                                            className="text-red-400 hover:text-red-300 ml-auto"
                                             onClick={(e) => {
                                                 e.stopPropagation()
                                                 handleDelete(podcast.id)
@@ -279,6 +295,7 @@ export default function PodcastsPage() {
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
+                                    </div>
                                     </div>
                                 </div>
                             </AnimatedCard>

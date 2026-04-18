@@ -58,6 +58,10 @@ export const ContentSlide: React.FC<ContentSlideProps> = ({
   const parsedContent = parseContent(content)
   const visibleWords = words.slice(0, wordsToShow).join(" ")
 
+  // Extract Pollinations Image URL if available
+  const imgUrlStr = visualElements.find(el => el.startsWith("IMAGE_URL:"))
+  const imageUrl = imgUrlStr ? imgUrlStr.replace("IMAGE_URL:", "") : null
+
   const getStyleColors = () => {
     switch (style) {
       case "cinematic":
@@ -120,67 +124,121 @@ export const ContentSlide: React.FC<ContentSlideProps> = ({
         {title}
       </h2>
 
-      {/* Content */}
+      {/* Content Area - Split if image exists */}
       <div
         style={{
           flex: 1,
-          color: colors.textColor,
-          fontSize: "2rem",
-          lineHeight: 1.6,
+          display: "flex",
+          flexDirection: "row",
+          gap: "3rem",
           transform: `translateX(${translateX}px)`,
         }}
       >
-        {parsedContent.map((item, index) => {
-          if (item.type === "spacer") {
-            return <div key={index} style={{ height: "1rem" }} />
-          }
+        {/* Text Section */}
+        <div
+          style={{
+            flex: imageUrl ? 1 : 2,
+            color: colors.textColor,
+            fontSize: "2rem",
+            lineHeight: 1.6,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {parsedContent.map((item, index) => {
+            if (item.type === "spacer") {
+              return <div key={index} style={{ height: "1rem" }} />
+            }
 
-          const itemWords = item.text.split(" ")
-          const itemWordsToShow = Math.max(0, wordsToShow - words.slice(0, index).join(" ").split(" ").length)
-          const visibleItemText = itemWords.slice(0, itemWordsToShow).join(" ")
+            const itemWords = item.text.split(" ")
+            const itemWordsToShow = Math.max(0, wordsToShow - words.slice(0, index).join(" ").split(" ").length)
+            const visibleItemText = itemWords.slice(0, itemWordsToShow).join(" ")
 
-          if (item.type === "bullet") {
-            return (
-              <div
-                key={index}
-                style={{
-                  marginBottom: "1rem",
-                  display: "flex",
-                  alignItems: "flex-start",
-                }}
-              >
-                <span
+            if (item.type === "bullet") {
+              return (
+                <div
+                  key={index}
                   style={{
-                    color: colors.accent,
-                    marginRight: "1rem",
-                    fontSize: "2rem",
+                    marginBottom: "1rem",
+                    display: "flex",
+                    alignItems: "flex-start",
                   }}
                 >
-                  •
-                </span>
-                <span>{visibleItemText}</span>
-              </div>
-            )
-          } else if (item.type === "h1") {
-            return (
-              <h1 key={index} style={{ fontSize: "3rem", marginBottom: "1rem", marginTop: "1rem" }}>
-                {item.text}
-              </h1>
-            )
-          } else if (item.type === "h2") {
-            return (
-              <h2 key={index} style={{ fontSize: "2.5rem", marginBottom: "1rem", marginTop: "1rem" }}>
-                {item.text}
-              </h2>
-            )
-          } else {
-            return (
-              <p key={index} style={{ marginBottom: "1rem" }}>
-                {visibleItemText}
-              </p>
-            )
-          }
-        })}
+                  <span
+                    style={{
+                      color: colors.accent,
+                      marginRight: "1rem",
+                      fontSize: "2rem",
+                    }}
+                  >
+                    •
+                  </span>
+                  <span>{visibleItemText}</span>
+                </div>
+              )
+            } else if (item.type === "h1") {
+              return (
+                <h1 key={index} style={{ fontSize: "3rem", marginBottom: "1rem", marginTop: "1rem" }}>
+                  {item.text}
+                </h1>
+              )
+            } else if (item.type === "h2") {
+              return (
+                <h2 key={index} style={{ fontSize: "2.5rem", marginBottom: "1rem", marginTop: "1rem" }}>
+                  {item.text}
+                </h2>
+              )
+            } else {
+              return (
+                <p key={index} style={{ marginBottom: "1rem" }}>
+                  {visibleItemText}
+                </p>
+              )
+            }
+          })}
+        </div>
+        
+        {/* Image Section */}
+        {imageUrl && (
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                maxHeight: "60vh",
+                borderRadius: "1.5rem",
+                overflow: "hidden",
+                border: `2px solid ${colors.accent}40`,
+                boxShadow: `0 20px 40px ${colors.accent}20`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: `${colors.accent}10`,
+              }}
+            >
+              {/* Note: since Pollinations might take a second to generate the first time, 
+                  Remotion will handle the <img/> load automatically during rendering. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src={imageUrl} 
+                alt={title} 
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

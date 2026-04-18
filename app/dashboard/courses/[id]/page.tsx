@@ -38,6 +38,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import confetti from "canvas-confetti"
 
 // Dynamically import Remotion Player to avoid SSR issues
 const RemotionPlayer = dynamic(
@@ -240,6 +241,8 @@ function CourseDetailContent() {
   }, [supabase, params.id, course])
 
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false)
+  const [showCertificateModal, setShowCertificateModal] = useState(false)
+  const [certificateData, setCertificateData] = useState<any>(null)
 
   const generateAudio = async () => {
     if (!params.id || isGeneratingAudio) return
@@ -339,12 +342,39 @@ function CourseDetailContent() {
     }
   }
 
-  const handleUpdateProgress = async (slideId: string, completed: boolean, timeSpent: number) => {
+  const handleUpdateProgress = async (slideId: string, completed: boolean, timeSpent: number = 0) => {
     if (!supabase || !params.id) return
+
+    // Optimistic UI update
+    setProgress((prev: any) => {
+      const hasPrevData = prev?.data || []
+      const existingIdx = hasPrevData.findIndex((p: any) => p.slide_id === slideId)
+      let newData = [...hasPrevData]
+      
+      if (existingIdx >= 0) {
+        newData[existingIdx] = { ...newData[existingIdx], completed }
+      } else {
+        newData.push({ slide_id: slideId, completed })
+      }
+      
+      const totalSlides = course?.layout?.chapters?.reduce(
+        (total: number, ch: any) => total + (ch.slides?.length || 0), 0
+      ) || 0
+      
+      const completedSlides = newData.filter(p => p.completed).length
+      
+      return {
+        ...prev,
+        totalSlides,
+        completedSlides,
+        progressPercentage: totalSlides > 0 ? Math.round((completedSlides / totalSlides) * 100) : 0,
+        data: newData
+      }
+    })
 
     try {
       if (params.id) {
-        await fetch(`/api/courses/${params.id}/progress`, {
+        const res = await fetch(`/api/courses/${params.id}/progress`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -353,6 +383,22 @@ function CourseDetailContent() {
             timeSpent,
           }),
         })
+
+        const data = await res.json()
+        
+        if (data.certificateAwarded) {
+           // We achieved 100% completion!
+           setCertificateData(data.certificate)
+           setShowCertificateModal(true)
+           
+           // Fire confetti
+           confetti({
+             particleCount: 150,
+             spread: 70,
+             origin: { y: 0.6 },
+             colors: ['#3b82f6', '#06b6d4', '#10b981']
+           })
+        }
 
         // Track analytics
         await fetch(`/api/courses/${params.id}/analytics`, {
@@ -568,7 +614,7 @@ function CourseDetailContent() {
               <h1 className="text-3xl md:text-4xl font-bold mb-2 text-foreground">
                 {course.title}
               </h1>
-              <div className="flex items-center gap-4 text-foreground/60 text-sm">
+              <div className="flex items-center gap-4 text-foreground/60 text-sm mb-4">
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   <span>{formatDuration(course.estimated_duration)}</span>
@@ -580,6 +626,24 @@ function CourseDetailContent() {
                   </div>
                 )}
               </div>
+              
+              {/* Progress Bar */}
+              {progress !== null && course.status === "completed" && (
+                <div className="max-w-md space-y-1.5 mt-2">
+                  <div className="flex justify-between text-xs text-foreground/70">
+                    <span>Course Progress</span>
+                    <span className={progress.progressPercentage === 100 ? "text-emerald-400 font-semibold" : ""}>
+                      {progress.completedSlides} of {progress.totalSlides} slides ({progress.progressPercentage}%)
+                    </span>
+                  </div>
+                  <div className="h-2 w-full bg-foreground/10 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full duration-500 ease-out ${progress.progressPercentage === 100 ? "bg-emerald-500" : "bg-cyan-500"}`}
+                      style={{ width: `${Math.max(0, Math.min(100, progress.progressPercentage || 0))}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             {course.status === "completed" && (
               <Button
@@ -696,47 +760,73 @@ function CourseDetailContent() {
                       <>
                         {chapter.slides && chapter.slides.length > 0 && (
                           <div className="mt-3 space-y-2">
-                            {chapter.slides.map((slide: any, slideIndex: number) => (
-                              <div
-                                key={slide.slideId || slideIndex}
-                                className="p-3 rounded bg-white/5 border border-foreground/5 hover:border-cyan-500/30 transition-colors group"
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <Badge variant="outline" className="border-foreground/20 text-foreground/70 text-xs">
-                                        {slide.type?.replace("-", " ") || "slide"}
-                                      </Badge>
-                                      <span className="text-white/90 font-medium text-sm">
-                                        {slide.content?.title || `Slide ${slideIndex + 1}`}
-                                      </span>
-                                    </div>
-                                    {slide.content?.body && (
-                                      <p className="text-foreground/60 text-xs line-clamp-2 mt-1">
-                                        {slide.content.body.replace(/[#*`]/g, "").substring(0, 100)}...
-                                      </p>
-                                    )}
-                                  </div>
-                                  <div className="flex items-center gap-2 ml-4">
-                                    <div className="text-foreground/50 text-xs">
-                                      {slide.estimatedDuration || 30}s
-                                    </div>
-                                    <Button
-                                      onClick={() => {
-                                        setSelectedSlide(slide)
-                                        setSelectedChapter(chapter)
-                                        setSidePanelOpen(true)
-                                      }}
-                                      variant="ghost"
-                                      size="sm"
-                                      className="opacity-0 group-hover:opacity-100 transition-opacity text-foreground/70 hover:text-foreground hover:bg-foreground/10 h-7 px-2"
-                                    >
-                                      <Sparkles className="h-3 w-3" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                            {chapter.slides.map((slide: any, slideIndex: number) => {
+                                      const isSlideCompleted = progress?.data?.some((p: any) => p.slide_id === slide.slideId && p.completed)
+                                      
+                                      return (
+                                        <div
+                                          key={slide.slideId || slideIndex}
+                                          className={`p-3 rounded border transition-colors group ${
+                                            isSlideCompleted 
+                                              ? 'bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40' 
+                                              : 'bg-white/5 border-foreground/5 hover:border-cyan-500/30'
+                                          }`}
+                                        >
+                                          <div className="flex items-center justify-between">
+                                            <div className="flex-1 flex gap-3">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className={`mt-0.5 shrink-0 rounded-full h-6 w-6 p-0 transition-colors ${
+                                                  isSlideCompleted 
+                                                    ? 'text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10' 
+                                                    : 'text-foreground/30 hover:text-foreground hover:bg-foreground/10'
+                                                }`}
+                                                onClick={(e) => {
+                                                  e.stopPropagation()
+                                                  handleUpdateProgress(slide.slideId, !isSlideCompleted)
+                                                }}
+                                              >
+                                                <CheckCircle className="h-5 w-5" />
+                                              </Button>
+                                              
+                                              <div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                  <Badge variant="outline" className="border-foreground/20 text-foreground/70 text-xs">
+                                                    {slide.type?.replace("-", " ") || "slide"}
+                                                  </Badge>
+                                                  <span className="text-white/90 font-medium text-sm">
+                                                    {slide.content?.title || `Slide ${slideIndex + 1}`}
+                                                  </span>
+                                                </div>
+                                                {slide.content?.body && (
+                                                  <p className="text-foreground/60 text-xs line-clamp-2 mt-1">
+                                                    {slide.content.body.replace(/[#*`]/g, "").substring(0, 100)}...
+                                                  </p>
+                                                )}
+                                              </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 ml-4">
+                                              <div className="text-foreground/50 text-xs">
+                                                {slide.estimatedDuration || 30}s
+                                              </div>
+                                              <Button
+                                                onClick={() => {
+                                                  setSelectedSlide(slide)
+                                                  setSelectedChapter(chapter)
+                                                  setSidePanelOpen(true)
+                                                }}
+                                                variant="ghost"
+                                                size="sm"
+                                                className="opacity-0 group-hover:opacity-100 transition-opacity text-foreground/70 hover:text-foreground hover:bg-foreground/10 h-7 px-2"
+                                              >
+                                                <Sparkles className="h-3 w-3" />
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )
+                                    })}
                           </div>
                         )}
                         <div className="mt-3 pt-3 border-t border-foreground/10">
@@ -846,6 +936,53 @@ function CourseDetailContent() {
               ) : (
                 "Generate Chapters"
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Certificate Unlocked Modal */}
+      <Dialog open={showCertificateModal} onOpenChange={setShowCertificateModal}>
+        <DialogContent className="glass-surface border-foreground/20 text-foreground sm:max-w-[450px] overflow-hidden">
+          <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-emerald-400 to-cyan-500" />
+          <DialogHeader className="pt-4 text-center items-center">
+            <div className="rounded-full bg-emerald-500/20 p-3 mb-2 flex items-center justify-center border border-emerald-500/30">
+              <CheckCircle className="h-8 w-8 text-emerald-400" />
+            </div>
+            <DialogTitle className="text-2xl font-bold">Course Completed!</DialogTitle>
+            <DialogDescription className="text-md text-foreground/80 mt-2">
+              Congratulations! You've successfully finished <strong>{course?.title}</strong>.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-6 flex flex-col items-center justify-center space-y-4">
+            <div className="w-full relative aspect-[1.414/1] rounded-lg overflow-hidden border border-foreground/20 shadow-2xl bg-gradient-to-br from-blue-900 to-cyan-900 p-6 flex flex-col justify-between">
+               <div className="flex justify-between items-start opacity-50">
+                 <Sparkles className="h-4 w-4" />
+                 <span className="text-[10px] tracking-widest uppercase">Official Certificate</span>
+               </div>
+               <div className="text-center space-y-2">
+                 <h4 className="text-3xl font-serif text-white opacity-90 italic">Certificate</h4>
+                 <div className="text-xs text-white/70 uppercase tracking-widest">of Completion</div>
+                 <div className="w-16 h-px bg-cyan-500 mx-auto my-4" />
+                 <h2 className="text-xl text-white font-bold">{certificateData?.metadata?.recipient_name}</h2>
+               </div>
+               <div className="flex justify-between items-end opacity-70">
+                 <div className="text-[10px]">{certificateData?.certificate_number}</div>
+                 <div className="text-[10px]">{new Date().toLocaleDateString()}</div>
+               </div>
+            </div>
+            <p className="text-sm text-foreground/60 text-center px-4">
+              Your certificate has been permanently saved to your profile and is cryptographically verifiable.
+            </p>
+          </div>
+          <DialogFooter className="flex gap-2 sm:justify-center">
+            <Button variant="outline" onClick={() => setShowCertificateModal(false)}>
+              Close
+            </Button>
+            <Button className="bg-gradient-to-r from-emerald-500 to-cyan-600 text-white" asChild>
+              <Link href="/dashboard/certificates">
+                View My Certificates
+              </Link>
             </Button>
           </DialogFooter>
         </DialogContent>

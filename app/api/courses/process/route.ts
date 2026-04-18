@@ -113,8 +113,8 @@ Requirements:
 
 Course structure (MINIMAL - for fast generation, can be enhanced later):
 - For "quick-explainer": 1-2 chapters, 2-3 slides per chapter
-- For "full-course": 3-5 chapters, 3-4 slides per chapter
-- For "tutorial": 2-4 chapters, 2-3 slides per chapter
+- For "full-course": 4-6 chapters, 4-6 slides per chapter (CRITICAL: Do not just make 2 chapters, create a truly comprehensive full course)
+- For "tutorial": 2-4 chapters, 2-4 slides per chapter
 
 NARRATION SCRIPT RULES (THIS IS CRITICAL):
 The "narrationScript" field is THE MOST IMPORTANT part. It will be read aloud by a text-to-speech engine and is the primary learning experience for the student. Follow these rules strictly:
@@ -179,7 +179,7 @@ Return the JSON in this exact format:
         prompt: userPrompt,
         systemPrompt,
         temperature: 0.6,
-        maxTokens: 3200,
+        maxTokens: 5000,
       })
       aiResponseText = groqResponse.text
       console.log("Groq generation successful, response length:", aiResponseText.length)
@@ -195,7 +195,7 @@ Return the JSON in this exact format:
           prompt: userPrompt,
           systemPrompt,
           temperature: 0.7,
-          maxTokens: 3200,
+          maxTokens: 5000,
         })
         aiResponseText = aiResponse.text
         console.log("Gemini generation successful, response length:", aiResponseText.length)
@@ -275,6 +275,19 @@ Return the JSON in this exact format:
       for (const slide of chapter.slides || []) {
         slide.slideId = crypto.randomUUID()
         chapterTotal += (slide.estimatedDuration || 30)
+        
+        // Inject Pollinations AI Image for every content slide
+        if (slide.type === "content-slide") {
+          const imagePrompt = `Educational illustration for ${topic}: ${slide.content.title}. clean flat art, modern ${style} style, clean background, no text, no logo`
+          const encodedPrompt = encodeURIComponent(imagePrompt)
+          const seed = Math.floor(Math.random() * 1000000)
+          const imgUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=450&model=flux&nologo=true&enhance=true&seed=${seed}`
+          
+          if (!slide.content.visualElements) {
+            slide.content.visualElements = []
+          }
+          slide.content.visualElements.push(`IMAGE_URL:${imgUrl}`)
+        }
       }
       totalDuration += chapterTotal
     }

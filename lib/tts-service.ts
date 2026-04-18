@@ -2,6 +2,7 @@ import { generateElevenLabsTTS, getElevenLabsVoices } from "./elevenlabs"
 import { generateEdgeTTS, getEdgeTTSVoices, EDGE_TTS_POPULAR_VOICES } from "./edge-tts"
 import { generateGoogleTTS } from "./google-tts"
 import { generateHuggingFaceTTS } from "./huggingface-tts"
+import mp3Duration from "mp3-duration"
 
 export type TTSProvider = "google-tts" | "huggingface" | "edge-tts" | "elevenlabs" | "google-cloud"
 
@@ -46,42 +47,59 @@ export async function generateTTS(options: TTSOptions): Promise<TTSResult> {
   type ProviderAttempt = { name: TTSProvider; fn: () => Promise<TTSResult> }
   const providers: ProviderAttempt[] = []
 
-  const tryGoogleTTS = (): Promise<TTSResult> => 
-    generateGoogleTTS({ text, lang: "en", slow: false }).then(res => ({
-      buffer: res.buffer, duration: res.duration, format: res.format, provider: "google-tts" as TTSProvider
-    }))
-
-  const tryHuggingFace = (): Promise<TTSResult> => 
-    generateHuggingFaceTTS({ text }).then(res => ({
-      buffer: res.buffer, duration: res.duration, format: res.format, provider: "huggingface" as TTSProvider
-    }))
-
-  const tryElevenLabs = (): Promise<TTSResult> => {
-    // Edge-TTS voices (e.g., 'en-US-AriaNeural') are invalid for ElevenLabs.
-    const isEdgeVoice = voice && (voice.includes("-") || voice.includes("Neural"));
-    return generateElevenLabsTTS({
-      text,
-      voiceId: isEdgeVoice ? undefined : voice,
-    }).then((result) => ({
-      buffer: result.buffer,
-      duration: estimatedDuration,
-      format: "mp3" as const,
-      provider: "elevenlabs" as TTSProvider,
-    }))
+  const tryGoogleTTS = async (): Promise<TTSResult> => {
+    const res = await generateGoogleTTS({ text, lang: "en", slow: false })
+    const duration = await mp3Duration(res.buffer)
+    return { buffer: res.buffer, duration, format: res.format, provider: "google-tts" as TTSProvider }
   }
 
-  const tryEdgeTTS = (): Promise<TTSResult> =>
-    generateEdgeTTS({
+  const tryHuggingFace = async (): Promise<TTSResult> => {
+    const res = await generateHuggingFaceTTS({ text })
+    const duration = await mp3Duration(res.buffer)
+    return { buffer: res.buffer, duration, format: res.format, provider: "huggingface" as TTSProvider }
+  }
+
+  const tryElevenLabs = async (): Promise<TTSResult> => {
+    // Edge-TTS voices (e.g., 'en-US-AriaNeural') are invalid for ElevenLabs.
+    const isEdgeVoice = voice && (voice.includes("-") || voice.includes("Neural"));
+    const result = await generateElevenLabsTTS({
       text,
-      voice: voice || "en-US-AriaNeural",
-      rate: options.rate || "+0%",
-      pitch: options.pitch || "+0Hz",
-    }).then((result) => ({
+      voiceId: isEdgeVoice ? undefined : voice,
+    })
+    const duration = await mp3Duration(result.buffer)
+    return {
       buffer: result.buffer,
-      duration: estimatedDuration,
+      duration,
       format: "mp3" as const,
-      provider: "edge-tts" as TTSProvider,
-    }))
+      provider: "elevenlabs" as TTSProvider,
+    }
+  }
+
+  const tryEdgeTTS = async (): Promise<TTSResult> => {
+    let lastError: any
+    // Attempt Edge-TTS up to 3 times for resilience (Vercel networks can hiccup on Websockets)
+    for (let attempts = 0; attempts < 3; attempts++) {
+      try {
+        const result = await generateEdgeTTS({
+          text,
+          voice: voice || "en-US-AriaNeural",
+          rate: options.rate || "+0%",
+          pitch: options.pitch || "+0Hz",
+        })
+        const duration = await mp3Duration(result.buffer)
+        return {
+          buffer: result.buffer,
+          duration,
+          format: "mp3" as const,
+          provider: "edge-tts" as TTSProvider,
+        }
+      } catch (err) {
+        lastError = err
+        await new Promise(r => setTimeout(r, 1000)) // wait 1s before retry
+      }
+    }
+    throw lastError
+  }
 
   // Set the specific order: 
   // 1. google-tts

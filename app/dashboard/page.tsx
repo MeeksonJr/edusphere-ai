@@ -26,6 +26,7 @@ import { StreakWidget } from "@/components/dashboard/StreakWidget"
 import { DailyGoals } from "@/components/dashboard/DailyGoals"
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid"
 import { LearningPathWidget } from "@/components/dashboard/LearningPathWidget"
+import { ContinueLearningWidget } from "@/components/dashboard/ContinueLearningWidget"
 
 export default async function Dashboard() {
   const supabase = await createClient()
@@ -275,9 +276,17 @@ export default async function Dashboard() {
       ) : null
     },
     {
-      id: "up-next",
+      id: "continue-learning",
       content: (
         <ScrollReveal direction="left" delay={0.1}>
+          <ContinueLearningWidget />
+        </ScrollReveal>
+      )
+    },
+    {
+      id: "up-next",
+      content: (
+        <ScrollReveal direction="left" delay={0.15}>
           <LearningPathWidget />
         </ScrollReveal>
       )
