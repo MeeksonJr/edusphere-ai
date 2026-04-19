@@ -179,14 +179,14 @@ Return the JSON in this exact format:
         prompt: userPrompt,
         systemPrompt,
         temperature: 0.6,
-        maxTokens: 3200,
+        maxTokens: 8192,
       })
       aiResponseText = groqResponse.text
-      console.log("Groq generation successful, response length:", aiResponseText.length)
+      console.log(`Groq generation successful, response length: ${aiResponseText.length}, model: ${groqResponse.model}`)
     } catch (groqError: any) {
       console.error("Groq AI generation error:", groqError)
       lastError = groqError
-
+ 
       // Try Gemini as second fallback
       try {
         console.log("Falling back to Gemini...")
@@ -195,14 +195,14 @@ Return the JSON in this exact format:
           prompt: userPrompt,
           systemPrompt,
           temperature: 0.7,
-          maxTokens: 3200,
+          maxTokens: 8192,
         })
         aiResponseText = aiResponse.text
-        console.log("Gemini generation successful, response length:", aiResponseText.length)
+        console.log(`Gemini generation successful, response length: ${aiResponseText.length}, model: ${aiResponse.model}`)
       } catch (geminiError: any) {
         console.error("Gemini fallback also failed:", geminiError)
         lastError = geminiError
-
+ 
         // Try Hugging Face as final fallback
         try {
           console.log("Falling back to Hugging Face...")
@@ -211,9 +211,10 @@ Return the JSON in this exact format:
             prompt: `${systemPrompt}\n\n${userPrompt}`,
             systemPrompt: undefined,
             temperature: 0.7,
-            maxTokens: 3200,
+            maxTokens: 4096,
           })
           aiResponseText = hfResponse.text
+          console.log(`HuggingFace generation successful, response length: ${aiResponseText.length}`)
         } catch (hfError: any) {
           console.error("All AI providers failed:", { groqError, geminiError, hfError })
           await supabase
